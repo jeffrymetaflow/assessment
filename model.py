@@ -92,6 +92,9 @@ File "/mount/src/itrm/model.py", line 88
 ").replace("  ", "
 ").replace("## ", "").replace("### ", "").replace("---", "
 ----------------------
+").replace("  ", "
+").replace("## ", "").replace("### ", "").replace("---", "
+----------------------
 ")
 
 
