@@ -67,6 +67,78 @@ if section == "🧠 Overview Summary":
         summary_display = itrm_summary
     st.markdown(summary_display, unsafe_allow_html=True)
 
+elif section == "⚙️ Inputs Setup":
+    # Inputs tab content
+    if 'inputs' not in st.session_state:
+        st.session_state.inputs = {
+            'revenue_baseline': 739_000_000,
+            'it_expense_baseline': 4_977_370,
+            'category_revenue_split': [0.5, 0.2, 0.1, 0.15, 0.05],
+            'category_expense_split': [0.25, 0.2, 0.1, 0.1, 0.35],
+            'target_revenue_growth': [0.10, 0.05, 0.07],
+            'target_expense_growth': [0.06, 0.03, 0.03]
+        }
+
+    st.title("⚙️ ITRM Inputs Setup")
+
+    st.subheader("Baseline Financials")
+    st.session_state.inputs['revenue_baseline'] = st.number_input(
+        "Baseline Revenue ($)",
+        value=st.session_state.inputs['revenue_baseline']
+    )
+    st.session_state.inputs['it_expense_baseline'] = st.number_input(
+        "Baseline IT Expense ($)",
+        value=st.session_state.inputs['it_expense_baseline']
+    )
+
+    st.subheader("Application Category Splits")
+    category_labels = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
+    revenue_splits, expense_splits = [], []
+
+    for i, label in enumerate(category_labels):
+        col1, col2 = st.columns(2)
+        with col1:
+            rev = st.number_input(
+                f"{label} - % of Revenue", min_value=0.0, max_value=1.0,
+                value=st.session_state.inputs['category_revenue_split'][i], key=f"{label}_rev"
+            )
+            revenue_splits.append(rev)
+        with col2:
+            exp = st.number_input(
+                f"{label} - % of Expense", min_value=0.0, max_value=1.0,
+                value=st.session_state.inputs['category_expense_split'][i], key=f"{label}_exp"
+            )
+            expense_splits.append(exp)
+
+    st.session_state.inputs['category_revenue_split'] = revenue_splits
+    st.session_state.inputs['category_expense_split'] = expense_splits
+
+    st.subheader("Target Revenue & Expense Growth")
+    years = ["Year 1", "Year 2", "Year 3"]
+    rev_growth, exp_growth = [], []
+
+    for i, year in enumerate(years):
+        col1, col2 = st.columns(2)
+        with col1:
+            rev = st.number_input(
+                f"{year} Target Revenue Growth (%)", format="%.2f",
+                value=st.session_state.inputs['target_revenue_growth'][i],
+                key=f"{year}_rev_growth"
+            )
+            rev_growth.append(rev)
+        with col2:
+            exp = st.number_input(
+                f"{year} Target Expense Growth (%)", format="%.2f",
+                value=st.session_state.inputs['target_expense_growth'][i],
+                key=f"{year}_exp_growth"
+            )
+            exp_growth.append(exp)
+
+    st.session_state.inputs['target_revenue_growth'] = rev_growth
+    st.session_state.inputs['target_expense_growth'] = exp_growth
+
+    st.success("Inputs saved. You can now use them in the calculator.")
+
 elif section == "📊 ITRM Calculator":
     st.title("📊 ITRM Calculator")
     st.markdown("Data... Include cost inputs, margin graphs, and tool selection logic here.")
