@@ -267,11 +267,11 @@ elif section == "💰 ITRM Financial Summary":
 
 # AI Assistant Tab
 elif section == "🤖 AI Assistant":
-    import openai
+    from openai import OpenAI
     from streamlit_chat import message
 
     st.title("🤖 AI Assistant")
-    openai.api_key = st.secrets["OPENAI_API_KEY"]  # Store securely in secrets
+    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
     if "messages" not in st.session_state:
         st.session_state.messages = [
@@ -283,11 +283,11 @@ elif section == "🤖 AI Assistant":
     if user_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
         with st.spinner("Thinking..."):
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=st.session_state.messages
             )
-            msg = response["choices"][0]["message"]["content"]
+            msg = response.choices[0].message.content
             st.session_state.messages.append({"role": "assistant", "content": msg})
 
     for i, msg in enumerate(st.session_state.messages[1:]):
