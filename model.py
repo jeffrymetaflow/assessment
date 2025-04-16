@@ -79,18 +79,18 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
             def chapter_body(self, body):
                 self.set_font("DejaVu", "", 11)
                 self.multi_cell(0, 10, body)
-# Load the font before using it
-pdf = PDF()
-pdf.add_page()
-pdf.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)  # Ensure the TTF file is in your working directory
-pdf.add_font("DejaVu", "B", "DejaVuSans-Bold.ttf", uni=True)
-
-# Example usage
-pdf.set_font("DejaVu", size=11)
-pdf.chapter_body(cleaned_summary)
+        # Load the font before using it
         pdf = PDF()
         pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)  # Ensure the TTF file is in your working directory
+        pdf.add_font("DejaVu", "B", "DejaVuSans-Bold.ttf", uni=True)
+
+        # Example usage
+        pdf.set_font("DejaVu", size=11)
+        pdf.chapter_body(cleaned_summary)
+            pdf = PDF()
+            pdf.add_page()
+            pdf.set_auto_page_break(auto=True, margin=15)
 
         pdf.chapter_title("Client: " + (client_name if client_name else "<Client Name>"))
         cleaned_summary = (
