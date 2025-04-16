@@ -286,7 +286,7 @@ Please rate your cybersecurity maturity against the **NIST Cybersecurity Framewo
 - **3 – Developing**: Documented practices exist, but only partially implemented.
 - **4 – Managed**: Practices are implemented and actively managed.
 - **5 – Optimized**: Practices are well-integrated and continuously improved.
-""")")
+""")
 
     responses = []
     for control in nist_controls:
@@ -499,3 +499,4 @@ elif section == "📊 ITRM Calculator":
         st.markdown("- Monitor expense-heavy categories for targeted optimization.")
         st.markdown("- Validate whether revenue growth assumptions are realistic.")
         st.markdown("- Revisit automation or cloud strategies to reduce total IT spend.")
+
