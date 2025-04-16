@@ -7,6 +7,24 @@ section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "⚙️ Inputs Set
 # Shared Input
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
 
+# Logic: Display selected section
+if section == "🧠 Overview Summary":
+    st.title("🧠 IT Revenue Margin Strategy Summary")
+    itrm_summary = "..."  # (your markdown summary goes here)
+    summary_display = itrm_summary.replace("<Client Name>", client_name) if client_name else itrm_summary
+    st.markdown(summary_display, unsafe_allow_html=True)
+
+elif section == "⚙️ Inputs Setup":
+    # You can paste the entire content of the Inputs Tab here
+    # or better: call a function from inputs_tab.py if modularized
+    import inputs_tab
+    inputs_tab.render_inputs_tab()
+
+elif section == "📊 ITRM Calculator":
+    # Your calculator logic goes here or call a module
+    import calculator_tab
+    calculator_tab.render_calculator_tab()
+
 # Overview Markdown Template
 itrm_summary = """
 **Title:** IT Revenue Margin (ITRM) Overview Summary  
