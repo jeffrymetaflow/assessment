@@ -231,6 +231,9 @@ elif section == "💰 ITRM Financial Summary":
         cat_data.append([cat, expense, percent_exp, percent_rev])
 
     cat_df = pd.DataFrame(cat_data, columns=["Category", "Total IT Expense", "% of Expense", "% of Revenue"])
+    cat_df["Total IT Expense"] = cat_df["Total IT Expense"].apply(lambda x: f"${x:,.2f}")
+    cat_df["% of Expense"] = cat_df["% of Expense"].apply(lambda x: f"{x:.2f}%")
+    cat_df["% of Revenue"] = cat_df["% of Revenue"].apply(lambda x: f"{x:.2f}%")
     st.dataframe(cat_df)
 
     fig, ax = plt.subplots()
