@@ -6,7 +6,7 @@ from fpdf import FPDF
 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "⚙️ Inputs Setup", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🤖 AI Assistant"])
+section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "⚙️ Inputs Setup", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🤖 AI Assistant", "🔐 Cybersecurity Assessment"])
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
 
 # Overview Tab
@@ -265,6 +265,51 @@ elif section == "💰 ITRM Financial Summary":
     else:
         st.success("✅ Top IT spending aligns with top revenue driver, indicating strategic alignment.")
 
+# Cybersecurity Assessment Tab
+elif section == "🔐 Cybersecurity Assessment":
+    st.title("🔐 Cybersecurity Maturity Assessment")
+
+    nist_controls = [
+        "Identify - Asset Management",
+        "Protect - Access Control",
+        "Protect - Data Security",
+        "Detect - Anomalies and Events",
+        "Respond - Response Planning",
+        "Recover - Recovery Planning"
+    ]
+
+    st.markdown("Please rate your cybersecurity maturity against the NIST Cybersecurity Framework categories (1 = Not Started, 5 = Fully Implemented):")
+
+    responses = []
+    for control in nist_controls:
+        score = st.slider(control, min_value=1, max_value=5, value=3, key=f"cyber_nist_{control}")
+        responses.append(score)
+
+    st.session_state.cybersecurity_scores = dict(zip(nist_controls, responses))
+    average_score = sum(responses) / len(responses)
+
+    # Maturity Heatmap
+    st.subheader("🧭 Maturity Heatmap")
+    fig, ax = plt.subplots(figsize=(8, 1))
+    ax.imshow([responses], cmap='YlGn', aspect='auto')
+    ax.set_xticks(range(len(nist_controls)))
+    ax.set_xticklabels(nist_controls, rotation=45, ha="right")
+    ax.set_yticks([])
+    ax.set_title("NIST Domain Maturity Levels")
+    for i, score in enumerate(responses):
+        ax.text(i, 0, str(score), va='center', ha='center', color='black')
+    st.pyplot(fig)
+
+    st.markdown(f"### 🧮 Overall Cybersecurity Maturity Score: **{average_score:.2f} / 5**")
+    st.markdown(f"### 🧮 Overall Cybersecurity Maturity Score: **{average_score:.2f} / 5**")
+
+    if average_score >= 4.5:
+        st.success("Excellent maturity. Your cybersecurity posture appears robust.")
+    elif average_score >= 3.0:
+        st.info("Moderate maturity. Consider targeted improvements in specific areas.")
+    else:
+        st.warning("Low maturity. Immediate enhancements are recommended to reduce risk.")
+
 # AI Assistant Tab
 elif section == "🤖 AI Assistant":
     from openai import OpenAI, OpenAIError, RateLimitError, AuthenticationError
@@ -429,4 +474,5 @@ elif section == "📊 ITRM Calculator":
         st.markdown("- Monitor expense-heavy categories for targeted optimization.")
         st.markdown("- Validate whether revenue growth assumptions are realistic.")
         st.markdown("- Revisit automation or cloud strategies to reduce total IT spend.")
+
 
