@@ -61,12 +61,12 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
 
 **IT Revenue Margin – Driving Efficiency for Digital Transformation.**
 """
-    summary_display = itrm_summary.replace("<Client Name>", client_name) if client_name else itrm_summary
+     summary_display = itrm_summary.replace("<Client Name>", client_name) if client_name else itrm_summary
     st.markdown(summary_display, unsafe_allow_html=True)
     # Generate PDF with Summary, Chart, and Insights
     
 
-    st.stop()
+    
 
     if st.button("📄 Download Executive Summary PDF"):
         class PDF(FPDF):
@@ -89,6 +89,27 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
 
         pdf.chapter_title("Client: " + (client_name if client_name else "<Client Name>"))
         pdf.chapter_body(summary_display.replace("**", "").replace("<Client Name>", client_name if client_name else "<Client Name>").replace("  ", "\n").replace("## ", "").replace("### ", "").replace("---", "\n----------------------\n"))
+
+        # Add ITRM trend chart if available
+        if 'calculator_results' in st.session_state:
+            results = st.session_state.calculator_results
+            years = list(results.keys())
+            itrms = [results[y]['ITRM'] for y in years]
+
+            # Plot chart to BytesIO buffer
+            fig, ax = plt.subplots()
+            ax.plot(years, itrms, marker='o', linewidth=2)
+            ax.set_ylabel("IT Revenue Margin (%)")
+            ax.set_title("ITRM Over Time")
+
+            chart_buffer = BytesIO()
+            fig.savefig(chart_buffer, format="PNG")
+            chart_buffer.seek(0)
+
+            # Insert chart image into PDF
+            pdf.add_page()
+            pdf.chapter_title("ITRM Trend Chart")
+            pdf.image(chart_buffer, x=10, y=None, w=180)
 
         buffer = BytesIO()
         pdf.output(buffer)
