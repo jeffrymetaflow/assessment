@@ -95,7 +95,7 @@ cleaned_summary = (
     .replace("---", "----------------------")  # Replace horizontal rules
 )
         pdf.chapter_body(cleaned_summary)
-        File "/mount/src/itrm/model.py", line 88
+
           
         # Add ITRM trend chart if available
         if 'calculator_results' in st.session_state:
