@@ -94,7 +94,7 @@ cleaned_summary = (
     .replace("### ", "")  # Remove level 3 headers
     .replace("---", "----------------------")  # Replace horizontal rules
 )
-        pdf.chapter_body(cleaned_summary)
+    pdf.chapter_body(cleaned_summary)
 
           
         # Add ITRM trend chart if available
