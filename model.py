@@ -68,18 +68,26 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
     if st.button("📄 Download Executive Summary PDF"):
         class PDF(FPDF):
             def header(self):
-                self.set_font("Arial", "B", 12)
+                self.set_font("DejaVu", "B", 12)
                 self.cell(0, 10, "IT Revenue Margin Executive Summary", ln=True, align="C")
                 self.ln(5)
 
             def chapter_title(self, title):
-                self.set_font("Arial", "B", 12)
+                self.set_font("DejaVu", "B", 12)
                 self.cell(0, 10, title, ln=True, align="L")
 
             def chapter_body(self, body):
-                self.set_font("Arial", "", 11)
+                self.set_font("DejaVu", "", 11)
                 self.multi_cell(0, 10, body)
+# Load the font before using it
+pdf = PDF()
+pdf.add_page()
+pdf.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)  # Ensure the TTF file is in your working directory
+pdf.add_font("DejaVu", "B", "DejaVuSans-Bold.ttf", uni=True)
 
+# Example usage
+pdf.set_font("DejaVu", size=11)
+pdf.chapter_body(cleaned_summary)
         pdf = PDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
