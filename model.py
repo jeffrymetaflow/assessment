@@ -95,7 +95,6 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
             .replace("---", "\n----------------------\n")  # Replace horizontal rules with separator
         )
         pdf.chapter_body(cleaned_summary)
-File "/mount/src/itrm/model.py", line 88
           
         # Add ITRM trend chart if available
         if 'calculator_results' in st.session_state:
