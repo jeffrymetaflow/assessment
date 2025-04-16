@@ -65,10 +65,7 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
     st.markdown(summary_display, unsafe_allow_html=True)
     # Generate PDF with Summary, Chart, and Insights
     
-
-    
-
-    if st.button("📄 Download Executive Summary PDF"):
+        if st.button("📄 Download Executive Summary PDF"):
         class PDF(FPDF):
             def header(self):
                 self.set_font("Arial", "B", 12)
