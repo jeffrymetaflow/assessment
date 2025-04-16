@@ -84,11 +84,8 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
 
-        pdf.chapter_title("Client: " + (client_name if client_name else "<Client Name>"))
+       pdf.chapter_title("Client: " + (client_name if client_name else "<Client Name>"))
         cleaned_summary = summary_display.replace("**", "").replace("<Client Name>", client_name if client_name else "<Client Name>").replace("  ", "
-").replace("## ", "").replace("### ", "").replace("---", "
-----------------------
-").replace("  ", "
 ").replace("## ", "").replace("### ", "").replace("---", "
 ----------------------
 ")
