@@ -278,7 +278,15 @@ elif section == "🔐 Cybersecurity Assessment":
         "Recover - Recovery Planning"
     ]
 
-    st.markdown("Please rate your cybersecurity maturity against the NIST Cybersecurity Framework categories (1 = Not Started, 5 = Fully Implemented):")
+    st.markdown("""
+Please rate your cybersecurity maturity against the **NIST Cybersecurity Framework** categories. Use the scale below to self-assess how well your organization addresses each area:
+
+- **1 – Not Started**: No formal practices or policies in place.
+- **2 – Initial**: Informal practices exist but are not documented or consistent.
+- **3 – Developing**: Documented practices exist, but only partially implemented.
+- **4 – Managed**: Practices are implemented and actively managed.
+- **5 – Optimized**: Practices are well-integrated and continuously improved.
+"""):")
 
     responses = []
     for control in nist_controls:
