@@ -69,7 +69,7 @@ if section == "🧠 Overview Summary":
 
 elif section == "📊 ITRM Calculator":
     st.title("📊 ITRM Calculator")
-    st.markdown("Coming soon... Include cost inputs, margin graphs, and tool selection logic here.")
+    st.markdown("Data... Include cost inputs, margin graphs, and tool selection logic here.")
 
 import streamlit as st
 import pandas as pd
