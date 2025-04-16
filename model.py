@@ -2,7 +2,7 @@ import streamlit as st
 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", ["📊 ITRM Calculator", "🧠 Overview Summary"])
+section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "📊 ITRM Calculator"])
 
 # Shared Input
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
