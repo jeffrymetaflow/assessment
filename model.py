@@ -68,54 +68,59 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
 elif section == "💰 ITRM Financial Summary":
     st.title("💰 ITRM Financial Summary")
 
-    uploaded_file = st.file_uploader("Upload ITRM Workbook (.xlsx)", type="xlsx")
+    if 'inputs' not in st.session_state:
+        st.warning("Please set up your inputs in the Inputs Setup tab.")
+        st.stop()
+    if 'calculator_results' not in st.session_state:
+        st.warning("Please run the calculator to populate financial data.")
+        st.stop()
 
-    if uploaded_file:
-        try:
-            df = pd.read_excel(uploaded_file, sheet_name="ITRM Financial Summary", header=None)
-            df.dropna(how='all', inplace=True)
+    inputs = st.session_state.inputs
+    results = st.session_state.calculator_results
+    categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
 
-            # Display core tables
-            st.subheader("📊 Category Financial Breakdown")
-            cat_df = df.iloc[1:7, 0:4]
-            cat_df.columns = ["Category", "Total IT Expense", "% of Expense", "% of Revenue"]
-            cat_df.reset_index(drop=True, inplace=True)
-            st.dataframe(cat_df)
+    st.subheader("📊 Category Financial Breakdown (Year 3)")
+    year = "Year 3"
+    revenue = inputs['revenue_baseline'] * (1 + inputs['target_revenue_growth'][2])
+    cat_data = []
+    for i, cat in enumerate(categories):
+        split = inputs['category_revenue_split'][i]
+        expense = results[year]['category_expenses'][i]
+        percent_exp = expense / results[year]['Total Expense'] * 100
+        percent_rev = split * 100
+        cat_data.append([cat, expense, percent_exp, percent_rev])
 
-            # Show comparison chart
-            fig, ax = plt.subplots()
-            ax.bar(cat_df["Category"], cat_df["% of Expense"], label="% of Expense")
-            ax.bar(cat_df["Category"], cat_df["% of Revenue"], alpha=0.5, label="% of Revenue")
-            ax.set_title("Expense vs Revenue Distribution by Category")
-            ax.set_ylabel("%")
-            ax.legend()
-            st.pyplot(fig)
+    cat_df = pd.DataFrame(cat_data, columns=["Category", "Total IT Expense", "% of Expense", "% of Revenue"])
+    st.dataframe(cat_df)
 
-            # Growth targets
-            st.subheader("📈 Revenue & Expense Growth Targets")
-            growth_df = df.iloc[8:11, 0:4]
-            growth_df.columns = ["Metric", "Year 1", "Year 2", "Year 3"]
-            growth_df.reset_index(drop=True, inplace=True)
-            st.dataframe(growth_df)
+    fig, ax = plt.subplots()
+    ax.bar(cat_df["Category"], cat_df["% of Expense"], label="% of Expense")
+    ax.bar(cat_df["Category"], cat_df["% of Revenue"], alpha=0.5, label="% of Revenue")
+    ax.set_title("Expense vs Revenue Distribution by Category")
+    ax.set_ylabel("%")
+    ax.legend()
+    st.pyplot(fig)
 
-            # Insights
-            st.subheader("🧠 Summary Insights")
-            top_exp = cat_df.sort_values("% of Expense", ascending=False).iloc[0]
-            top_rev = cat_df.sort_values("% of Revenue", ascending=False).iloc[0]
+    st.subheader("📈 Revenue & Expense Growth Targets")
+    growth_df = pd.DataFrame({
+        "Metric": ["Revenue Growth", "Expense Growth"],
+        "Year 1": [inputs['target_revenue_growth'][0], inputs['target_expense_growth'][0]],
+        "Year 2": [inputs['target_revenue_growth'][1], inputs['target_expense_growth'][1]],
+        "Year 3": [inputs['target_revenue_growth'][2], inputs['target_expense_growth'][2]]
+    })
+    st.dataframe(growth_df)
 
-            st.markdown(f"- **{top_exp['Category']}** has the highest share of IT expenses: **{top_exp['% of Expense']:.1f}%**")
-            st.markdown(f"- **{top_rev['Category']}** contributes the most to revenue: **{top_rev['% of Revenue']:.1f}%**")
+    st.subheader("🧠 Summary Insights")
+    top_exp = cat_df.sort_values("% of Expense", ascending=False).iloc[0]
+    top_rev = cat_df.sort_values("% of Revenue", ascending=False).iloc[0]
 
-            if top_exp['Category'] != top_rev['Category']:
-                st.warning("🚨 The top IT expense category does not align with top revenue category. Consider optimization.")
-            else:
-                st.success("✅ Top IT spending aligns with top revenue driver, indicating strategic alignment.")
+    st.markdown(f"- **{top_exp['Category']}** has the highest share of IT expenses: **{top_exp['% of Expense']:.1f}%**")
+    st.markdown(f"- **{top_rev['Category']}** contributes the most to revenue: **{top_rev['% of Revenue']:.1f}%**")
 
-        except Exception as e:
-            st.error("Failed to load financial summary from spreadsheet.")
-            st.exception(e)
+    if top_exp['Category'] != top_rev['Category']:
+        st.warning("🚨 The top IT expense category does not align with top revenue category. Consider optimization.")
     else:
-        st.info("📂 Please upload the ITRM Excel workbook to view the financial summary.")
+        st.success("✅ Top IT spending aligns with top revenue driver, indicating strategic alignment.")
 
 # Inputs Tab
 elif section == "⚙️ Inputs Setup":
