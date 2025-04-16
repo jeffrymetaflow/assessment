@@ -89,7 +89,7 @@ cleaned_summary = summary_display.replace("**", "").replace("<Client Name>", cli
 ").replace("## ", "").replace("### ", "").replace("---", "
 ----------------------
 ")
-pdf.chapter_body(cleaned_summary)
+        pdf.chapter_body(cleaned_summary)
 File "/mount/src/itrm/model.py", line 88
           
         # Add ITRM trend chart if available
