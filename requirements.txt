@@ -4,6 +4,6 @@ matplotlib
 fpdf
 fpdf==1.7.2
 fpdf2==2.7.8
-openai
 streamlit-chat
+openai>=1.0.0
 
