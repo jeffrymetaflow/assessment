@@ -68,9 +68,10 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
 elif section == "💰 ITRM Financial Summary":
     st.title("💰 ITRM Financial Summary")
 
-    uploaded_file = "./mnt/data/IT Revenue Margin Workbook.xlsx"
+    uploaded_file = st.file_uploader("Upload ITRM Workbook (.xlsx)", type="xlsx")
     try:
-        df = pd.read_excel(uploaded_file, sheet_name="ITRM Financial Summary", header=None)
+    if uploaded_file:
+        df = pd.read_excel(uploaded_file, sheet_name="ITRM Financial Summary", header=None)"ITRM Financial Summary", header=None)
         df.dropna(how='all', inplace=True)
 
         # Display core tables
@@ -108,6 +109,9 @@ elif section == "💰 ITRM Financial Summary":
             st.warning("🚨 The top IT expense category does not align with top revenue category. Consider optimization.")
         else:
             st.success("✅ Top IT spending aligns with top revenue driver, indicating strategic alignment.")
+
+    else:
+    st.info("📂 Please upload the ITRM Excel workbook to view the financial summary.")
 
     except Exception as e:
         st.error("Failed to load financial summary from spreadsheet.")
