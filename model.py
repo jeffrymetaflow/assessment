@@ -286,7 +286,7 @@ Please rate your cybersecurity maturity against the **NIST Cybersecurity Framewo
 - **3 – Developing**: Documented practices exist, but only partially implemented.
 - **4 – Managed**: Practices are implemented and actively managed.
 - **5 – Optimized**: Practices are well-integrated and continuously improved.
-"""):")
+""")")
 
     responses = []
     for control in nist_controls:
