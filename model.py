@@ -6,7 +6,7 @@ from fpdf import FPDF
 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "⚙️ Inputs Setup", "📊 ITRM Calculator", "💰 ITRM Financial Summary"])
+section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "⚙️ Inputs Setup", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🤖 AI Assistant"])
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
 
 # Overview Tab
@@ -265,6 +265,36 @@ elif section == "💰 ITRM Financial Summary":
     else:
         st.success("✅ Top IT spending aligns with top revenue driver, indicating strategic alignment.")
 
+# AI Assistant Tab
+elif section == "🤖 AI Assistant":
+    import openai
+    from streamlit_chat import message
+
+    st.title("🤖 AI Assistant")
+    openai.api_key = st.secrets["OPENAI_API_KEY"]  # Store securely in secrets
+
+    if "messages" not in st.session_state:
+        st.session_state.messages = [
+            {"role": "system", "content": "You are an expert IT strategy assistant helping explain IT Revenue Margin modeling to business leaders."}
+        ]
+
+    user_input = st.text_input("Ask the assistant anything about your IT model or strategy:")
+
+    if user_input:
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        with st.spinner("Thinking..."):
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=st.session_state.messages
+            )
+            msg = response["choices"][0]["message"]["content"]
+            st.session_state.messages.append({"role": "assistant", "content": msg})
+
+    for i, msg in enumerate(st.session_state.messages[1:]):
+        is_user = (i % 2 == 0)
+        message(msg["content"], is_user=is_user)
+
+
 # Inputs Tab
 elif section == "⚙️ Inputs Setup":
     if 'inputs' not in st.session_state:
@@ -388,3 +418,4 @@ elif section == "📊 ITRM Calculator":
         st.markdown("- Monitor expense-heavy categories for targeted optimization.")
         st.markdown("- Validate whether revenue growth assumptions are realistic.")
         st.markdown("- Revisit automation or cloud strategies to reduce total IT spend.")
+
