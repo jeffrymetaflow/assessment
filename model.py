@@ -257,8 +257,8 @@ elif section == "💰 ITRM Financial Summary":
     top_exp = cat_df.sort_values("% of Expense", ascending=False).iloc[0]
     top_rev = cat_df.sort_values("% of Revenue", ascending=False).iloc[0]
 
-    st.markdown(f"- **{top_exp['Category']}** has the highest share of IT expenses: **{top_exp['% of Expense']:.1f}%**")
-    st.markdown(f"- **{top_rev['Category']}** contributes the most to revenue: **{top_rev['% of Revenue']:.1f}%**")
+    st.markdown(f"- **{top_exp['Category']}** has the highest share of IT expenses: **{top_exp['% of Expense']}**")
+    st.markdown(f"- **{top_rev['Category']}** contributes the most to revenue: **{top_rev['% of Revenue']}**")
 
     if top_exp['Category'] != top_rev['Category']:
         st.warning("🚨 The top IT expense category does not align with top revenue category. Consider optimization.")
