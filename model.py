@@ -132,3 +132,98 @@ ax.plot(years, itrms, marker='o', linewidth=2)
 ax.set_ylabel("IT Revenue Margin (%)")
 ax.set_title("ITRM Over Time")
 st.pyplot(fig)
+
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+st.title("📊 ITRM Multi-Year Calculator")
+
+# Load shared inputs from session state or display warning
+if 'inputs' not in st.session_state:
+    st.warning("Please configure baseline inputs in the 'Inputs Setup' tab first.")
+    st.stop()
+
+inputs = st.session_state.inputs
+categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
+
+# === Input section ===
+st.markdown("### Revenue Forecast (based on growth targets)")
+
+revenue_input = {
+    "Year 1": inputs['revenue_baseline'] * (1 + inputs['target_revenue_growth'][0]),
+    "Year 2": inputs['revenue_baseline'] * (1 + inputs['target_revenue_growth'][1]),
+    "Year 3": inputs['revenue_baseline'] * (1 + inputs['target_revenue_growth'][2]),
+}
+
+# === Expense Calculation ===
+st.markdown("---")
+st.markdown("### Expense Adjustment by Category")
+
+expense_results = {}
+default_changes = {
+    "Year 1": [0.30, -0.20, -0.15, 0.10, 0.10],
+    "Year 2": [0.05, -0.02, -0.20, 0.10, 0.05],
+    "Year 3": [0.05, -0.02, -0.20, 0.10, 0.05],
+}
+
+for year in ["Year 1", "Year 2", "Year 3"]:
+    st.markdown(f"#### {year} Category Adjustments")
+    category_expenses = []
+    revenue = revenue_input[year]
+    valid = True
+    split_total = 0
+
+    for i, cat in enumerate(categories):
+        col1, col2 = st.columns(2)
+        with col1:
+            split = inputs['category_revenue_split'][i]
+            st.markdown(f"{cat} - Revenue %: **{split*100:.1f}%**")
+        with col2:
+            change = st.number_input(
+                f"{cat} Expense Change % ({year})", format="%.2f",
+                value=default_changes[year][i], key=f"{year}_{cat}_change"
+            )
+
+        split_total += split
+        expense = revenue * split * (1 + change)
+        category_expenses.append(expense)
+
+    if abs(split_total - 1.0) > 0.001:
+        st.error(f"{year} category revenue splits do not total 100% (currently {split_total*100:.2f}%)")
+        valid = False
+
+    if valid:
+        total_expense = sum(category_expenses)
+        itrm = (total_expense / revenue) * 100
+        expense_results[year] = {"Total Expense": total_expense, "ITRM": itrm}
+
+        st.success(f"**{year} Total Expense:** ${total_expense:,.2f}")
+        st.info(f"**{year} IT Revenue Margin (ITRM):** {itrm:.2f}%")
+
+st.markdown("---")
+
+# === Chart section ===
+if expense_results:
+    st.markdown("### 📈 IT Revenue Margin Trend")
+    years = list(expense_results.keys())
+    itrms = [expense_results[y]["ITRM"] for y in years]
+
+    fig, ax = plt.subplots()
+    ax.plot(years, itrms, marker='o', linewidth=2)
+    ax.set_ylabel("IT Revenue Margin (%)")
+    ax.set_title("ITRM Over Time")
+    st.pyplot(fig)
+
+# === Reset Button ===
+st.markdown("---")
+if st.button("🔄 Reset Inputs to Defaults"):
+    st.session_state.inputs = {
+        'revenue_baseline': 739_000_000,
+        'it_expense_baseline': 4_977_370,
+        'category_revenue_split': [0.5, 0.2, 0.1, 0.15, 0.05],
+        'category_expense_split': [0.25, 0.2, 0.1, 0.1, 0.35],
+        'target_revenue_growth': [0.10, 0.05, 0.07],
+        'target_expense_growth': [0.06, 0.03, 0.03]
+    }
+    st.success("Inputs reset. Please go to the 'Inputs Setup' tab to review.")
