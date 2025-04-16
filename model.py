@@ -85,7 +85,8 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
         pdf.set_auto_page_break(auto=True, margin=15)
 
         pdf.chapter_title("Client: " + (client_name if client_name else "<Client Name>"))
-        cleaned_summary = summary_display.replace("**", "") # Remove Markdown bold syntax
+        cleaned_summary = summary_display
+            .replace("**", "") # Remove Markdown bold syntax
             .replace("<Client Name>", client_name if client_name else "<Client Name>") # Replace placeholder
             .replace("  ", "") # Replace double spaces with a single space
             .replace("## ", "") # Remove level 2 headers
