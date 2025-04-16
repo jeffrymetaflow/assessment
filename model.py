@@ -80,10 +80,9 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
                 self.set_font("Arial", "", 11)
                 self.multi_cell(0, 10, body)
 
-            pdf = PDF()
-            pdf.add_page()
-            pdf.set_auto_page_break(auto=True, margin=15)
-
+        pdf = PDF() # Ensure this is after the class definition
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
         pdf.chapter_title("Client: " + (client_name if client_name else "<Client Name>"))
         cleaned_summary = (
             summary_display
