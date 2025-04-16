@@ -268,6 +268,7 @@ elif section == "💰 ITRM Financial Summary":
 # Cybersecurity Assessment Tab
 elif section == "🔐 Cybersecurity Assessment":
     st.title("🔐 Cybersecurity Maturity Assessment")
+    st.markdown("For more details, visit the [NIST Cybersecurity Framework website](https://www.nist.gov/).")
 
     st.markdown("""
     **NIST Cybersecurity Framework Functions:**
@@ -509,3 +510,4 @@ elif section == "📊 ITRM Calculator":
         st.markdown("- Monitor expense-heavy categories for targeted optimization.")
         st.markdown("- Validate whether revenue growth assumptions are realistic.")
         st.markdown("- Revisit automation or cloud strategies to reduce total IT spend.")
+
