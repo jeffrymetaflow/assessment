@@ -89,14 +89,7 @@ File "/mount/src/itrm/model.py", line 88
           cleaned_summary = summary_display.replace("**", "").replace("<Client Name>", client_name if client_name else "<Client Name>").replace("  ", "
 ").replace("## ", "").replace("### ", "").replace("---", "
 ----------------------
-").replace("  ", "
-").replace("## ", "").replace("### ", "").replace("---", "
-----------------------
-").replace("  ", "
-").replace("## ", "").replace("### ", "").replace("---", "
-----------------------
 ")
-
 
         pdf.chapter_body(cleaned_summary)
 
