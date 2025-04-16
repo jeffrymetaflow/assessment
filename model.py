@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "⚙️ Inputs Setup", "📊 ITRM Calculator"])
+section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "⚙️ Inputs Setup", "📊 ITRM Calculator", "💰 ITRM Financial Summary"])
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
 
 # Overview Tab
@@ -61,6 +61,57 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
 """
     summary_display = itrm_summary.replace("<Client Name>", client_name) if client_name else itrm_summary
     st.markdown(summary_display, unsafe_allow_html=True)
+
+# [Inputs and Calculator tabs truncated for brevity in this update]
+
+# Financial Summary Tab
+elif section == "💰 ITRM Financial Summary":
+    st.title("💰 ITRM Financial Summary")
+
+    uploaded_file = "./mnt/data/IT Revenue Margin Workbook.xlsx"
+    try:
+        df = pd.read_excel(uploaded_file, sheet_name="ITRM Financial Summary", header=None)
+        df.dropna(how='all', inplace=True)
+
+        # Display core tables
+        st.subheader("📊 Category Financial Breakdown")
+        cat_df = df.iloc[1:7, 0:4]
+        cat_df.columns = ["Category", "Total IT Expense", "% of Expense", "% of Revenue"]
+        cat_df.reset_index(drop=True, inplace=True)
+        st.dataframe(cat_df)
+
+        # Show comparison chart
+        fig, ax = plt.subplots()
+        ax.bar(cat_df["Category"], cat_df["% of Expense"], label="% of Expense")
+        ax.bar(cat_df["Category"], cat_df["% of Revenue"], alpha=0.5, label="% of Revenue")
+        ax.set_title("Expense vs Revenue Distribution by Category")
+        ax.set_ylabel("%")
+        ax.legend()
+        st.pyplot(fig)
+
+        # Growth targets
+        st.subheader("📈 Revenue & Expense Growth Targets")
+        growth_df = df.iloc[8:11, 0:4]
+        growth_df.columns = ["Metric", "Year 1", "Year 2", "Year 3"]
+        growth_df.reset_index(drop=True, inplace=True)
+        st.dataframe(growth_df)
+
+        # Insights
+        st.subheader("🧠 Summary Insights")
+        top_exp = cat_df.sort_values("% of Expense", ascending=False).iloc[0]
+        top_rev = cat_df.sort_values("% of Revenue", ascending=False).iloc[0]
+
+        st.markdown(f"- **{top_exp['Category']}** has the highest share of IT expenses: **{top_exp['% of Expense']:.1f}%**")
+        st.markdown(f"- **{top_rev['Category']}** contributes the most to revenue: **{top_rev['% of Revenue']:.1f}%**")
+
+        if top_exp['Category'] != top_rev['Category']:
+            st.warning("🚨 The top IT expense category does not align with top revenue category. Consider optimization.")
+        else:
+            st.success("✅ Top IT spending aligns with top revenue driver, indicating strategic alignment.")
+
+    except Exception as e:
+        st.error("Failed to load financial summary from spreadsheet.")
+        st.exception(e)
 
 # Inputs Tab
 elif section == "⚙️ Inputs Setup":
