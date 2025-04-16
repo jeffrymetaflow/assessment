@@ -58,6 +58,15 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
 **IT Revenue Margin – Driving Efficiency for Digital Transformation.**
 """
 
+section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "⚙️ Inputs Setup", "📊 ITRM Calculator"])
+
+if section == "🧠 Overview Summary":
+    # show summary
+elif section == "⚙️ Inputs Setup":
+    # show inputs
+elif section == "📊 ITRM Calculator":
+    # show calculator
+
 # Logic: Display selected section
 if section == "🧠 Overview Summary":
     st.title("🧠 IT Revenue Margin Strategy Summary")
