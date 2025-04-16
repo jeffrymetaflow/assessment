@@ -89,6 +89,7 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
 ").replace("## ", "").replace("### ", "").replace("---", "
 ----------------------
 ")
+
         pdf.chapter_body(cleaned_summary)
 
         # Add ITRM trend chart if available
