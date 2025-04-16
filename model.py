@@ -70,3 +70,65 @@ if section == "🧠 Overview Summary":
 elif section == "📊 ITRM Calculator":
     st.title("📊 ITRM Calculator")
     st.markdown("Coming soon... Include cost inputs, margin graphs, and tool selection logic here.")
+
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+st.title("📊 ITRM Multi-Year Calculator")
+
+# === Input section ===
+st.markdown("### Enter Revenue Forecast and Expense Adjustment by Category")
+
+revenue_input = {
+    "Year 1": st.number_input("Year 1 Revenue ($)", value=812_900_000),
+    "Year 2": st.number_input("Year 2 Revenue ($)", value=853_545_000),
+    "Year 3": st.number_input("Year 3 Revenue ($)", value=913_293_150),
+}
+
+categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
+default_splits = [0.5, 0.2, 0.1, 0.15, 0.05]
+default_changes = {
+    "Year 1": [0.30, -0.20, -0.15, 0.10, 0.10],
+    "Year 2": [0.05, -0.02, -0.20, 0.10, 0.05],
+    "Year 3": [0.05, -0.02, -0.20, 0.10, 0.05],
+}
+
+expense_results = {}
+
+st.markdown("---")
+
+for year in ["Year 1", "Year 2", "Year 3"]:
+    st.markdown(f"### {year} Category Settings")
+    category_expenses = []
+    revenue = revenue_input[year]
+
+    for i, cat in enumerate(categories):
+        col1, col2 = st.columns(2)
+        with col1:
+            split = st.number_input(f"{cat} Revenue % ({year})", min_value=0.0, max_value=1.0, value=default_splits[i], key=f"{year}_{cat}_split")
+        with col2:
+            change = st.number_input(f"{cat} Expense Change % ({year})", format="%.2f", value=default_changes[year][i], key=f"{year}_{cat}_change")
+
+        expense = revenue * split * (1 + change)
+        category_expenses.append(expense)
+
+    total_expense = sum(category_expenses)
+    itrm = (total_expense / revenue) * 100
+    expense_results[year] = {"Total Expense": total_expense, "ITRM": itrm}
+
+    st.success(f"**{year} Total Expense:** ${total_expense:,.2f}")
+    st.info(f"**{year} IT Revenue Margin (ITRM):** {itrm:.2f}%")
+
+st.markdown("---")
+
+# === Chart section ===
+st.markdown("### 📈 IT Revenue Margin Trend")
+years = list(expense_results.keys())
+itrms = [expense_results[y]["ITRM"] for y in years]
+
+fig, ax = plt.subplots()
+ax.plot(years, itrms, marker='o', linewidth=2)
+ax.set_ylabel("IT Revenue Margin (%)")
+ax.set_title("ITRM Over Time")
+st.pyplot(fig)
