@@ -90,6 +90,9 @@ File "/mount/src/itrm/model.py", line 88
 ").replace("## ", "").replace("### ", "").replace("---", "
 ----------------------
 ")
+").replace("## ", "").replace("### ", "").replace("---", "
+----------------------
+")
 
         pdf.chapter_body(cleaned_summary)
 
