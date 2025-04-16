@@ -64,55 +64,7 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
     summary_display = itrm_summary.replace("<Client Name>", client_name) if client_name else itrm_summary
     st.markdown(summary_display, unsafe_allow_html=True)
     # Generate PDF with Summary, Chart, and Insights
-    if st.button("📄 Download Executive Summary PDF"):
-        class PDF(FPDF):
-            def header(self):
-                self.set_font("Arial", "B", 12)
-                self.cell(0, 10, "IT Revenue Margin Executive Summary", ln=True, align="C")
-                self.ln(5)
-
-            def chapter_title(self, title):
-                self.set_font("Arial", "B", 12)
-                self.cell(0, 10, title, ln=True, align="L")
-
-            def chapter_body(self, body):
-                self.set_font("Arial", "", 11)
-                self.multi_cell(0, 10, body)
-
-        pdf = PDF()
-        pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=15)
-
-        pdf.chapter_title("Client: " + (client_name if client_name else "<Client Name>"))
-   cleaned_summary = summary_display.replace("**", "").replace("<Client Name>", client_name if client_name else "<Client Name>").replace("  ", "\n").replace("## ", "").replace("### ", "").replace("---", "\n----------------------\n")
-----------------------
-")
-        pdf.chapter_body(cleaned_summary)
-
-        if "calculator_results" in st.session_state:
-            results = st.session_state.calculator_results
-            pdf.chapter_title("
-IT Revenue Margin Results")
-            for year, data in results.items():
-                pdf.chapter_body(f"{year}: Total Expense = ${data['Total Expense']:,.2f}, ITRM = {data['ITRM']:.2f}%")
-
-            pdf.chapter_title("
-ITRM Summary Insights")
-            itrm_start = results["Year 1"]["ITRM"]
-            itrm_end = results["Year 3"]["ITRM"]
-            delta = itrm_start - itrm_end
-            if delta > 0:
-                insight = f"✅ ITRM improved by {delta:.2f}%. Increased IT efficiency."
-            elif delta < 0:
-                insight = f"⚠️ ITRM worsened by {-delta:.2f}%. Consider optimization."
-            else:
-                insight = "ℹ️ ITRM remained consistent across the years."
-            pdf.chapter_body(insight)
-
-        buffer = BytesIO()
-        pdf.output(buffer)
-        buffer.seek(0)
-        st.download_button("📥 Download PDF", buffer, file_name="ITRM_Executive_Summary.pdf")
+    
 
     st.stop()
 
