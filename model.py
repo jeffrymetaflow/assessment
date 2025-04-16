@@ -62,7 +62,7 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
 **IT Revenue Margin – Driving Efficiency for Digital Transformation.**
 """
 
-    summary_display = itrm_summary.replace("<Client Name>", client_name) if client_name else itrm_summary
+     summary_display = itrm_summary.replace("<Client Name>", client_name) if client_name else itrm_summary
     st.markdown(summary_display, unsafe_allow_html=True)
 
     if st.button("📄 Download Executive Summary PDF"):
@@ -89,7 +89,6 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
 ").replace("## ", "").replace("### ", "").replace("---", "
 ----------------------
 ")
-
         pdf.chapter_body(cleaned_summary)
 
         # Add ITRM trend chart if available
