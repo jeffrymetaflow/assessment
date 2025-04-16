@@ -88,6 +88,9 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
         cleaned_summary = summary_display.replace("**", "").replace("<Client Name>", client_name if client_name else "<Client Name>").replace("  ", "
 ").replace("## ", "").replace("### ", "").replace("---", "
 ----------------------
+").replace("  ", "
+").replace("## ", "").replace("### ", "").replace("---", "
+----------------------
 ")
         pdf.chapter_body(cleaned_summary)
 File "/mount/src/itrm/model.py", line 88
