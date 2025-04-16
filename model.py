@@ -267,32 +267,43 @@ elif section == "💰 ITRM Financial Summary":
 
 # AI Assistant Tab
 elif section == "🤖 AI Assistant":
-    from openai import OpenAI
+    from openai import OpenAI, OpenAIError, RateLimitError, AuthenticationError
     from streamlit_chat import message
 
     st.title("🤖 AI Assistant")
-    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = [
-            {"role": "system", "content": "You are an expert IT strategy assistant helping explain IT Revenue Margin modeling to business leaders."}
-        ]
+    if "OPENAI_API_KEY" not in st.secrets:
+        st.warning("🤖 AI Assistant is temporarily unavailable. Please add your OpenAI API key in Streamlit Secrets.")
+    else:
+        client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-    user_input = st.text_input("Ask the assistant anything about your IT model or strategy:")
+        if "messages" not in st.session_state:
+            st.session_state.messages = [
+                {"role": "system", "content": "You are an expert IT strategy assistant helping explain IT Revenue Margin modeling to business leaders."}
+            ]
 
-    if user_input:
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        with st.spinner("Thinking..."):
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=st.session_state.messages
-            )
-            msg = response.choices[0].message.content
-            st.session_state.messages.append({"role": "assistant", "content": msg})
+        user_input = st.text_input("Ask the assistant anything about your IT model or strategy:")
 
-    for i, msg in enumerate(st.session_state.messages[1:]):
-        is_user = (i % 2 == 0)
-        message(msg["content"], is_user=is_user)
+        if user_input:
+            st.session_state.messages.append({"role": "user", "content": user_input})
+            with st.spinner("Thinking..."):
+                try:
+                    response = client.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=st.session_state.messages
+                    )
+                    msg = response.choices[0].message.content
+                    st.session_state.messages.append({"role": "assistant", "content": msg})
+                except RateLimitError:
+                    st.error("🚦 OpenAI rate limit exceeded. Please try again later or check your billing settings.")
+                except AuthenticationError:
+                    st.error("🔐 Authentication failed. Please verify your API key and billing setup.")
+                except OpenAIError as e:
+                    st.error(f"💥 OpenAI Error: {str(e)}")
+
+        for i, msg in enumerate(st.session_state.messages[1:]):
+            is_user = (i % 2 == 0)
+            message(msg["content"], is_user=is_user)
 
 
 # Inputs Tab
