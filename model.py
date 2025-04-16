@@ -310,6 +310,23 @@ elif section == "🔐 Cybersecurity Assessment":
     else:
         st.warning("Low maturity. Immediate enhancements are recommended to reduce risk.")
 
+    st.subheader("🧩 Automated NIST Category Recommendations")
+    recommendations = {
+        "Identify - Asset Management": "Ensure a complete and regularly updated inventory of all hardware, software, and data assets.",
+        "Protect - Access Control": "Implement strong identity and access management (IAM) protocols with role-based access.",
+        "Protect - Data Security": "Apply encryption, secure data storage, and data classification policies.",
+        "Detect - Anomalies and Events": "Deploy SIEM tools and configure alerts for anomalous behavior.",
+        "Respond - Response Planning": "Establish and routinely test an incident response plan.",
+        "Recover - Recovery Planning": "Maintain and validate data backups and recovery procedures." 
+    }
+
+    for control, score in zip(nist_controls, responses):
+        if score <= 3:
+            st.warning(f"🔍 {control}: {recommendations[control]}")
+        else:
+            st.success(f"✅ {control}: Maturity level is sufficient.")
+        st.warning("Low maturity. Immediate enhancements are recommended to reduce risk.")
+
 # AI Assistant Tab
 elif section == "🤖 AI Assistant":
     from openai import OpenAI, OpenAIError, RateLimitError, AuthenticationError
@@ -474,5 +491,3 @@ elif section == "📊 ITRM Calculator":
         st.markdown("- Monitor expense-heavy categories for targeted optimization.")
         st.markdown("- Validate whether revenue growth assumptions are realistic.")
         st.markdown("- Revisit automation or cloud strategies to reduce total IT spend.")
-
-
