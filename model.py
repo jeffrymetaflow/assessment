@@ -269,6 +269,16 @@ elif section == "💰 ITRM Financial Summary":
 elif section == "🔐 Cybersecurity Assessment":
     st.title("🔐 Cybersecurity Maturity Assessment")
 
+    st.markdown("""
+    **NIST Cybersecurity Framework Functions:**
+
+    - **Identify:** Understand the business context, the resources that support critical functions, and the related cybersecurity risks.
+    - **Protect:** Develop and implement safeguards to ensure the delivery of critical services.
+    - **Detect:** Identify the occurrence of a cybersecurity event in a timely manner.
+    - **Respond:** Take action regarding a detected cybersecurity incident.
+    - **Recover:** Maintain plans for resilience and restore capabilities or services impaired due to a cybersecurity incident.
+    """)
+
     nist_controls = [
         "Identify - Asset Management",
         "Protect - Access Control",
@@ -499,4 +509,3 @@ elif section == "📊 ITRM Calculator":
         st.markdown("- Monitor expense-heavy categories for targeted optimization.")
         st.markdown("- Validate whether revenue growth assumptions are realistic.")
         st.markdown("- Revisit automation or cloud strategies to reduce total IT spend.")
-
