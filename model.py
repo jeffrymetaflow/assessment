@@ -6,8 +6,211 @@ from fpdf import FPDF
 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "⚙️ Inputs Setup", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🤖 AI Assistant", "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment"])
+section = st.sidebar.radio("Go to", ["🧭 Strategic Roadmap", "📊 Benchmarking & Persona", "🧭 Strategic Roadmap", "📊 Benchmarking & Persona", "🧠 Overview Summary", "⚙️ Inputs Setup", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🤖 AI Assistant", "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment"])
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
+
+# Strategic Roadmap Tab
+elif section == "🧭 Strategic Roadmap":
+    st.title("🧭 Strategic Roadmap")
+    st.markdown("""
+    Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
+    """)
+
+    roadmap_items = []
+
+    if 'it_maturity_scores' in st.session_state:
+        scores = st.session_state.it_maturity_scores
+        for _, row in scores.iterrows():
+            score = row["Score (%)"]
+            cat = row["Category"]
+            if score >= 80:
+                label = "🟢 Maintain and enhance automation"
+            elif score >= 50:
+                label = "🟡 Standardize and document processes"
+            else:
+                label = "🔴 Prioritize investment and leadership support"
+            roadmap_items.append((cat, label))
+
+    if 'cybersecurity_scores' in st.session_state:
+        for control, score in st.session_state.cybersecurity_scores.items():
+            if score >= 4:
+                label = "✅ Sustain mature practices"
+            elif score == 3:
+                label = "⚠️ Refine documentation and training"
+            else:
+                label = "❌ Prioritize process implementation and governance"
+            roadmap_items.append((control, label))
+
+    if roadmap_items:
+        st.subheader("📅 Strategic Timeline by Quarter")
+        timeline_df = pd.DataFrame({
+            "Quarter": ["Q1", "Q2", "Q3", "Q4"] * ((len(roadmap_items) + 3) // 4),
+            "Action Item": roadmap_items[:16]  # Limit to 16 items across 4 quarters
+        })
+        timeline_df = timeline_df.dropna().reset_index(drop=True)
+        st.dataframe(timeline_df)
+
+        st.subheader("✅ Progress Tracker")
+        for quarter in ["Q1", "Q2", "Q3", "Q4"]:
+            st.markdown(f"**{quarter}**")
+            for item in timeline_df[timeline_df["Quarter"] == quarter]["Action Item"]:
+                st.checkbox(f"{item[0]} – {item[1]}", key=f"{quarter}_{item[0]}")
+elif section == "🧭 Strategic Roadmap":
+    st.title("🧭 Strategic Roadmap")
+    st.markdown("""
+    Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
+    """)
+
+    checklist = []
+
+    if 'it_maturity_scores' in st.session_state:
+        scores = st.session_state.it_maturity_scores
+        for _, row in scores.iterrows():
+            score = row["Score (%)"]
+            cat = row["Category"]
+            if score >= 80:
+                rec = f"🟢 {cat}: Maintain and enhance automation."
+            elif score >= 50:
+                rec = f"🟡 {cat}: Standardize and document processes."
+            else:
+                rec = f"🔴 {cat}: Prioritize investment and leadership support."
+            checklist.append(rec)
+            st.markdown(f"- [ ] {rec}")
+
+    if 'cybersecurity_scores' in st.session_state:
+        st.markdown("---")
+        st.markdown("### 🔐 Cybersecurity Roadmap")
+        for control, score in st.session_state.cybersecurity_scores.items():
+            if score >= 4:
+                rec = f"✅ {control}: Sustain mature practices."
+            elif score == 3:
+                rec = f"⚠️ {control}: Consider refining documentation and training."
+            else:
+                rec = f"❌ {control}: Prioritize process implementation and governance."
+            checklist.append(rec)
+            st.markdown(f"- [ ] {rec}")
+
+    if checklist:
+        st.markdown("---")
+        st.subheader("🗒️ Your Strategic Checklist")
+        for item in checklist:
+            st.markdown(f"- [ ] {item}")
+elif section == "🧭 Strategic Roadmap":
+    st.title("🧭 Strategic Roadmap")
+    st.markdown("""
+    Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
+    """)
+
+    if 'it_maturity_scores' in st.session_state:
+        scores = st.session_state.it_maturity_scores
+        roadmap = []
+        for _, row in scores.iterrows():
+            score = row["Score (%)"]
+            cat = row["Category"]
+            if score >= 80:
+                rec = f"🟢 {cat}: Maintain and enhance automation."
+            elif score >= 50:
+                rec = f"🟡 {cat}: Standardize and document processes."
+            else:
+                rec = f"🔴 {cat}: Prioritize investment and leadership support."
+            roadmap.append((cat, rec))
+            st.markdown(rec)
+
+        st.subheader("📆 Recommended Improvement Timeline")
+        timeline_df = pd.DataFrame({
+            "Phase": ["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"],
+            "Focus": [roadmap[0][1], roadmap[1][1], roadmap[2][1], roadmap[3][1]]
+        })
+        st.dataframe(timeline_df)
+    else:
+        st.info("Run the IT Maturity Assessment first to generate roadmap insights.")
+elif section == "🧭 Strategic Roadmap":
+    st.title("🧭 Strategic Roadmap")
+    st.markdown("""
+    Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
+    """)
+
+    if 'it_maturity_scores' in st.session_state:
+        scores = st.session_state.it_maturity_scores
+        for _, row in scores.iterrows():
+            score = row["Score (%)"]
+            cat = row["Category"]
+            if score >= 80:
+                st.success(f"🟢 {cat}: Maintain and enhance automation.")
+            elif score >= 50:
+                st.warning(f"🟡 {cat}: Standardize and document processes.")
+            else:
+                st.error(f"🔴 {cat}: Prioritize investment and leadership support.")
+    else:
+        st.info("Run the IT Maturity Assessment first to generate roadmap insights.")
+
+# Benchmarking & Persona Tab
+elif section == "📊 Benchmarking & Persona":
+    st.title("📊 Benchmarking & Persona")
+
+    industry = st.selectbox("Select Industry", ["Healthcare", "Financial Services", "Retail", "Manufacturing", "Education", "Other"])
+    company_size = st.selectbox("Select Company Size", ["< 500 employees", "500–5000", "> 5000"])
+    user_role = st.radio("Your Role", ["CIO", "IT Director", "IT Ops", "Finance", "Other"])
+
+    st.session_state.client_profile = {
+        "industry": industry,
+        "company_size": company_size,
+        "user_role": user_role
+    }
+
+    st.subheader("📈 Industry Benchmarks")
+    benchmark_data = {
+        "Healthcare": [80, 65, 60, 50, 35],
+        "Financial Services": [85, 75, 70, 55, 40],
+        "Retail": [70, 60, 55, 45, 30],
+        "Manufacturing": [75, 68, 62, 50, 38],
+        "Education": [65, 55, 50, 40, 25],
+        "Other": [72, 60, 57, 46, 32]
+    }
+    benchmark_df = pd.DataFrame({
+        "Category": ["Managed / Automated", "Standardized / Optimized", "Defined / Measured", "Reactive / Operational", "Survival, Ad-Hoc, Manual Legacy"],
+        "Industry Average (%)": benchmark_data[industry]
+    })
+    st.dataframe(benchmark_df)
+
+    if 'it_maturity_scores' in st.session_state:
+        user_df = st.session_state.it_maturity_scores
+        compare_df = pd.merge(user_df, benchmark_df, on="Category")
+        compare_df["Gap"] = compare_df["Score (%)"] - compare_df["Industry Average (%)"]
+        st.subheader("📊 Your Score vs Industry Average")
+        st.dataframe(compare_df)
+        st.bar_chart(compare_df.set_index("Category")[["Score (%)", "Industry Average (%)"]])
+    else:
+        st.info("Complete the IT Maturity Assessment to see benchmark comparisons.")
+elif section == "📊 Benchmarking & Persona":
+    st.title("📊 Benchmarking & Persona")
+
+    industry = st.selectbox("Select Industry", ["Healthcare", "Financial Services", "Retail", "Manufacturing", "Education", "Other"])
+    company_size = st.selectbox("Select Company Size", ["< 500 employees", "500–5000", "> 5000"])
+    user_role = st.radio("Your Role", ["CIO", "IT Director", "IT Ops", "Finance", "Other"])
+
+    st.session_state.client_profile = {
+        "industry": industry,
+        "company_size": company_size,
+        "user_role": user_role
+    }
+
+    st.subheader("📈 Benchmarked Averages (Mock Data)")
+    bench_df = pd.DataFrame({
+        "Category": ["Managed / Automated", "Standardized / Optimized", "Defined / Measured", "Reactive / Operational", "Survival, Ad-Hoc, Manual Legacy"],
+        "Industry Average (%)": [82, 68, 63, 47, 30]
+    })
+    st.dataframe(bench_df)
+
+    if 'it_maturity_scores' in st.session_state:
+        user_df = st.session_state.it_maturity_scores
+        compare_df = pd.merge(user_df, bench_df, on="Category")
+        compare_df["Gap"] = compare_df["Score (%)"] - compare_df["Industry Average (%)"]
+        st.subheader("📊 Your Score vs Industry Average")
+        st.dataframe(compare_df)
+        st.bar_chart(compare_df.set_index("Category")[["Score (%)", "Industry Average (%)"]])
+    else:
+        st.info("Complete the IT Maturity Assessment to see benchmark comparisons.")
 
 # Overview Tab
 if section == "🧠 Overview Summary":
