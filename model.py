@@ -589,6 +589,10 @@ if section == "⚙️ Inputs Setup":
             0.05, 0.10, 0.15, 0.10, 0.20, 0.02, 0.03, 0.04, 0.02, 0.03
         ]
     }
+    
+    # Ensure both lists have the same length
+    assert len(data["Parameter"]) == len(data["Value"]), "Lists have different lengths!"
+
     inputs_df = pd.DataFrame(data)
 
     # Display the table with editable cells
