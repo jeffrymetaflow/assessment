@@ -22,6 +22,18 @@ client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp"
 if "baseline_revenue" not in st.session_state:
     st.session_state.baseline_revenue = 0  # Replace 0 with a meaningful default value
 
+if "category_expenses_to_total" not in st.session_state:
+    st.session_state.category_expenses_to_total = [0.1] * 5  # Default: 5 categories with 10% each
+
+if "category_revenue_to_total" not in st.session_state:
+    st.session_state.category_revenue_to_total = [0.05] * 5  # Default: 5 categories with 5% each
+
+if "revenue_growth" not in st.session_state:
+    st.session_state.revenue_growth = [0.05] * 3  # Default growth rate: 5% per year for 3 years
+
+if "expense_growth" not in st.session_state:
+    st.session_state.expense_growth = [0.03] * 3  # Default growth rate: 3% per year for 3 years
+
 # Strategic Roadmap Tab
 if section == "🧭 Strategic Roadmap":
     st.title("🧭 Strategic Roadmap")
