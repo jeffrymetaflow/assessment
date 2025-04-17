@@ -301,8 +301,8 @@ if section == "💰 ITRM Financial Summary":
 
     # Allow user to adjust growth rates for each year (Year 1, Year 2, Year 3)
     st.markdown("### Adjust Revenue Growth and Expense Growth")
-    new_revenue_growth = [st.slider(f"Year {i+1} Revenue Growth (%)", 0.0, 100.0, value=int(revenue_growth[i]*100)) for i in range(3)]
-    new_expense_growth = [st.slider(f"Year {i+1} Expense Growth (%)", 0.0, 100.0, value=int(expense_growth[i]*100)) for i in range(3)]
+    new_revenue_growth = [st.slider(f"Year {i+1} Revenue Growth (%)", 0.0, 100.0, value=float(revenue_growth[i] * 100)) for i in range(3)]
+    new_expense_growth = [st.slider(f"Year {i+1} Expense Growth (%)", 0.0, 100.0, value=float(expense_growth[i] * 100)) for i in range(3)]
 
     # Apply new growth rates to calculate the updated revenue and expenses
     revenue_input = {
