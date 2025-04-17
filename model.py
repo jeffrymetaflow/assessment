@@ -828,9 +828,15 @@ if section == "⚙️ Inputs Setup":
 
     if revenue_input != revenue:
         st.session_state.baseline_revenue = revenue_input
+    if 'it_expense' not in st.session_state:
+    st.session_state.it_expense = 0  # Default value
+
+    it_expense = st.session_state.it_expense
+    expense_input = st.number_input("IT Expense ($)", value=it_expense, step=100000)
+    
     if expense_input != it_expense:
         st.session_state.it_expense = expense_input
-
+        
 # Calculator Tab
 if section == "📊 ITRM Calculator":
     st.title("📊 ITRM Multi-Year Calculator")
