@@ -571,8 +571,39 @@ elif section == "📝 IT Maturity Assessment":
 if section == "⚙️ Inputs Setup":
     st.title("⚙️ Inputs Setup")
 
-    # Create a DataFrame to represent the table of inputs
-    data = {
+    # Displaying editable inputs for each of the parameters using st.number_input
+    baseline_revenue = st.number_input("Baseline Revenue ($)", value=739_000_000)
+    it_expense = st.number_input("IT Expense Baseline ($)", value=4_977_370)
+
+    # Expense and Revenue Percentages
+    category_expenses_to_total = [
+        st.number_input(f"Category {i+1} % of IT Expenses", value=0.1) for i in range(5)
+    ]
+    
+    category_revenue_to_total = [
+        st.number_input(f"Category {i+1} % of Revenue", value=0.05) for i in range(5)
+    ]
+
+    # Growth Rates
+    revenue_growth = [
+        st.number_input(f"Year {i+1} Revenue Growth (%)", value=0.05) for i in range(3)
+    ]
+    expense_growth = [
+        st.number_input(f"Year {i+1} Expense Growth (%)", value=0.03) for i in range(3)
+    ]
+
+    # Store these values in session_state for use in the ITRM calculator
+    if st.button("Save Inputs"):
+        st.session_state.baseline_revenue = baseline_revenue
+        st.session_state.it_expense = it_expense
+        st.session_state.category_expenses_to_total = category_expenses_to_total
+        st.session_state.category_revenue_to_total = category_revenue_to_total
+        st.session_state.revenue_growth = revenue_growth
+        st.session_state.expense_growth = expense_growth
+        st.success("Inputs saved successfully!")
+
+    # Show the inputs in a table
+    input_data = {
         "Parameter": [
             "Baseline Revenue ($)", "IT Expense Baseline ($)", 
             "Category 1 % of IT Expenses", "Category 2 % of IT Expenses", 
@@ -585,35 +616,21 @@ if section == "⚙️ Inputs Setup":
             "Year 2 Expense Growth (%)", "Year 3 Expense Growth (%)"
         ],
         "Value": [
-            739_000_000, 4_977_370, 0.10, 0.20, 0.30, 0.15, 0.25,  # Category 1 to 5 for IT Expenses & Revenue
-            0.05, 0.10, 0.15, 0.10, 0.20, 0.02, 0.03, 0.04, 0.02, 0.03, 0.03
+            baseline_revenue, it_expense,
+            *category_expenses_to_total,
+            *category_revenue_to_total,
+            *revenue_growth,
+            *expense_growth
         ]
     }
-    
-    # Ensure both lists have the same length
-    assert len(data["Parameter"]) == len(data["Value"]), "Lists have different lengths!"
 
-    inputs_df = pd.DataFrame(data)
+    inputs_df = pd.DataFrame(input_data)
 
-    # Display the table with editable cells
-    st.subheader("Edit Inputs Below:")
-    edited_inputs = st.dataframe(inputs_df)
+    st.subheader("Review Inputs")
+    st.dataframe(inputs_df)
 
-    # After editing, save the values back to session state
-    st.session_state.baseline_revenue = edited_inputs.iloc[0, 1]
-    st.session_state.it_expense = edited_inputs.iloc[1, 1]
-    st.session_state.category_expenses_to_total = [
-        edited_inputs.iloc[2, 1], edited_inputs.iloc[3, 1], edited_inputs.iloc[4, 1], edited_inputs.iloc[5, 1], edited_inputs.iloc[6, 1]
-    ]
-    st.session_state.category_revenue_to_total = [
-        edited_inputs.iloc[7, 1], edited_inputs.iloc[8, 1], edited_inputs.iloc[9, 1], edited_inputs.iloc[10, 1], edited_inputs.iloc[11, 1]
-    ]
-    st.session_state.revenue_growth = [
-        edited_inputs.iloc[12, 1], edited_inputs.iloc[13, 1], edited_inputs.iloc[14, 1]
-    ]
-    st.session_state.expense_growth = [
-        edited_inputs.iloc[15, 1], edited_inputs.iloc[16, 1], edited_inputs.iloc[17, 1]
-    ]
+    # Show session state data
+    st.write(st.session_state)
     
 # Calculator Tab
 if section == "📊 ITRM Calculator":
