@@ -636,7 +636,7 @@ if section == "⚙️ Inputs Setup":
 if section == "📊 ITRM Calculator":
     st.title("📊 ITRM Multi-Year Calculator")
 
-    if 'inputs' not in st.session_state:
+    if 'baseline_revenue' not in st.session_state:
         st.warning("Please configure inputs in the Inputs Setup tab first.")
         st.stop()
 
