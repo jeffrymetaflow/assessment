@@ -571,41 +571,46 @@ elif section == "📝 IT Maturity Assessment":
 if section == "⚙️ Inputs Setup":
     st.title("⚙️ Inputs Setup")
 
-    # Baseline Revenue Input
-    baseline_revenue = st.number_input("Baseline Revenue ($)", value=739_000_000, step=1000000)
-    st.session_state.baseline_revenue = baseline_revenue  # Store in session state
+    # Create a DataFrame to represent the table of inputs
+    data = {
+        "Parameter": [
+            "Baseline Revenue ($)", "IT Expense Baseline ($)", 
+            "Category 1 % of IT Expenses", "Category 2 % of IT Expenses", 
+            "Category 3 % of IT Expenses", "Category 4 % of IT Expenses", 
+            "Category 5 % of IT Expenses", "Category 1 % of Revenue", 
+            "Category 2 % of Revenue", "Category 3 % of Revenue", 
+            "Category 4 % of Revenue", "Category 5 % of Revenue",
+            "Year 1 Revenue Growth (%)", "Year 2 Revenue Growth (%)", 
+            "Year 3 Revenue Growth (%)", "Year 1 Expense Growth (%)", 
+            "Year 2 Expense Growth (%)", "Year 3 Expense Growth (%)"
+        ],
+        "Value": [
+            739_000_000, 4_977_370, 0.10, 0.20, 0.30, 0.15, 0.25,  # Category 1 to 5 for IT Expenses & Revenue
+            0.05, 0.10, 0.15, 0.10, 0.20, 0.02, 0.03, 0.04, 0.02, 0.03
+        ]
+    }
+    inputs_df = pd.DataFrame(data)
 
-    # IT Expense Baseline
-    baseline_it_expense = st.number_input("IT Expense Baseline ($)", value=4_977_370, step=10000)
-    st.session_state.it_expense = baseline_it_expense  # Store in session state
+    # Display the table with editable cells
+    st.subheader("Edit Inputs Below:")
+    edited_inputs = st.dataframe(inputs_df)
 
-    # Category Expenses and Revenue Allocations
-    expense_categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
-
-    category_expenses_to_total = []  # This stores the expense % to total IT expense
-    category_revenue_to_total = []  # This stores the revenue % for each category
-
-    for i, category in enumerate(expense_categories):
-        expense_percentage = st.number_input(f"{category} % of IT Expenses", min_value=0.0, max_value=1.0, value=0.1, key=f"{category}_expense_percentage")
-        revenue_percentage = st.number_input(f"{category} % of Revenue", min_value=0.0, max_value=1.0, value=0.1, key=f"{category}_revenue_percentage")
-
-        category_expenses_to_total.append(expense_percentage)
-        category_revenue_to_total.append(revenue_percentage)
-
-    st.session_state.category_expenses_to_total = category_expenses_to_total  # Store in session state
-    st.session_state.category_revenue_to_total = category_revenue_to_total  # Store in session state
-
-    # Revenue and IT Expense Growth rates per year
-    revenue_growth = []
-    expense_growth = []
-
-    for i in range(1, 4):
-        revenue_growth.append(st.number_input(f"Year {i} Revenue Growth (%)", min_value=-1.0, max_value=1.0, value=0.05, key=f"revenue_growth_{i}"))
-        expense_growth.append(st.number_input(f"Year {i} IT Expense Growth (%)", min_value=-1.0, max_value=1.0, value=0.05, key=f"expense_growth_{i}"))
-
-    st.session_state.revenue_growth = revenue_growth  # Store in session state
-    st.session_state.expense_growth = expense_growth  # Store in session state
-
+    # After editing, save the values back to session state
+    st.session_state.baseline_revenue = edited_inputs.iloc[0, 1]
+    st.session_state.it_expense = edited_inputs.iloc[1, 1]
+    st.session_state.category_expenses_to_total = [
+        edited_inputs.iloc[2, 1], edited_inputs.iloc[3, 1], edited_inputs.iloc[4, 1], edited_inputs.iloc[5, 1], edited_inputs.iloc[6, 1]
+    ]
+    st.session_state.category_revenue_to_total = [
+        edited_inputs.iloc[7, 1], edited_inputs.iloc[8, 1], edited_inputs.iloc[9, 1], edited_inputs.iloc[10, 1], edited_inputs.iloc[11, 1]
+    ]
+    st.session_state.revenue_growth = [
+        edited_inputs.iloc[12, 1], edited_inputs.iloc[13, 1], edited_inputs.iloc[14, 1]
+    ]
+    st.session_state.expense_growth = [
+        edited_inputs.iloc[15, 1], edited_inputs.iloc[16, 1], edited_inputs.iloc[17, 1]
+    ]
+    
 # Calculator Tab
 if section == "📊 ITRM Calculator":
     st.title("📊 ITRM Calculator")
