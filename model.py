@@ -6,7 +6,7 @@ from fpdf import FPDF
 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "⚙️ Inputs Setup", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🤖 AI Assistant", "🔐 Cybersecurity Assessment"])
+section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "⚙️ Inputs Setup", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🤖 AI Assistant", "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment"])
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
 
 # Overview Tab
@@ -386,6 +386,71 @@ elif section == "🤖 AI Assistant":
             is_user = (i % 2 == 0)
             message(msg["content"], is_user=is_user)
 
+
+elif section == "📝 IT Maturity Assessment":
+    st.title("📝 IT Maturity Assessment Tool")
+    st.markdown("""
+    Welcome to the interactive IT Maturity Assessment. Please answer the following questions 
+    based on your current IT environment. Your responses will be used to calculate a maturity score
+    across several technology domains.
+    """)
+
+    grouped_questions = {
+        "Managed / Automated": ["Failover between sites", "Software Intelligence"],
+        "Survival, Ad-Hoc, Manual Legacy ": ["Back Up for restoring in case of data center disaster"],
+        # Add more categories and questions here as needed
+    }
+
+    responses = {}
+
+    with st.form("maturity_form"):
+        for category, questions in grouped_questions.items():
+            st.subheader(category.strip())
+            for q in questions:
+                key = f"{category.strip()}::{q}"
+                responses[key] = st.radio(q.strip(), ["Yes", "No"], key=key)
+        submitted = st.form_submit_button("Submit Assessment")
+
+    if submitted:
+        st.header("📊 Maturity Assessment Results")
+        score_data = []
+
+        for category in grouped_questions:
+            questions = grouped_questions[category]
+            yes_count = sum(1 for q in questions if responses.get(f"{category.strip()}::{q}") == "Yes")
+            total = len(questions)
+            percent = round((yes_count / total) * 100, 1)
+            score_data.append({"Category": category.strip(), "Score (%)": percent})
+
+        score_df = pd.DataFrame(score_data).sort_values(by="Category")
+        st.session_state.it_maturity_scores = score_df
+
+        st.dataframe(score_df, use_container_width=True)
+
+        st.subheader("🔵 Heatmap View of Maturity by Category")
+        st.dataframe(score_df.style.format({"Score (%)": "{:.1f}"}))
+
+        st.subheader("📈 Bar Chart of Scores")
+        st.bar_chart(score_df.set_index("Category"))
+
+        st.markdown("""
+        ### 🔍 Interpretation:
+        - **80%+**: High maturity — optimized or automated
+        - **50-79%**: Moderate maturity — standardized or in transition
+        - **Below 50%**: Low maturity — ad-hoc or siloed
+        """)
+
+        st.header("🧭 Recommendations by Category")
+        for _, row in score_df.iterrows():
+            score = row["Score (%)"]
+            category = row["Category"]
+            if score >= 80:
+                rec = f"✅ *{category}* is highly mature. Continue optimizing with automation and cross-domain integration."
+            elif score >= 50:
+                rec = f"⚠️ *{category}* shows moderate maturity. Focus on standardization, consolidation, and governance improvements."
+            else:
+                rec = f"❌ *{category}* is low maturity. Prioritize modernization, documentation, and automation."
+            st.markdown(rec)
 
 # Inputs Tab
 elif section == "⚙️ Inputs Setup":
