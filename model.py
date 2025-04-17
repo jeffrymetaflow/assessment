@@ -655,6 +655,66 @@ elif section == "📝 IT Maturity Assessment":
                 st.markdown("Ask the assistant anything about your IT model or strategy.")
                 st.text_area("Your Question", value="", height=100)
 
+    # AI Assistant Function to update values in the session state
+    def ai_assistant_update(query):
+        response = ""
+    
+        # Update baseline revenue
+        if "baseline revenue" in query.lower():
+            try:
+                new_revenue = float(query.split("update baseline revenue to ")[1].replace(",", ""))
+                st.session_state.baseline_revenue = new_revenue
+                response = f"✅ Baseline revenue has been updated to ${new_revenue:,.2f}."
+            except ValueError:
+                response = "❌ Couldn't parse the revenue amount. Please ensure it's a valid number."
+    
+        # Update IT expenses
+        elif "it expense" in query.lower():
+            try:
+                new_expense = float(query.split("update IT expense to ")[1].replace(",", ""))
+                st.session_state.it_expense = new_expense
+                response = f"✅ IT Expense has been updated to ${new_expense:,.2f}."
+            except ValueError:
+                response = "❌ Couldn't parse the expense amount. Please ensure it's a valid number."
+    
+        # Handle other inputs (categories, revenue growth, etc.) similarly...
+        return response
+    
+    # AI Assistant Tab - User Interface
+    if section == "🤖 AI Assistant":
+        st.title("AI Assistant")
+    
+        user_input = st.text_input("Ask the AI Assistant to update the Inputs:")
+    
+        if user_input:
+            assistant_response = ai_assistant_update(user_input)
+            st.markdown(assistant_response)
+    
+            # Display the updated values
+            st.write(f"Current Baseline Revenue: ${st.session_state.baseline_revenue:,.2f}")
+            st.write(f"Current IT Expense: ${st.session_state.it_expense:,.2f}")
+    
+        # You can add more examples or guidelines here
+        st.markdown("You can update values such as baseline revenue, IT expense, and more.")
+        st.write("Example commands: \n- 'Update baseline revenue to 1,000,000' \n- 'Update IT expense to 500,000'")
+    
+    # Inputs Tab - To reflect updates made by the AI Assistant
+    if section == "⚙️ Inputs Setup":
+        st.title("Inputs Setup")
+        st.markdown("Configure your baseline inputs and growth expectations.")
+    
+        revenue = st.session_state.get("baseline_revenue", 0.0)
+        it_expense = st.session_state.get("it_expense", 0.0)
+    
+        # Dynamically update input fields
+        revenue_input = st.number_input("Baseline Revenue ($)", value=revenue, step=1000000)
+        expense_input = st.number_input("IT Expense ($)", value=it_expense, step=100000)
+    
+        if revenue_input != revenue:
+            st.session_state.baseline_revenue = revenue_input
+        if expense_input != it_expense:
+            st.session_state.it_expense = expense_input
+
 # Inputs Tab
 if section == "⚙️ Inputs Setup":
     st.title("⚙️ Inputs Setup")
