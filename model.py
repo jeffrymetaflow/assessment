@@ -799,14 +799,14 @@ if section == "⚙️ Inputs Setup":
         baseline_revenue = 739000000  # Default value if there's an issue with the revenue format
     
     # Now, use it in the Streamlit number input widget
-    revenue_input = st.number_input("Baseline Revenue ($)", value=baseline_revenue, step=1000000)
+        revenue_input = st.number_input("Baseline Revenue ($)", value=baseline_revenue, step=1000000)
     
     # Save the updated value back into session state
     if revenue_input != st.session_state.baseline_revenue:
         st.session_state.baseline_revenue = revenue_input    
     # Dynamically update input fields
-    revenue_input = st.number_input("Baseline Revenue ($)", value=revenue, step=1000000)
-    expense_input = st.number_input("IT Expense ($)", value=it_expense, step=100000)
+        revenue_input = st.number_input("Baseline Revenue ($)", value=revenue, step=1000000)
+        expense_input = st.number_input("IT Expense ($)", value=it_expense, step=100000)
 
     if revenue_input != revenue:
         st.session_state.baseline_revenue = revenue_input
