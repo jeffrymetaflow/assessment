@@ -807,11 +807,7 @@ if section == "⚙️ Inputs Setup":
     # If it's a string (e.g., '1,000,000'), clean it and convert to float
     if isinstance(baseline_revenue, str):
         baseline_revenue = float(baseline_revenue.replace(",", ""))  # Remove commas and convert
-    
-    # Ensure that baseline_revenue is now a valid numeric value (float or int)
-    if not isinstance(baseline_revenue, (int, float)):
-        baseline_revenue = 739000000  # Default value if there's an issue with the revenue format
-    
+     
     # Now, use it in the Streamlit number input widget
     revenue_input = st.number_input("Baseline Revenue ($)", value=baseline_revenue, step=1000000)
     
