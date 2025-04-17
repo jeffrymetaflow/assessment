@@ -117,6 +117,30 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
 
         buffer = BytesIO()
         pdf.output(buffer)
+
+        # Add IT Maturity Scores
+        if 'it_maturity_scores' in st.session_state:
+            maturity_df = st.session_state.it_maturity_scores
+            pdf.add_page()
+            pdf.chapter_title("IT Maturity Assessment Summary")
+            for index, row in maturity_df.iterrows():
+                line = f"{row['Category']}: {row['Score (%)']}%"
+                pdf.chapter_body(line)
+
+        # Add Financial Summary Insights
+        if 'calculator_results' in st.session_state:
+            results = st.session_state.calculator_results
+            last_year = 'Year 3'
+            pdf.add_page()
+            pdf.chapter_title("Financial Summary Insights")
+            if 'inputs' in st.session_state:
+                inputs = st.session_state.inputs
+                categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
+                revenue = inputs['revenue_baseline'] * (1 + inputs['target_revenue_growth'][2])
+                for i, cat in enumerate(categories):
+                    split = inputs['category_revenue_split'][i]
+                    expense = results[last_year]['category_expenses'][i]
+                    pdf.chapter_body(f"{cat}: ${expense:,.2f} expense, {split * 100:.1f}% of revenue")
         buffer.seek(0)
         st.download_button("📥 Download PDF", buffer, file_name="ITRM_Executive_Summary.pdf")
 
@@ -612,5 +636,7 @@ elif section == "📊 ITRM Calculator":
         st.markdown("- Monitor expense-heavy categories for targeted optimization.")
         st.markdown("- Validate whether revenue growth assumptions are realistic.")
         st.markdown("- Revisit automation or cloud strategies to reduce total IT spend.")
+
+
 
 
