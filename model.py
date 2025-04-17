@@ -583,52 +583,77 @@ elif section == "📝 IT Maturity Assessment":
                 rec = f"❌ *{category}* is low maturity. Prioritize modernization, documentation, and automation."
             st.markdown(rec)
 
-    # Function to generate AI-powered cybersecurity recommendations based on maturity scores
-    def generate_cybersecurity_recommendations(cybersecurity_scores):
-        recommendations = []
-        for category, score in cybersecurity_scores.items():
+# Function to generate AI-powered cybersecurity recommendations based on maturity scores
+def generate_cybersecurity_recommendations(cybersecurity_scores):
+    recommendations = []
+    for category, score in cybersecurity_scores.items():
+        if category == "Identify":
             if score >= 4:
-                recommendation = f"✅ **{category}**: Sustain mature practices and monitor emerging trends."
+                recommendation = "✅ **Identify**: Sustain mature practices, monitor emerging trends, and ensure your cybersecurity risk management processes are consistently updated."
             elif score == 3:
-                recommendation = f"⚠️ **{category}**: Refine documentation, improve awareness, and conduct training sessions."
+                recommendation = "⚠️ **Identify**: Review and improve risk management processes, including threat detection, vulnerability assessments, and mitigation planning."
             else:
-                recommendation = f"❌ **{category}**: Prioritize investment in processes, implement governance and compliance practices."
+                recommendation = "❌ **Identify**: Establish robust risk management practices, conduct regular vulnerability assessments, and develop proactive threat detection mechanisms."
         
-            recommendations.append(recommendation)
-        return recommendations
+        elif category == "Protect":
+            if score >= 4:
+                recommendation = "✅ **Protect**: Maintain strong preventive controls, continue training, and enhance system defense capabilities."
+            elif score == 3:
+                recommendation = "⚠️ **Protect**: Enhance preventive controls and conduct regular system security assessments."
+            else:
+                recommendation = "❌ **Protect**: Focus on improving access controls, patch management, and data encryption strategies."
+        
+        elif category == "Detect":
+            if score >= 4:
+                recommendation = "✅ **Detect**: Sustain continuous monitoring and analysis of cybersecurity events to detect anomalies promptly."
+            elif score == 3:
+                recommendation = "⚠️ **Detect**: Strengthen real-time detection systems and incident response protocols."
+            else:
+                recommendation = "❌ **Detect**: Implement and fine-tune anomaly detection tools and integrate proactive monitoring systems."
+        
+        elif category == "Respond":
+            if score >= 4:
+                recommendation = "✅ **Respond**: Ensure ongoing incident response planning and regular testing to handle potential threats effectively."
+            elif score == 3:
+                recommendation = "⚠️ **Respond**: Create and regularly test an incident response plan and conduct training for key stakeholders."
+            else:
+                recommendation = "❌ **Respond**: Develop and implement an incident response plan, ensuring clear roles, responsibilities, and procedures during cybersecurity incidents."
+        
+        elif category == "Recover":
+            if score >= 4:
+                recommendation = "✅ **Recover**: Continue to strengthen recovery processes and maintain regular testing of disaster recovery plans."
+            elif score == 3:
+                recommendation = "⚠️ **Recover**: Review recovery processes and update your disaster recovery plan."
+            else:
+                recommendation = "❌ **Recover**: Focus on developing and testing disaster recovery plans to minimize downtime during cybersecurity breaches."
+        
+        recommendations.append(recommendation)
+    return recommendations
 
-    # AI Assistant function to provide personalized responses based on cybersecurity scores
-    def ai_assistant(query):
-        if 'cybersecurity_scores' in st.session_state:
-            recommendations = generate_cybersecurity_recommendations(st.session_state.cybersecurity_scores)
-            return "\n".join(recommendations)
-        else:
-            return "I can assist you with IT maturity and recommendations based on your inputs."
+# AI Assistant function to provide personalized responses based on cybersecurity scores
+def ai_assistant(query):
+    if 'cybersecurity_scores' in st.session_state:
+        recommendations = generate_cybersecurity_recommendations(st.session_state.cybersecurity_scores)
+        return "\n".join(recommendations)
+    else:
+        return "I can assist you with IT maturity and recommendations based on your inputs."
 
-    # Display the AI Assistant interaction in the app
-        st.sidebar.title("AI Assistant")
-        query = st.text_input("Ask the AI Assistant:", placeholder="e.g., What are the cybersecurity recommendations?")
+# Display the AI Assistant interaction in the app
+st.sidebar.title("AI Assistant")
+query = st.text_input("Ask the AI Assistant:", placeholder="e.g., What are the cybersecurity recommendations?")
 
-    if query:
-        response = ai_assistant(query)
-        st.markdown(f"**AI Assistant Response:**\n{response}")
+if query:
+    response = ai_assistant(query)
+    st.markdown(f"**AI Assistant Response:**\n{response}")
 
-    # Existing sidebar and tabs code
-    section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🧭 Strategic Roadmap", "📊 Benchmarking & Persona", "🤖 AI Assistant"])
+# Sidebar navigation for the app
+section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🧭 Strategic Roadmap", "📊 Benchmarking & Persona", "🤖 AI Assistant"])
 
-    # AI Assistant Tab Content
-    if section == "🤖 AI Assistant":
-        st.title("AI Assistant")
-        st.markdown("Ask the assistant anything about your IT model or strategy.")
-        st.text_area("Your Question", value="", height=100)
-
-    # If the section is AI Assistant, display the assistant functionality
-    if section == "🤖 AI Assistant":
-        st.markdown("### Ask the AI Assistant")
-        query = st.text_input("Enter your question:")
-
-        if query:
-            st.write(ai_assistant(query))  # Display the AI-generated response
+# AI Assistant Tab Content
+if section == "🤖 AI Assistant":
+    st.title("AI Assistant")
+    st.markdown("Ask the assistant anything about your IT model or strategy.")
+    st.text_area("Your Question", value="", height=100)
 
 # Inputs Tab
 if section == "⚙️ Inputs Setup":
