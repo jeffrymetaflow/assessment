@@ -624,6 +624,9 @@ if section == "📊 ITRM Calculator":
     revenue_growth = st.session_state.revenue_growth
     expense_growth = st.session_state.expense_growth
 
+    # Define categories, adjust these names based on your actual expense categories
+    expense_categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
+
     # Calculate and display ITRM for each year
     st.markdown("### Yearly Calculations")
     category_expenses = {}
@@ -649,4 +652,3 @@ if section == "📊 ITRM Calculator":
     ax.set_ylabel("IT Revenue Margin (%)")
     ax.set_title("ITRM Over Time")
     st.pyplot(fig)
-
