@@ -81,6 +81,7 @@ if section == "🧭 Strategic Roadmap":
         for item in checklist:
             st.markdown(f"- [ ] {item}")
 
+
 # Benchmarking & Persona Tab
 elif section == "📊 Benchmarking & Persona":
     st.title("📊 Benchmarking & Persona")
