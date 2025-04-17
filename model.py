@@ -6,7 +6,17 @@ from fpdf import FPDF
 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", ["🧭 Strategic Roadmap", "📊 Benchmarking & Persona", "🧭 Strategic Roadmap", "📊 Benchmarking & Persona", "🧠 Overview Summary", "⚙️ Inputs Setup", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🤖 AI Assistant", "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment"])
+section = st.sidebar.radio("Go to", [
+    "🧠 Overview Summary",
+    "⚙️ Inputs Setup",
+    "📊 ITRM Calculator",
+    "💰 ITRM Financial Summary",
+    "🔐 Cybersecurity Assessment",
+    "📝 IT Maturity Assessment",
+    "🧭 Strategic Roadmap",
+    "📊 Benchmarking & Persona",
+    "🤖 AI Assistant"
+])
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
 
 # Strategic Roadmap Tab
@@ -70,7 +80,6 @@ if section == "🧭 Strategic Roadmap":
         st.subheader("🗒️ Your Strategic Checklist")
         for item in checklist:
             st.markdown(f"- [ ] {item}")
-
 
 # Benchmarking & Persona Tab
 elif section == "📊 Benchmarking & Persona":
