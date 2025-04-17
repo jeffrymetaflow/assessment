@@ -134,7 +134,7 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
                     expense = results[last_year]['category_expenses'][i]
                     pdf.chapter_body(f"{cat}: ${expense:,.2f} expense, {split * 100:.1f}% of revenue")
         buffer.seek(0)
-        st.download_button(st.download_button("📥 Download PDF", buffer, file_name="ITRM_Executive_Summary.pdf")
+        st.download_button("📥 Download PDF", buffer, file_name="ITRM_Executive_Summary.pdf")
 
 # Calculator Tab
 elif section == "📊 ITRM Calculator":
