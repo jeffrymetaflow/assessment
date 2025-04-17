@@ -93,27 +93,30 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
     .replace("### ", "")
     .replace("---", "----------------------")
 )
-cleaned_summary = cleaned_summary.encode("latin-1", "ignore").decode("latin-1")
-    .replace("<Client Name>", client_name if client_name else "<Client Name>")
+
     .replace("  ", "")
     .replace("## ", "")
     .replace("### ", "")
     .replace("---", "----------------------")
 )
-cleaned_summary = cleaned_summary.encode("latin-1", "ignore").decode("latin-1")
-            .replace("<Client Name>", client_name if client_name else "<Client Name>")
+
+    .replace("  ", "")
+    .replace("## ", "")
+    .replace("### ", "")
+    .replace("---", "----------------------")
+)
+
             .replace("  ", "")
             .replace("## ", "")
             .replace("### ", "")
             .replace("---", "----------------------")
         )
-        cleaned_summary = cleaned_summary.encode("latin-1", "ignore").decode("latin-1")
-            .replace("  ", "")
+        
             .replace("## ", "")
             .replace("### ", "")
             .replace("---", "----------------------")
         )
-        cleaned_summary = cleaned_summary.encode("latin-1", "ignore").decode("latin-1")  # Remove double spaces
+          # Remove double spaces
             .replace("## ", "")  # Remove level 2 headers
             .replace("### ", "")  # Remove level 3 headers
             .replace("---", "----------------------")  # Replace horizontal rules
@@ -661,6 +664,4 @@ elif section == "📊 ITRM Calculator":
         st.markdown("- Monitor expense-heavy categories for targeted optimization.")
         st.markdown("- Validate whether revenue growth assumptions are realistic.")
         st.markdown("- Revisit automation or cloud strategies to reduce total IT spend.")
-
-
 
