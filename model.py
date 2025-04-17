@@ -60,12 +60,18 @@ if section == "🧭 Strategic Roadmap":
             roadmap_items.append((control, label))
             checklist.append(rec)
 
+    # Ensure both arrays have the same length
+    quarters = ["Q1", "Q2", "Q3", "Q4"] * ((len(roadmap_items) + 3) // 4)
+    quarters = quarters[:len(roadmap_items)]  # Trim to match the length of roadmap_items
+
+    # Create DataFrame with proper alignment
+    timeline_df = pd.DataFrame({
+        "Quarter": quarters,
+        "Action Item": roadmap_items  # Ensure matching lengths
+    })
+
     if roadmap_items:
         st.subheader("📅 Strategic Timeline by Quarter")
-        timeline_df = pd.DataFrame({
-            "Quarter": ["Q1", "Q2", "Q3", "Q4"] * ((len(roadmap_items) + 3) // 4),
-            "Action Item": roadmap_items[:16]
-        })
         timeline_df = timeline_df.dropna().reset_index(drop=True)
         st.dataframe(timeline_df)
 
@@ -73,7 +79,7 @@ if section == "🧭 Strategic Roadmap":
         for quarter in ["Q1", "Q2", "Q3", "Q4"]:
             st.markdown(f"**{quarter}**")
             for item in timeline_df[timeline_df["Quarter"] == quarter]["Action Item"]:
-                st.checkbox(f"{item[0]} – {item[1]}", key=f"{quarter}_{item[0]}")
+                st.checkbox(f"{item[0]} – {item[1]}", key=f"{quarter}_{item[0]}" )
 
     if checklist:
         st.markdown("---")
