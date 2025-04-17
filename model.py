@@ -606,8 +606,8 @@ elif section == "📝 IT Maturity Assessment":
             return "I can assist you with IT maturity and recommendations based on your inputs."
 
     # Display the AI Assistant interaction in the app
-     st.sidebar.title("AI Assistant")
-    query = st.text_input("Ask the AI Assistant:", placeholder="e.g., What are the cybersecurity recommendations?")
+        st.sidebar.title("AI Assistant")
+        query = st.text_input("Ask the AI Assistant:", placeholder="e.g., What are the cybersecurity recommendations?")
 
     if query:
         response = ai_assistant(query)
