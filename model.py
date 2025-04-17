@@ -779,7 +779,23 @@ if section == "⚙️ Inputs Setup":
 
     # Clear any unnecessary session data
     st.session_state.pop('inputs', None)  # Remove the 'inputs' key to avoid potential display issues
+
+    if section == "⚙️ Inputs Setup":
+        st.title("Inputs Setup")
+        st.markdown("Configure your baseline inputs and growth expectations.")
     
+        revenue = st.session_state.get("baseline_revenue", 0.0)
+        it_expense = st.session_state.get("it_expense", 0.0)
+    
+        # Dynamically update input fields
+        revenue_input = st.number_input("Baseline Revenue ($)", value=revenue, step=1000000)
+        expense_input = st.number_input("IT Expense ($)", value=it_expense, step=100000)
+    
+        if revenue_input != revenue:
+            st.session_state.baseline_revenue = revenue_input
+        if expense_input != it_expense:
+            st.session_state.it_expense = expense_input
+
 # Calculator Tab
 if section == "📊 ITRM Calculator":
     st.title("📊 ITRM Multi-Year Calculator")
