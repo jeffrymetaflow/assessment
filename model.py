@@ -287,55 +287,28 @@ if section == "📊 ITRM Calculator":
     st.title("📊 ITRM Calculator")
     st.markdown("Enter revenue and expense adjustments below")
 
-    # Ensure the baseline revenue is loaded from the Inputs Setup tab or set a default
-    if 'baseline_revenue' not in st.session_state:
-        st.session_state.baseline_revenue = 739_000_000  # Default revenue for testing
+    # Ensure the inputs are available
+    if 'baseline_revenue' not in st.session_state or 'category_expenses' not in st.session_state:
+        st.warning("Please configure inputs in the Inputs Setup tab first.")
+        st.stop()
 
-    # Use the revenue from session state (input from the user)
+    # Retrieve values from session state
     revenue = st.session_state.baseline_revenue
+    category_expenses = st.session_state.category_expenses
 
-    # Revenue Input for Year 1, Year 2, Year 3
-    revenue_input = {
-        "Year 1": revenue,
-        "Year 2": revenue * 1.05,  # Example growth for Year 2
-        "Year 3": revenue * 1.10   # Example growth for Year 3
-    }
-
-    categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
-    category_revenue_splits = [0.5, 0.2, 0.1, 0.15, 0.05]
-    category_expense_changes = [0.30, -0.20, -0.15, 0.10, 0.10]
-
-    category_expenses = {}
-
+    # Calculate and display ITRM for each year
     for year in ["Year 1", "Year 2", "Year 3"]:
-        st.markdown(f"### {year} Category Adjustments")
-        category_expenses[year] = []
-        total_expense = 0
-
-        for i, cat in enumerate(categories):
-            col1, col2 = st.columns(2)
-            with col1:
-                split = category_revenue_splits[i]
-                st.markdown(f"{cat} - Revenue %: **{split*100:.1f}%**")
-            with col2:
-                change = st.number_input(
-                    f"{cat} Expense Change % ({year})", format="%.2f", value=category_expense_changes[i], key=f"{year}_{cat}_change"
-                )
-
-            expense = revenue_input[year] * split * (1 + change)
-            total_expense += expense
-            category_expenses[year].append(expense)
+        st.markdown(f"### {year} Adjustments")
+        total_expense = sum(category_expenses[year])
 
         st.success(f"**{year} Total Expense:** ${total_expense:,.2f}")
-        itrm = (total_expense / revenue_input[year]) * 100
+        itrm = (total_expense / revenue) * 100
         st.info(f"**{year} IT Revenue Margin (ITRM):** {itrm:.2f}%")
-
-    st.markdown("---")
 
     # Chart section: ITRM trend across years
     st.markdown("### 📈 IT Revenue Margin Trend")
-    years = list(revenue_input.keys())
-    itrms = [ (sum(category_expenses[year]) / revenue_input[year]) * 100 for year in years]
+    years = ["Year 1", "Year 2", "Year 3"]
+    itrms = [ (sum(category_expenses[year]) / revenue) * 100 for year in years]
 
     fig, ax = plt.subplots()
     ax.plot(years, itrms, marker='o', linewidth=2)
