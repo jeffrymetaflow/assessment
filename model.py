@@ -831,4 +831,3 @@ elif section == "📊 ITRM Calculator":
         st.markdown("- Monitor expense-heavy categories for targeted optimization.")
         st.markdown("- Validate whether revenue growth assumptions are realistic.")
         st.markdown("- Revisit automation or cloud strategies to reduce total IT spend.")
-
