@@ -396,10 +396,33 @@ elif section == "📝 IT Maturity Assessment":
     """)
 
     grouped_questions = {
-        "Managed / Automated": ["Failover between sites", "Software Intelligence"],
-        "Survival, Ad-Hoc, Manual Legacy ": ["Back Up for restoring in case of data center disaster"],
-        # Add more categories and questions here as needed
-    }
+    "Managed / Automated": [
+        "Failover between sites",
+        "Software Intelligence",
+        "Automated patch management",
+        "Self-healing infrastructure"
+    ],
+    "Standardized / Optimized": [
+        "Documented configuration baselines",
+        "Centralized logging and monitoring",
+        "Defined performance SLAs"
+    ],
+    "Defined / Measured": [
+        "Service catalog in place",
+        "Change management policy",
+        "IT financial transparency dashboards"
+    ],
+    "Reactive / Operational": [
+        "Ticket-based support system",
+        "Manual security patching",
+        "Email-based approval workflows"
+    ],
+    "Survival, Ad-Hoc, Manual Legacy": [
+        "Back Up for restoring in case of data center disaster",
+        "No defined IT process for onboarding",
+        "Spreadsheets used for asset tracking"
+    ]
+}
 
     responses = {}
 
