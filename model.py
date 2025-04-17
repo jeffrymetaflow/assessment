@@ -342,10 +342,10 @@ if section == "💰 ITRM Financial Summary":
         st.markdown(f"- **{year}:** ${expense:,.2f}")
 
     # Calculate IT Revenue Margin (ITRM) for each year
-    itrm = {
-        "Year 1": (expense_input["Year 1"] / revenue_input["Year 1"]) * 100,
-        "Year 2": (expense_input["Year 2"] / revenue_input["Year 2"]) * 100,
-        "Year 3": (expense_input["Year 3"] / revenue_input["Year 3"]) * 100,
+     itrm = {
+        "Year 1": (expense_input["Year 1"] / revenue_input["Year 1"]) * 100 if revenue_input["Year 1"] != 0 else 0,
+        "Year 2": (expense_input["Year 2"] / revenue_input["Year 2"]) * 100 if revenue_input["Year 2"] != 0 else 0,
+        "Year 3": (expense_input["Year 3"] / revenue_input["Year 3"]) * 100 if revenue_input["Year 3"] != 0 else 0,
     }
 
     # Display ITRM
