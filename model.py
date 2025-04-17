@@ -10,7 +10,7 @@ section = st.sidebar.radio("Go to", ["🧭 Strategic Roadmap", "📊 Benchmarkin
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
 
 # Strategic Roadmap Tab
-elif section == "🧭 Strategic Roadmap":
+if section == "🧭 Strategic Roadmap":
     st.title("🧭 Strategic Roadmap")
     st.markdown("""
     Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
@@ -55,7 +55,7 @@ elif section == "🧭 Strategic Roadmap":
             st.markdown(f"**{quarter}**")
             for item in timeline_df[timeline_df["Quarter"] == quarter]["Action Item"]:
                 st.checkbox(f"{item[0]} – {item[1]}", key=f"{quarter}_{item[0]}")
-elif section == "🧭 Strategic Roadmap":
+if section == "🧭 Strategic Roadmap":
     st.title("🧭 Strategic Roadmap")
     st.markdown("""
     Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
@@ -95,7 +95,7 @@ elif section == "🧭 Strategic Roadmap":
         st.subheader("🗒️ Your Strategic Checklist")
         for item in checklist:
             st.markdown(f"- [ ] {item}")
-elif section == "🧭 Strategic Roadmap":
+if section == "🧭 Strategic Roadmap":
     st.title("🧭 Strategic Roadmap")
     st.markdown("""
     Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
@@ -124,7 +124,7 @@ elif section == "🧭 Strategic Roadmap":
         st.dataframe(timeline_df)
     else:
         st.info("Run the IT Maturity Assessment first to generate roadmap insights.")
-elif section == "🧭 Strategic Roadmap":
+if section == "🧭 Strategic Roadmap":
     st.title("🧭 Strategic Roadmap")
     st.markdown("""
     Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
