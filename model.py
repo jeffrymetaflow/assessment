@@ -17,6 +17,7 @@ if section == "🧭 Strategic Roadmap":
     """)
 
     roadmap_items = []
+    checklist = []
 
     if 'it_maturity_scores' in st.session_state:
         scores = st.session_state.it_maturity_scores
@@ -25,27 +26,35 @@ if section == "🧭 Strategic Roadmap":
             cat = row["Category"]
             if score >= 80:
                 label = "🟢 Maintain and enhance automation"
+                rec = f"🟢 {cat}: Maintain and enhance automation."
             elif score >= 50:
                 label = "🟡 Standardize and document processes"
+                rec = f"🟡 {cat}: Standardize and document processes."
             else:
                 label = "🔴 Prioritize investment and leadership support"
+                rec = f"🔴 {cat}: Prioritize investment and leadership support."
             roadmap_items.append((cat, label))
+            checklist.append(rec)
 
     if 'cybersecurity_scores' in st.session_state:
         for control, score in st.session_state.cybersecurity_scores.items():
             if score >= 4:
                 label = "✅ Sustain mature practices"
+                rec = f"✅ {control}: Sustain mature practices."
             elif score == 3:
                 label = "⚠️ Refine documentation and training"
+                rec = f"⚠️ {control}: Consider refining documentation and training."
             else:
                 label = "❌ Prioritize process implementation and governance"
+                rec = f"❌ {control}: Prioritize process implementation and governance."
             roadmap_items.append((control, label))
+            checklist.append(rec)
 
     if roadmap_items:
         st.subheader("📅 Strategic Timeline by Quarter")
         timeline_df = pd.DataFrame({
             "Quarter": ["Q1", "Q2", "Q3", "Q4"] * ((len(roadmap_items) + 3) // 4),
-            "Action Item": roadmap_items[:16]  # Limit to 16 items across 4 quarters
+            "Action Item": roadmap_items[:16]
         })
         timeline_df = timeline_df.dropna().reset_index(drop=True)
         st.dataframe(timeline_df)
@@ -55,94 +64,13 @@ if section == "🧭 Strategic Roadmap":
             st.markdown(f"**{quarter}**")
             for item in timeline_df[timeline_df["Quarter"] == quarter]["Action Item"]:
                 st.checkbox(f"{item[0]} – {item[1]}", key=f"{quarter}_{item[0]}")
-if section == "🧭 Strategic Roadmap":
-    st.title("🧭 Strategic Roadmap")
-    st.markdown("""
-    Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
-    """)
-
-    checklist = []
-
-    if 'it_maturity_scores' in st.session_state:
-        scores = st.session_state.it_maturity_scores
-        for _, row in scores.iterrows():
-            score = row["Score (%)"]
-            cat = row["Category"]
-            if score >= 80:
-                rec = f"🟢 {cat}: Maintain and enhance automation."
-            elif score >= 50:
-                rec = f"🟡 {cat}: Standardize and document processes."
-            else:
-                rec = f"🔴 {cat}: Prioritize investment and leadership support."
-            checklist.append(rec)
-            st.markdown(f"- [ ] {rec}")
-
-    if 'cybersecurity_scores' in st.session_state:
-        st.markdown("---")
-        st.markdown("### 🔐 Cybersecurity Roadmap")
-        for control, score in st.session_state.cybersecurity_scores.items():
-            if score >= 4:
-                rec = f"✅ {control}: Sustain mature practices."
-            elif score == 3:
-                rec = f"⚠️ {control}: Consider refining documentation and training."
-            else:
-                rec = f"❌ {control}: Prioritize process implementation and governance."
-            checklist.append(rec)
-            st.markdown(f"- [ ] {rec}")
 
     if checklist:
         st.markdown("---")
         st.subheader("🗒️ Your Strategic Checklist")
         for item in checklist:
             st.markdown(f"- [ ] {item}")
-if section == "🧭 Strategic Roadmap":
-    st.title("🧭 Strategic Roadmap")
-    st.markdown("""
-    Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
-    """)
 
-    if 'it_maturity_scores' in st.session_state:
-        scores = st.session_state.it_maturity_scores
-        roadmap = []
-        for _, row in scores.iterrows():
-            score = row["Score (%)"]
-            cat = row["Category"]
-            if score >= 80:
-                rec = f"🟢 {cat}: Maintain and enhance automation."
-            elif score >= 50:
-                rec = f"🟡 {cat}: Standardize and document processes."
-            else:
-                rec = f"🔴 {cat}: Prioritize investment and leadership support."
-            roadmap.append((cat, rec))
-            st.markdown(rec)
-
-        st.subheader("📆 Recommended Improvement Timeline")
-        timeline_df = pd.DataFrame({
-            "Phase": ["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"],
-            "Focus": [roadmap[0][1], roadmap[1][1], roadmap[2][1], roadmap[3][1]]
-        })
-        st.dataframe(timeline_df)
-    else:
-        st.info("Run the IT Maturity Assessment first to generate roadmap insights.")
-if section == "🧭 Strategic Roadmap":
-    st.title("🧭 Strategic Roadmap")
-    st.markdown("""
-    Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
-    """)
-
-    if 'it_maturity_scores' in st.session_state:
-        scores = st.session_state.it_maturity_scores
-        for _, row in scores.iterrows():
-            score = row["Score (%)"]
-            cat = row["Category"]
-            if score >= 80:
-                st.success(f"🟢 {cat}: Maintain and enhance automation.")
-            elif score >= 50:
-                st.warning(f"🟡 {cat}: Standardize and document processes.")
-            else:
-                st.error(f"🔴 {cat}: Prioritize investment and leadership support.")
-    else:
-        st.info("Run the IT Maturity Assessment first to generate roadmap insights.")
 
 # Benchmarking & Persona Tab
 elif section == "📊 Benchmarking & Persona":
