@@ -86,8 +86,14 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
         pdf.chapter_title("Client: " + (client_name if client_name else "<Client Name>"))
         cleaned_summary = (
             summary_display
-            .replace("**", "")  # Remove Markdown bold syntax
-            .replace("<Client Name>", client_name if client_name else "<Client Name>")  # Replace placeholder
+            .replace("**", "")
+            .replace("<Client Name>", client_name if client_name else "<Client Name>")
+            .replace("  ", "")
+            .replace("## ", "")
+            .replace("### ", "")
+            .replace("---", "----------------------")
+        )
+        cleaned_summary = cleaned_summary.encode("latin-1", "ignore").decode("latin-1")  # Replace placeholder
             .replace("  ", "")  # Remove double spaces
             .replace("## ", "")  # Remove level 2 headers
             .replace("### ", "")  # Remove level 3 headers
@@ -636,7 +642,4 @@ elif section == "📊 ITRM Calculator":
         st.markdown("- Monitor expense-heavy categories for targeted optimization.")
         st.markdown("- Validate whether revenue growth assumptions are realistic.")
         st.markdown("- Revisit automation or cloud strategies to reduce total IT spend.")
-
-
-
 
