@@ -606,19 +606,39 @@ if section == "⚙️ Inputs Setup":
     st.title("⚙️ Inputs Setup")
 
     # Baseline Revenue Input
-    baseline_revenue = st.number_input("Baseline Revenue", value=739_000_000, step=1000000)
+    baseline_revenue = st.number_input("Baseline Revenue ($)", value=739_000_000, step=1000000)
     st.session_state.baseline_revenue = baseline_revenue  # Store in session state
 
-    # Category Expenses (per year)
-    category_expenses = {}
-    for year in ["Year 1", "Year 2", "Year 3"]:
-        category_expenses[year] = []
-        st.markdown(f"### {year} Expenses")
-        for i, category in enumerate(["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]):
-            expense = st.number_input(f"{category} Expense", key=f"{year}_{category}")
-            category_expenses[year].append(expense)
-    
-    st.session_state.category_expenses = category_expenses  # Store in session state
+    # IT Expense Baseline
+    baseline_it_expense = st.number_input("IT Expense Baseline ($)", value=4_977_370, step=10000)
+    st.session_state.it_expense = baseline_it_expense  # Store in session state
+
+    # Category Expenses and Revenue Allocations
+    expense_categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
+
+    category_expenses_to_total = []  # This stores the expense % to total IT expense
+    category_revenue_to_total = []  # This stores the revenue % for each category
+
+    for i, category in enumerate(expense_categories):
+        expense_percentage = st.number_input(f"{category} % of IT Expenses", min_value=0.0, max_value=1.0, value=0.1, key=f"{category}_expense_percentage")
+        revenue_percentage = st.number_input(f"{category} % of Revenue", min_value=0.0, max_value=1.0, value=0.1, key=f"{category}_revenue_percentage")
+
+        category_expenses_to_total.append(expense_percentage)
+        category_revenue_to_total.append(revenue_percentage)
+
+    st.session_state.category_expenses_to_total = category_expenses_to_total  # Store in session state
+    st.session_state.category_revenue_to_total = category_revenue_to_total  # Store in session state
+
+    # Revenue and IT Expense Growth rates per year
+    revenue_growth = []
+    expense_growth = []
+
+    for i in range(1, 4):
+        revenue_growth.append(st.number_input(f"Year {i} Revenue Growth (%)", min_value=-1.0, max_value=1.0, value=0.05, key=f"revenue_growth_{i}"))
+        expense_growth.append(st.number_input(f"Year {i} IT Expense Growth (%)", min_value=-1.0, max_value=1.0, value=0.05, key=f"expense_growth_{i}"))
+
+    st.session_state.revenue_growth = revenue_growth  # Store in session state
+    st.session_state.expense_growth = expense_growth  # Store in session state
 
 # Calculator Tab
 elif section == "📊 ITRM Calculator":
