@@ -283,26 +283,24 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
         st.download_button("📥 Download PDF", buffer, file_name="ITRM_Executive_Summary.pdf")
 
 # Calculator Tab
-# Calculator Tab
-elif section == "📊 ITRM Calculator":
-    st.title("📊 ITRM Multi-Year Calculator")
+if section == "📊 ITRM Calculator":
+    st.title("📊 ITRM Calculator")
+    st.markdown("Enter revenue and expense adjustments below")
 
-    # Ensure inputs are configured
-    if 'inputs' not in st.session_state:
-        st.warning("Please configure inputs in the Inputs Setup tab first.")
-        st.stop()
+    # Ensure the baseline revenue is loaded from the Inputs Setup tab or set a default
+    if 'baseline_revenue' not in st.session_state:
+        st.session_state.baseline_revenue = 739_000_000  # Default revenue for testing
 
-    # Get the revenue from session state
+    # Use the revenue from session state (input from the user)
     revenue = st.session_state.baseline_revenue
 
-    # Example revenue growth logic
+    # Revenue Input for Year 1, Year 2, Year 3
     revenue_input = {
         "Year 1": revenue,
         "Year 2": revenue * 1.05,  # Example growth for Year 2
         "Year 3": revenue * 1.10   # Example growth for Year 3
     }
 
-    # Example categories and expense changes
     categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
     category_revenue_splits = [0.5, 0.2, 0.1, 0.15, 0.05]
     category_expense_changes = [0.30, -0.20, -0.15, 0.10, 0.10]
