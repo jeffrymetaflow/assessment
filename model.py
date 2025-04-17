@@ -283,65 +283,55 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
         st.download_button("📥 Download PDF", buffer, file_name="ITRM_Executive_Summary.pdf")
    
 # Financial Summary Tab
-elif section == "💰 ITRM Financial Summary":
+if section == "💰 ITRM Financial Summary":
     st.title("💰 ITRM Financial Summary")
 
-    if 'inputs' not in st.session_state:
-        st.warning("Please set up your inputs in the Inputs Setup tab.")
-        st.stop()
-    if 'calculator_results' not in st.session_state:
-        st.warning("Please run the calculator to populate financial data.")
+    if 'baseline_revenue' not in st.session_state or 'it_expense' not in st.session_state:
+        st.warning("Please configure inputs in the Inputs Setup tab first.")
         st.stop()
 
-    inputs = st.session_state.inputs
-    results = st.session_state.calculator_results
-    categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
+    # Retrieve the inputs from session state
+    baseline_revenue = st.session_state.baseline_revenue
+    it_expense = st.session_state.it_expense
+    category_expenses_to_total = st.session_state.category_expenses_to_total
+    category_revenue_to_total = st.session_state.category_revenue_to_total
+    revenue_growth = st.session_state.revenue_growth
+    expense_growth = st.session_state.expense_growth
 
-    st.subheader("📊 Category Financial Breakdown (Year 3)")
-    year = "Year 3"
-    revenue = inputs['revenue_baseline'] * (1 + inputs['target_revenue_growth'][2])
-    cat_data = []
-    for i, cat in enumerate(categories):
-        split = inputs['category_revenue_split'][i]
-        expense = results[year]['category_expenses'][i]
-        percent_exp = expense / results[year]['Total Expense'] * 100
-        percent_rev = split * 100
-        cat_data.append([cat, expense, percent_exp, percent_rev])
+    # Show the inputs
+    st.markdown(f"### Baseline Revenue: ${baseline_revenue:,.2f}")
+    st.markdown(f"### IT Expenses: ${it_expense:,.2f}")
 
-    cat_df = pd.DataFrame(cat_data, columns=["Category", "Total IT Expense", "% of Expense", "% of Revenue"])
-    cat_df["Total IT Expense"] = cat_df["Total IT Expense"].apply(lambda x: f"${x:,.2f}")
-    cat_df["% of Expense"] = cat_df["% of Expense"].apply(lambda x: f"{x:.2f}%")
-    cat_df["% of Revenue"] = cat_df["% of Revenue"].apply(lambda x: f"{x:.2f}%")
-    st.dataframe(cat_df)
+    # Calculate the total expenses and revenues for each category
+    category_expenses = [it_expense * exp_percent for exp_percent in category_expenses_to_total]
+    category_revenues = [baseline_revenue * rev_percent for rev_percent in category_revenue_to_total]
+
+    st.markdown("### Expense and Revenue Breakdown by Category")
+    for i, cat in enumerate(["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]):
+        st.markdown(f"**{cat}**:")
+        st.markdown(f"- Expense: ${category_expenses[i]:,.2f}")
+        st.markdown(f"- Revenue: ${category_revenues[i]:,.2f}")
+
+    # Total Expenses and Revenues
+    total_expenses = sum(category_expenses)
+    total_revenues = sum(category_revenues)
+    st.markdown(f"### Total Expenses: ${total_expenses:,.2f}")
+    st.markdown(f"### Total Revenues: ${total_revenues:,.2f}")
+
+    # Calculate ITRM (IT Revenue Margin)
+    itrm = (total_expenses / total_revenues) * 100 if total_revenues != 0 else 0
+    st.markdown(f"### **IT Revenue Margin (ITRM):** {itrm:.2f}%")
+
+    # Display the chart (ITRM Over Time)
+    st.markdown("### 📈 ITRM Over Time")
+    years = ['Year 1', 'Year 2', 'Year 3']
+    itrms = [itrm, itrm, itrm]  # You can modify this logic to reflect different years
 
     fig, ax = plt.subplots()
-    ax.bar(cat_df["Category"], cat_df["% of Expense"], label="% of Expense")
-    ax.bar(cat_df["Category"], cat_df["% of Revenue"], alpha=0.5, label="% of Revenue")
-    ax.set_title("Expense vs Revenue Distribution by Category")
-    ax.set_ylabel("%")
-    ax.legend()
+    ax.plot(years, itrms, marker='o', linewidth=2)
+    ax.set_ylabel("IT Revenue Margin (%)")
+    ax.set_title("ITRM Over Time")
     st.pyplot(fig)
-
-    st.subheader("📈 Revenue & Expense Growth Targets")
-    growth_df = pd.DataFrame({
-        "Metric": ["Revenue Growth", "Expense Growth"],
-        "Year 1": [inputs['target_revenue_growth'][0], inputs['target_expense_growth'][0]],
-        "Year 2": [inputs['target_revenue_growth'][1], inputs['target_expense_growth'][1]],
-        "Year 3": [inputs['target_revenue_growth'][2], inputs['target_expense_growth'][2]]
-    })
-    st.dataframe(growth_df)
-
-    st.subheader("🧠 Summary Insights")
-    top_exp = cat_df.sort_values("% of Expense", ascending=False).iloc[0]
-    top_rev = cat_df.sort_values("% of Revenue", ascending=False).iloc[0]
-
-    st.markdown(f"- **{top_exp['Category']}** has the highest share of IT expenses: **{top_exp['% of Expense']}**")
-    st.markdown(f"- **{top_rev['Category']}** contributes the most to revenue: **{top_rev['% of Revenue']}**")
-
-    if top_exp['Category'] != top_rev['Category']:
-        st.warning("🚨 The top IT expense category does not align with top revenue category. Consider optimization.")
-    else:
-        st.success("✅ Top IT spending aligns with top revenue driver, indicating strategic alignment.")
 
 # Cybersecurity Assessment Tab
 elif section == "🔐 Cybersecurity Assessment":
