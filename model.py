@@ -568,6 +568,33 @@ elif section == "📝 IT Maturity Assessment":
             st.markdown(rec)
 
 # Inputs Tab
+data = {
+    "Parameter": [
+        "Baseline Revenue ($)", "IT Expense Baseline ($)", 
+        "Category 1 % of IT Expenses", "Category 2 % of IT Expenses", 
+        "Category 3 % of IT Expenses", "Category 4 % of IT Expenses", 
+        "Category 5 % of IT Expenses", "Category 1 % of Revenue", 
+        "Category 2 % of Revenue", "Category 3 % of Revenue", 
+        "Category 4 % of Revenue", "Category 5 % of Revenue",
+        "Year 1 Revenue Growth (%)", "Year 2 Revenue Growth (%)", 
+        "Year 3 Revenue Growth (%)", "Year 1 Expense Growth (%)", 
+        "Year 2 Expense Growth (%)", "Year 3 Expense Growth (%)"
+    ],
+    "Value": [
+        739_000_000, 4_977_370, 0.10, 0.20, 0.30, 0.15, 0.25,  # Category 1 to 5 for IT Expenses & Revenue
+        0.05, 0.10, 0.15, 0.10, 0.20, 0.02, 0.03, 0.04, 0.02, 0.03
+    ]
+}
+
+# Print the lengths of both lists to debug
+st.write(f"Length of Parameter List: {len(data['Parameter'])}")
+st.write(f"Length of Value List: {len(data['Value'])}")
+
+# Ensure both lists have the same length
+assert len(data["Parameter"]) == len(data["Value"]), "Lists have different lengths!"
+
+# If lengths match, proceed to create DataFrame
+inputs_df = pd.DataFrame(data)
 if section == "⚙️ Inputs Setup":
     st.title("⚙️ Inputs Setup")
 
