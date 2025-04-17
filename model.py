@@ -800,6 +800,24 @@ if section == "⚙️ Inputs Setup":
     
     # Now, use it in the Streamlit number input widget
         revenue_input = st.number_input("Baseline Revenue ($)", value=baseline_revenue, step=1000000)
+
+    # Ensure revenue is a valid numeric value
+    baseline_revenue = st.session_state.get("baseline_revenue", 739000000)
+    
+    # If it's a string (e.g., '1,000,000'), clean it and convert to float
+    if isinstance(baseline_revenue, str):
+        baseline_revenue = float(baseline_revenue.replace(",", ""))  # Remove commas and convert
+    
+    # Ensure that baseline_revenue is now a valid numeric value (float or int)
+    if not isinstance(baseline_revenue, (int, float)):
+        baseline_revenue = 739000000  # Default value if there's an issue with the revenue format
+    
+    # Now, use it in the Streamlit number input widget
+    revenue_input = st.number_input("Baseline Revenue ($)", value=baseline_revenue, step=1000000)
+    
+    # Ensure that revenue_input and session_state.baseline_revenue are of the same type
+    if isinstance(revenue_input, (int, float)) and revenue_input != st.session_state.baseline_revenue:
+        st.session_state.baseline_revenue = revenue_input    
     
     # Save the updated value back into session state
     if revenue_input != st.session_state.baseline_revenue:
