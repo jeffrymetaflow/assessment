@@ -19,6 +19,9 @@ section = st.sidebar.radio("Go to", [
 ])
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
 
+if "baseline_revenue" not in st.session_state:
+    st.session_state.baseline_revenue = 0  # Replace 0 with a meaningful default value
+
 # Strategic Roadmap Tab
 if section == "🧭 Strategic Roadmap":
     st.title("🧭 Strategic Roadmap")
