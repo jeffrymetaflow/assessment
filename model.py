@@ -631,9 +631,6 @@ if section == "⚙️ Inputs Setup":
 
     # Clear any unnecessary session data
     st.session_state.pop('inputs', None)  # Remove the 'inputs' key to avoid potential display issues
-
-    # Show session state data
-    st.write(st.session_state)
     
 # Calculator Tab
 if section == "📊 ITRM Calculator":
