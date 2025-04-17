@@ -634,49 +634,79 @@ if section == "⚙️ Inputs Setup":
     
 # Calculator Tab
 if section == "📊 ITRM Calculator":
-    st.title("📊 ITRM Calculator")
-    st.markdown("Calculates IT Revenue Margin based on company revenue and IT expenses projections.")
+    st.title("📊 ITRM Multi-Year Calculator")
 
-    # Ensure the inputs are available
-    if 'baseline_revenue' not in st.session_state or 'it_expense' not in st.session_state or 'category_expenses_to_total' not in st.session_state or 'category_revenue_to_total' not in st.session_state:
+    if 'inputs' not in st.session_state:
         st.warning("Please configure inputs in the Inputs Setup tab first.")
         st.stop()
 
-    # Retrieve values from session state
-    revenue = st.session_state.baseline_revenue
-    expense = st.session_state.it_expense
+    # Retrieve the baseline and other inputs from session state
+    baseline_revenue = st.session_state.baseline_revenue
+    it_expense = st.session_state.it_expense
     category_expenses_to_total = st.session_state.category_expenses_to_total
     category_revenue_to_total = st.session_state.category_revenue_to_total
     revenue_growth = st.session_state.revenue_growth
     expense_growth = st.session_state.expense_growth
 
-    # Define categories, adjust these names based on your actual expense categories
-    expense_categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
+    # Display the baseline values
+    st.markdown(f"### Baseline Revenue: ${baseline_revenue:,.2f}")
+    st.markdown(f"### Baseline IT Expenses: ${it_expense:,.2f}")
+    
+    st.markdown("### Expense and Revenue Breakdown by Category")
+    categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
+    category_expenses = []
+    category_revenues = []
+    
+    # Input and Calculation for each category
+    for i, category in enumerate(categories):
+        col1, col2 = st.columns(2)
+        with col1:
+            expense_percent = category_expenses_to_total[i]
+            st.markdown(f"{category} - **Expense %**: **{expense_percent * 100:.2f}%**")
+        with col2:
+            revenue_percent = category_revenue_to_total[i]
+            st.markdown(f"{category} - **Revenue %**: **{revenue_percent * 100:.2f}%**")
+        
+        expense = it_expense * expense_percent
+        revenue = baseline_revenue * revenue_percent
+        category_expenses.append(expense)
+        category_revenues.append(revenue)
 
-    # Years for projection
-    years = ["Year 1", "Year 2", "Year 3"]
+    st.markdown("### Revenue Growth & Expense Growth")
 
-    # Calculate and display ITRM for each year
-    st.markdown("### Yearly Calculations")
-    category_expenses = {}
+    # Year 1 to 3 Revenue Growth and Expense Growth Calculation
+    revenue_projection = {}
+    expense_projection = {}
+    
+    for year in [1, 2, 3]:
+        st.markdown(f"#### Year {year}")
+        year_revenue = baseline_revenue * (1 + revenue_growth[year-1])
+        year_expenses = it_expense * (1 + expense_growth[year-1])
+        
+        revenue_projection[f"Year {year}"] = year_revenue
+        expense_projection[f"Year {year}"] = year_expenses
+        
+        st.markdown(f"**Projected Revenue for Year {year}:** ${year_revenue:,.2f}")
+        st.markdown(f"**Projected Expenses for Year {year}:** ${year_expenses:,.2f}")
 
-    itrms = []  # Initialize the list to store ITRM values
+    st.markdown("---")
+    
+    # Total Expenses and Revenues for all categories combined
+    total_expenses = sum(category_expenses)
+    total_revenues = sum(category_revenues)
+    
+    st.markdown(f"### Total Expenses: ${total_expenses:,.2f}")
+    st.markdown(f"### Total Revenues: ${total_revenues:,.2f}")
+    
+    # IT Revenue Margin Calculation (ITRM)
+    itrm = (total_expenses / total_revenues) * 100 if total_revenues != 0 else 0
+    st.markdown(f"### **IT Revenue Margin (ITRM):** {itrm:.2f}%")
 
-    for year_idx, year in enumerate(years):
-        total_expense = 0
-        for i, category in enumerate(expense_categories):
-            expense_value = expense * category_expenses_to_total[i] * (1 + expense_growth[year_idx])
-            total_expense += expense_value
+    # Display Graph for the ITRM
+    st.markdown("### 📈 ITRM Over Time")
+    years = ['Year 1', 'Year 2', 'Year 3']
+    itrms = [itrm, itrm, itrm]  # For now, assuming itrm remains the same for all 3 years, you can adjust this logic as needed
 
-        revenue_value = revenue * (1 + revenue_growth[year_idx])
-        itrm = (total_expense / revenue_value) * 100
-        itrms.append(itrm)
-
-        st.success(f"**{year} Total Expense:** ${total_expense:,.2f}")
-        st.info(f"**{year} IT Revenue Margin (ITRM):** {itrm:.2f}%")
-
-    # Display chart
-    st.markdown("### 📈 IT Revenue Margin Trend")
     fig, ax = plt.subplots()
     ax.plot(years, itrms, marker='o', linewidth=2)
     ax.set_ylabel("IT Revenue Margin (%)")
