@@ -400,27 +400,41 @@ elif section == "📝 IT Maturity Assessment":
         "Failover between sites",
         "Software Intelligence",
         "Automated patch management",
-        "Self-healing infrastructure"
+        "Self-healing infrastructure",
+        "Integrated asset and configuration management",
+        "AI-driven capacity forecasting"
     ],
     "Standardized / Optimized": [
         "Documented configuration baselines",
         "Centralized logging and monitoring",
-        "Defined performance SLAs"
+        "Defined performance SLAs",
+        "Integrated IT service management",
+        "Scheduled DR testing",
+        "Standardized vendor management process"
     ],
     "Defined / Measured": [
         "Service catalog in place",
         "Change management policy",
-        "IT financial transparency dashboards"
+        "IT financial transparency dashboards",
+        "Defined KPIs and scorecards",
+        "Maturity model assessments scheduled",
+        "Performance benchmarks in place"
     ],
     "Reactive / Operational": [
         "Ticket-based support system",
         "Manual security patching",
-        "Email-based approval workflows"
+        "Email-based approval workflows",
+        "Unstructured vendor reporting",
+        "Ad-hoc root cause analysis",
+        "Basic uptime monitoring"
     ],
     "Survival, Ad-Hoc, Manual Legacy": [
         "Back Up for restoring in case of data center disaster",
         "No defined IT process for onboarding",
-        "Spreadsheets used for asset tracking"
+        "Spreadsheets used for asset tracking",
+        "No disaster recovery plan",
+        "Unstructured documentation",
+        "Undefined service ownership"
     ]
 }
 
@@ -598,4 +612,5 @@ elif section == "📊 ITRM Calculator":
         st.markdown("- Monitor expense-heavy categories for targeted optimization.")
         st.markdown("- Validate whether revenue growth assumptions are realistic.")
         st.markdown("- Revisit automation or cloud strategies to reduce total IT spend.")
+
 
