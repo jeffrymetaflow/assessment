@@ -281,41 +281,7 @@ By adopting an AI-optimized IT revenue framework, <Client Name> can align IT ope
                     pdf.chapter_body(f"{cat}: ${expense:,.2f} expense, {split * 100:.1f}% of revenue")
         buffer.seek(0)
         st.download_button("📥 Download PDF", buffer, file_name="ITRM_Executive_Summary.pdf")
-
-# Calculator Tab
-if section == "📊 ITRM Calculator":
-    st.title("📊 ITRM Calculator")
-    st.markdown("Enter revenue and expense adjustments below")
-
-    # Ensure the inputs are available
-    if 'baseline_revenue' not in st.session_state or 'category_expenses' not in st.session_state:
-        st.warning("Please configure inputs in the Inputs Setup tab first.")
-        st.stop()
-
-    # Retrieve values from session state
-    revenue = st.session_state.baseline_revenue
-    category_expenses = st.session_state.category_expenses
-
-    # Calculate and display ITRM for each year
-    for year in ["Year 1", "Year 2", "Year 3"]:
-        st.markdown(f"### {year} Adjustments")
-        total_expense = sum(category_expenses[year])
-
-        st.success(f"**{year} Total Expense:** ${total_expense:,.2f}")
-        itrm = (total_expense / revenue) * 100
-        st.info(f"**{year} IT Revenue Margin (ITRM):** {itrm:.2f}%")
-
-    # Chart section: ITRM trend across years
-    st.markdown("### 📈 IT Revenue Margin Trend")
-    years = ["Year 1", "Year 2", "Year 3"]
-    itrms = [ (sum(category_expenses[year]) / revenue) * 100 for year in years]
-
-    fig, ax = plt.subplots()
-    ax.plot(years, itrms, marker='o', linewidth=2)
-    ax.set_ylabel("IT Revenue Margin (%)")
-    ax.set_title("ITRM Over Time")
-    st.pyplot(fig)
-    
+   
 # Financial Summary Tab
 elif section == "💰 ITRM Financial Summary":
     st.title("💰 ITRM Financial Summary")
