@@ -571,7 +571,7 @@ elif section == "📝 IT Maturity Assessment":
 if section == "⚙️ Inputs Setup":
     st.title("⚙️ Inputs Setup")
 
-    # Displaying editable inputs for each of the parameters using st.number_input
+    # Input Fields for Baseline Revenue, IT Expenses, and Growth Rates
     baseline_revenue = st.number_input("Baseline Revenue ($)", value=739_000_000)
     it_expense = st.number_input("IT Expense Baseline ($)", value=4_977_370)
 
@@ -592,7 +592,7 @@ if section == "⚙️ Inputs Setup":
         st.number_input(f"Year {i+1} Expense Growth (%)", value=0.03) for i in range(3)
     ]
 
-    # Store these values in session_state for use in the ITRM calculator
+    # Save inputs to session_state
     if st.button("Save Inputs"):
         st.session_state.baseline_revenue = baseline_revenue
         st.session_state.it_expense = it_expense
@@ -602,7 +602,7 @@ if section == "⚙️ Inputs Setup":
         st.session_state.expense_growth = expense_growth
         st.success("Inputs saved successfully!")
 
-    # Show the inputs in a table
+    # Show the inputs in a clean table
     input_data = {
         "Parameter": [
             "Baseline Revenue ($)", "IT Expense Baseline ($)", 
@@ -628,6 +628,9 @@ if section == "⚙️ Inputs Setup":
 
     st.subheader("Review Inputs")
     st.dataframe(inputs_df)
+
+    # Clear any unnecessary session data
+    st.session_state.pop('inputs', None)  # Remove the 'inputs' key to avoid potential display issues
 
     # Show session state data
     st.write(st.session_state)
