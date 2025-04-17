@@ -629,48 +629,23 @@ elif section == "📝 IT Maturity Assessment":
             st.markdown(rec)
 
 # Inputs Tab
-elif section == "⚙️ Inputs Setup":
-    if 'inputs' not in st.session_state:
-        st.session_state.inputs = {
-            'revenue_baseline': 739_000_000,
-            'it_expense_baseline': 4_977_370,
-            'category_revenue_split': [0.5, 0.2, 0.1, 0.15, 0.05],
-            'category_expense_split': [0.25, 0.2, 0.1, 0.1, 0.35],
-            'target_revenue_growth': [0.10, 0.05, 0.07],
-            'target_expense_growth': [0.06, 0.03, 0.03]
-        }
+if section == "⚙️ Inputs Setup":
+    st.title("⚙️ Inputs Setup")
 
-    st.title("⚙️ ITRM Inputs Setup")
-    st.session_state.inputs['revenue_baseline'] = st.number_input("Baseline Revenue ($)", value=st.session_state.inputs['revenue_baseline'], key="inputs_revenue_baseline")
-    st.session_state.inputs['it_expense_baseline'] = st.number_input("Baseline IT Expense ($)", value=st.session_state.inputs['it_expense_baseline'], key="inputs_it_expense_baseline")
+    # Baseline Revenue Input
+    baseline_revenue = st.number_input("Baseline Revenue", value=739_000_000, step=1000000)
+    st.session_state.baseline_revenue = baseline_revenue  # Store in session state
 
-    st.subheader("Application Category Splits")
-    categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
-    revenue_splits, expense_splits = [], []
-    for i, cat in enumerate(categories):
-        col1, col2 = st.columns(2)
-        with col1:
-            rev = st.number_input(f"{cat} - % of Revenue", min_value=0.0, max_value=1.0, value=st.session_state.inputs['category_revenue_split'][i], key=f"inputs_{cat}_rev")
-            revenue_splits.append(rev)
-        with col2:
-            exp = st.number_input(f"{cat} - % of Expense", min_value=0.0, max_value=1.0, value=st.session_state.inputs['category_expense_split'][i], key=f"inputs_{cat}_exp")
-            expense_splits.append(exp)
-    st.session_state.inputs['category_revenue_split'] = revenue_splits
-    st.session_state.inputs['category_expense_split'] = expense_splits
-
-    st.subheader("Target Revenue & Expense Growth")
-    rev_growth, exp_growth = [], []
-    for i, year in enumerate(["Year 1", "Year 2", "Year 3"]):
-        col1, col2 = st.columns(2)
-        with col1:
-            rev = st.number_input(f"{year} Target Revenue Growth (%)", format="%.2f", value=st.session_state.inputs['target_revenue_growth'][i], key=f"inputs_{year}_rev_growth")
-            rev_growth.append(rev)
-        with col2:
-            exp = st.number_input(f"{year} Target Expense Growth (%)", format="%.2f", value=st.session_state.inputs['target_expense_growth'][i], key=f"inputs_{year}_exp_growth")
-            exp_growth.append(exp)
-    st.session_state.inputs['target_revenue_growth'] = rev_growth
-    st.session_state.inputs['target_expense_growth'] = exp_growth
-    st.success("Inputs saved in session state. You can now use them in the calculator tab.")
+    # Category Expenses (per year)
+    category_expenses = {}
+    for year in ["Year 1", "Year 2", "Year 3"]:
+        category_expenses[year] = []
+        st.markdown(f"### {year} Expenses")
+        for i, category in enumerate(["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]):
+            expense = st.number_input(f"{category} Expense", key=f"{year}_{category}")
+            category_expenses[year].append(expense)
+    
+    st.session_state.category_expenses = category_expenses  # Store in session state
 
 # Calculator Tab
 elif section == "📊 ITRM Calculator":
