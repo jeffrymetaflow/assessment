@@ -627,26 +627,30 @@ if section == "📊 ITRM Calculator":
     # Define categories, adjust these names based on your actual expense categories
     expense_categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
 
+    # Years for projection
+    years = ["Year 1", "Year 2", "Year 3"]
+
     # Calculate and display ITRM for each year
     st.markdown("### Yearly Calculations")
     category_expenses = {}
 
-    for year in ["Year 1", "Year 2", "Year 3"]:
+    itrms = []  # Initialize the list to store ITRM values
+
+    for year_idx, year in enumerate(years):
         total_expense = 0
         for i, category in enumerate(expense_categories):
-            expense_value = expense * category_expenses_to_total[i] * (1 + expense_growth[int(year[-1])-1])
+            expense_value = expense * category_expenses_to_total[i] * (1 + expense_growth[year_idx])
             total_expense += expense_value
 
-        revenue_value = revenue * (1 + revenue_growth[int(year[-1])-1])
+        revenue_value = revenue * (1 + revenue_growth[year_idx])
         itrm = (total_expense / revenue_value) * 100
+        itrms.append(itrm)
 
         st.success(f"**{year} Total Expense:** ${total_expense:,.2f}")
         st.info(f"**{year} IT Revenue Margin (ITRM):** {itrm:.2f}%")
 
     # Display chart
     st.markdown("### 📈 IT Revenue Margin Trend")
-    itrms = [ (total_expense / (revenue * (1 + growth))) * 100 for total_expense, growth in zip(category_expenses.values(), revenue_growth)]
-
     fig, ax = plt.subplots()
     ax.plot(years, itrms, marker='o', linewidth=2)
     ax.set_ylabel("IT Revenue Margin (%)")
