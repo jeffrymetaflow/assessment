@@ -304,24 +304,24 @@ if section == "💰 ITRM Financial Summary":
     new_revenue_growth = [st.slider(f"Year {i+1} Revenue Growth (%)", 0.0, 100.0, value=float(revenue_growth[i] * 100)) for i in range(3)]
     new_expense_growth = [st.slider(f"Year {i+1} Expense Growth (%)", 0.0, 100.0, value=float(expense_growth[i] * 100)) for i in range(3)]
 
-    # Apply new growth rates to calculate the updated revenue and expenses
+    # Calculate the updated revenue and expenses
     revenue_input = {
-        "Year 1": baseline_revenue * (1 + new_revenue_growth[0] / 100),
+        "Year 1": baseline_revenue * (1 + new_revenue_growth[0] / 100),  # Adjust baseline by growth rate
         "Year 2": baseline_revenue * (1 + new_revenue_growth[1] / 100),
         "Year 3": baseline_revenue * (1 + new_revenue_growth[2] / 100),
     }
 
     expense_input = {
-        "Year 1": it_expense * (1 + new_expense_growth[0] / 100),
+        "Year 1": it_expense * (1 + new_expense_growth[0] / 100),  # Adjust baseline by expense growth rate
         "Year 2": it_expense * (1 + new_expense_growth[1] / 100),
         "Year 3": it_expense * (1 + new_expense_growth[2] / 100),
     }
 
-    # Display updated revenue and expenses
+    # Show updated revenue and expenses
     st.markdown(f"### Updated Revenue: {revenue_input}")
     st.markdown(f"### Updated Expenses: {expense_input}")
 
-    # Calculate IT Revenue Margin (ITRM)
+    # Calculate IT Revenue Margin (ITRM) for each year
     itrm = {
         "Year 1": (expense_input["Year 1"] / revenue_input["Year 1"]) * 100,
         "Year 2": (expense_input["Year 2"] / revenue_input["Year 2"]) * 100,
