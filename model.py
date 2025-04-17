@@ -803,7 +803,8 @@ if section == "⚙️ Inputs Setup":
     
     # Save the updated value back into session state
     if revenue_input != st.session_state.baseline_revenue:
-        st.session_state.baseline_revenue = revenue_input    
+        st.session_state.baseline_revenue = revenue_input   
+        
     # Dynamically update input fields
         revenue_input = st.number_input("Baseline Revenue ($)", value=revenue, step=1000000)
         expense_input = st.number_input("IT Expense ($)", value=it_expense, step=100000)
