@@ -641,82 +641,46 @@ if section == "⚙️ Inputs Setup":
     st.session_state.expense_growth = expense_growth  # Store in session state
 
 # Calculator Tab
-elif section == "📊 ITRM Calculator":
-    st.title("📊 ITRM Multi-Year Calculator")
-    if 'inputs' not in st.session_state:
+if section == "📊 ITRM Calculator":
+    st.title("📊 ITRM Calculator")
+    st.markdown("Calculates IT Revenue Margin based on company revenue and IT expenses projections.")
+
+    # Ensure the inputs are available
+    if 'baseline_revenue' not in st.session_state or 'it_expense' not in st.session_state or 'category_expenses_to_total' not in st.session_state or 'category_revenue_to_total' not in st.session_state:
         st.warning("Please configure inputs in the Inputs Setup tab first.")
         st.stop()
 
-    inputs = st.session_state.inputs
-    categories = ["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"]
-    revenue_input = {
-        "Year 1": inputs['revenue_baseline'] * (1 + inputs['target_revenue_growth'][0]),
-        "Year 2": inputs['revenue_baseline'] * (1 + inputs['target_revenue_growth'][1]),
-        "Year 3": inputs['revenue_baseline'] * (1 + inputs['target_revenue_growth'][2]),
-    }
-    default_changes = {
-        "Year 1": [0.30, -0.20, -0.15, 0.10, 0.10],
-        "Year 2": [0.05, -0.02, -0.20, 0.10, 0.05],
-        "Year 3": [0.05, -0.02, -0.20, 0.10, 0.05],
-    }
+    # Retrieve values from session state
+    revenue = st.session_state.baseline_revenue
+    expense = st.session_state.it_expense
+    category_expenses_to_total = st.session_state.category_expenses_to_total
+    category_revenue_to_total = st.session_state.category_revenue_to_total
+    revenue_growth = st.session_state.revenue_growth
+    expense_growth = st.session_state.expense_growth
 
-    expense_results = {}
+    # Calculate and display ITRM for each year
+    st.markdown("### Yearly Calculations")
+    category_expenses = {}
+
     for year in ["Year 1", "Year 2", "Year 3"]:
-        st.markdown(f"#### {year} Adjustments")
-        category_expenses, split_total = [], 0
-        revenue = revenue_input[year]
+        total_expense = 0
+        for i, category in enumerate(expense_categories):
+            expense_value = expense * category_expenses_to_total[i] * (1 + expense_growth[int(year[-1])-1])
+            total_expense += expense_value
 
-        for i, cat in enumerate(categories):
-            col1, col2 = st.columns(2)
-            with col1:
-                split = inputs['category_revenue_split'][i]
-                st.markdown(f"{cat} Revenue %: **{split*100:.1f}%**")
-            with col2:
-                change = st.number_input(f"{cat} Expense Change % ({year})", format="%.2f", value=default_changes[year][i], key=f"calc_{year}_{cat}_change")
-            split_total += split
-            expense = revenue * split * (1 + change)
-            category_expenses.append(expense)
+        revenue_value = revenue * (1 + revenue_growth[int(year[-1])-1])
+        itrm = (total_expense / revenue_value) * 100
 
-        if abs(split_total - 1.0) > 0.001:
-            st.error(f"{year} revenue splits do not total 100% (currently {split_total*100:.2f}%)")
-            continue
-
-        total_expense = sum(category_expenses)
-        itrm = (total_expense / revenue) * 100
-        expense_results[year] = {"Total Expense": total_expense, "ITRM": itrm}
         st.success(f"**{year} Total Expense:** ${total_expense:,.2f}")
         st.info(f"**{year} IT Revenue Margin (ITRM):** {itrm:.2f}%")
 
-    if expense_results:
-        st.markdown("---")
-        st.subheader("📈 ITRM Trend")
-        years = list(expense_results.keys())
-        itrms = [expense_results[y]["ITRM"] for y in years]
-        fig, ax = plt.subplots()
-        ax.plot(years, itrms, marker='o', linewidth=2)
-        ax.set_ylabel("IT Revenue Margin (%)")
-        ax.set_title("ITRM Over Time")
-        st.pyplot(fig)
+    # Display chart
+    st.markdown("### 📈 IT Revenue Margin Trend")
+    itrms = [ (total_expense / (revenue * (1 + growth))) * 100 for total_expense, growth in zip(category_expenses.values(), revenue_growth)]
 
-        st.markdown("---")
-        st.subheader("🧠 Summary Insights")
-        first_year = years[0]
-        last_year = years[-1]
-        itrm_start = expense_results[first_year]["ITRM"]
-        itrm_end = expense_results[last_year]["ITRM"]
-        delta = itrm_start - itrm_end
-
-        if delta > 0:
-            st.success(f"✅ Over the modeled period, your IT Revenue Margin improved by {delta:.2f}%.")
-            st.write("This indicates increased efficiency and optimization of IT resources relative to revenue growth.")
-        elif delta < 0:
-            st.warning(f"⚠️ IT Revenue Margin worsened by {-delta:.2f}%.")
-            st.write("This may indicate IT cost growth outpacing revenue or ineffective optimization.")
-        else:
-            st.info("ℹ️ IT Revenue Margin remained consistent across the modeling period.")
-
-        st.markdown("**Key Observations:**")
-        st.markdown("- Monitor expense-heavy categories for targeted optimization.")
-        st.markdown("- Validate whether revenue growth assumptions are realistic.")
-        st.markdown("- Revisit automation or cloud strategies to reduce total IT spend.")
+    fig, ax = plt.subplots()
+    ax.plot(years, itrms, marker='o', linewidth=2)
+    ax.set_ylabel("IT Revenue Margin (%)")
+    ax.set_title("ITRM Over Time")
+    st.pyplot(fig)
 
