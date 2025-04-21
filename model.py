@@ -405,6 +405,15 @@ if section == "💰 ITRM Financial Summary":
         )
         expense_growth.append(growth)
     
+    # Ensure revenue_input exists
+    if "revenue_input" not in st.session_state:
+        st.error("Please configure the inputs in the 'ITRM Calculator' tab first.")
+        st.stop()
+    
+    # Retrieve revenue_input
+    revenue_input = st.session_state.revenue_input
+    revenue_growth = st.session_state.revenue_growth
+    
     # Projected Revenue Calculation
     projected_revenue = {}
     for i, year in enumerate(revenue_input.keys()):
@@ -416,9 +425,9 @@ if section == "💰 ITRM Financial Summary":
             projected_revenue[year] = (
                 projected_revenue[previous_year] * (1 + growth_percentage)
             )
-
+    
+    # Display the projected revenue
     st.write("Projected Revenue:", projected_revenue)
-
     # Projected Expenses Calculation
     projected_expenses = {}
     for i, year in enumerate(expense_input.keys()):
@@ -1098,7 +1107,7 @@ if section == "📊 ITRM Calculator":
         st.title("📊 ITRM Multi-Year Calculator")
     
         # Retrieve baseline revenue and inputs
-        baseline_revenue = st.number_input("Baseline Revenue ($)", min_value=0)
+        baseline_revenue = st.number_input("Baseline Revenue ($)", min_value=0.0)
         revenue_growth = [st.slider(f"Year {i+1} Revenue Growth (%)", 0.0, 100.0, 5.0) for i in range(3)]
     
         # Define revenue input based on baseline revenue and years
