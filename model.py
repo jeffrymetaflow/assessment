@@ -685,12 +685,7 @@ elif section == "📝 IT Maturity Assessment":
             section = "example_section"  # Example unique section
             if f"unique_id_{section}" not in st.session_state:
                 st.session_state[f"unique_id_{section}"] = str(uuid.uuid4())
-            
-            sections = list(set(sections))  # Remove duplicates
-            for i, section in enumerate(sections):   
-                if query: response = ai_assistant(query)
-                st.markdown(f"**AI Assistant Response:**\n{response}")
-                    
+                               
             # Generate a unique identifier for the session if it doesn't already exist
             if 'unique_id' not in st.session_state:
                 st.session_state['unique_id'] = str(uuid.uuid4())
