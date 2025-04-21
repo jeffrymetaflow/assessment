@@ -691,7 +691,6 @@ elif section == "📝 IT Maturity Assessment":
                 placeholder="e.g., What are the cybersecurity recommendations?",
                 key=f"ai_assistant_query_{section}_{st.session_state[f'unique_id_{section}']}"
             )
-            sections = ["section1", "section2", "section3"]  # Example sections
             sections = list(set(sections))  # Remove duplicates
             for i, section in enumerate(sections):
                 query = st.text_input(
