@@ -684,7 +684,6 @@ elif section == "📝 IT Maturity Assessment":
             # Assign a dynamic key for the radio button based on the section name
             # Define a unique identifier for your section
             unique_identifier = "IT_Maturity"  # Replace this with the actual dynamic value you want to use.
-            
             # Now use it in the key
             section = st.sidebar.radio(
                 "Go to", 
