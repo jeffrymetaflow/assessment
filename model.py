@@ -37,11 +37,6 @@ if "revenue_growth" not in st.session_state:
 if "expense_growth" not in st.session_state:
     st.session_state.expense_growth = [0.03] * 3  # Default growth rate: 3% per year for 3 years
 
-# Sidebar Navigation
-st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🧭 Strategic Roadmap", "🤖 AI Assistant"])
-
-# Client Overview
 if section == "🧠 Overview Summary":
     st.title("Overview of IT Revenue Margin")
     st.markdown("""
@@ -55,7 +50,7 @@ if section == "🧠 Overview Summary":
     # ITRM Score
     itrm_score = st.number_input("Overall IT Revenue Margin Score", min_value=0, max_value=100, value=75, step=1)
     st.markdown(f"**ITRM Score:** {itrm_score}%")
-
+    
     # Revenue and Expense Growth
     st.subheader("Revenue and Expense Growth Over Time")
     years = ['Year 1', 'Year 2', 'Year 3']
@@ -90,18 +85,6 @@ if section == "🧠 Overview Summary":
     - **Focus on Cybersecurity** to mitigate risks.
     - **Optimize IT Costs** to improve profitability.
     """)
-
-# AI Assistant Tab (to be customized further)
-if section == "🤖 AI Assistant":
-    st.title("Ask the AI Assistant")
-    query = st.text_input("Ask the Assistant:", placeholder="e.g., What are my IT revenue growth recommendations?")
-    
-    if query:
-        st.write(f"**You asked:** {query}")
-        # Implement the logic to generate response from AI Assistant here
-        # Placeholder for AI response logic (can integrate OpenAI or pre-defined responses)
-        response = f"Response based on the input: {query}"
-        st.write(f"**AI Response:** {response}")
 
 # Strategic Roadmap Tab
 if section == "🧭 Strategic Roadmap":
