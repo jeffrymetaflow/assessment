@@ -729,40 +729,6 @@ elif section == "📝 IT Maturity Assessment":
             st.session_state.baseline_revenue = revenue_input
         if expense_input != it_expense:
             st.session_state.it_expense = expense_input
-        def itrm_explanation():
-            return """
-            **IT Revenue Margin (ITRM)** is a strategic framework designed to assess and optimize how IT expenses and revenues align over time. Unlike basic profitability calculations, ITRM focuses on dynamically analyzing both IT operating costs and revenue growth targets, ensuring that IT investments drive maximum ROI while aligning with overall business objectives.
-        
-            Key components of IT Revenue Margin modeling include:
-        
-            1. **Baseline IT Expenses**: The initial costs associated with IT operations, including infrastructure, licenses, services, and labor.
-            2. **Revenue Growth Projections**: Forecasting how IT-related services or products contribute to revenue growth year-over-year.
-            3. **Expense Category Analysis**: Categorizing IT expenses into various segments, such as cloud services, infrastructure, personnel, and software licenses, to understand their individual impact on the overall margin.
-            4. **Margin Optimization**: Continuously evaluating where costs can be reduced or optimized (e.g., automation, resource optimization) to improve the margin ratio.
-            5. **Long-Term IT Investment Strategies**: Planning how to invest in future technologies or initiatives that align with business objectives while maintaining efficient cost management.
-        
-            This framework helps businesses not only measure IT profitability but also continuously optimize their IT operations to reduce waste, drive efficiency, and achieve better alignment with overall business performance.
-            """
-        elif section == "AI Assistant":
-            from streamlit_chat import message
-        
-            st.title("AI Assistant")
-        
-            if "messages" not in st.session_state:
-                st.session_state.messages = [
-                    {"role": "system", "content": "You are an expert IT strategy assistant helping explain IT Revenue Margin modeling to business leaders."}
-                ]
-        
-            user_input = st.text_input("Ask the assistant anything about your IT model or strategy:")
-        
-        if user_input:
-            # Append user input to session state
-            st.session_state.messages.append({"role": "user", "content": user_input})
-    
-        # Render chat messages
-        for i, msg in enumerate(st.session_state.messages[1:]):
-            is_user = (i % 2 == 0)
-            message(msg["content"], is_user=is_user, key=f"message_{i}")
 
 # Inputs Tab
 if section == "⚙️ Inputs Setup":
