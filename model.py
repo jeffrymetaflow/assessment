@@ -681,7 +681,13 @@ elif section == "📝 IT Maturity Assessment":
                 st.markdown(f"**AI Assistant Response:**\n{response}")
             
             # Sidebar navigation for the app
-            section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🧭 Strategic Roadmap", "📊 Benchmarking & Persona", "🤖 AI Assistant"])
+            # Assign a dynamic key for the radio button based on the section name
+            section = st.sidebar.radio("Go to", 
+                ["🧠 Overview Summary", "📊 ITRM Calculator", "💰 ITRM Financial Summary", 
+                 "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🧭 Strategic Roadmap", 
+                 "📊 Benchmarking & Persona", "🤖 AI Assistant"], 
+                key="section_radio"
+            )
             
             # AI Assistant Tab Content
             if section == "🤖 AI Assistant":
