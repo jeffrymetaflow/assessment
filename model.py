@@ -489,6 +489,25 @@ if section == "💰 ITRM Financial Summary":
     ax.set_title("ITRM Over Time")
     st.pyplot(fig)
 
+    # Year-over-Year Comparison Chart
+    st.markdown("### 📊 Year-over-Year Comparison")
+    revenue_yoy = [projected_revenue["Year 2"] - projected_revenue["Year 1"],
+                   projected_revenue["Year 3"] - projected_revenue["Year 2"]]
+    expense_yoy = [projected_expenses["Year 2"] - projected_expenses["Year 1"],
+                   projected_expenses["Year 3"] - projected_expenses["Year 2"]]
+    itrm_yoy = [itrm["Year 2"] - itrm["Year 1"], itrm["Year 3"] - itrm["Year 2"]]
+
+    # Plot Year-over-Year Comparison
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.bar(["Year 2 vs Year 1", "Year 3 vs Year 2"], revenue_yoy, label="Revenue")
+    ax.bar(["Year 2 vs Year 1", "Year 3 vs Year 2"], expense_yoy, label="Expenses", alpha=0.7)
+    ax.bar(["Year 2 vs Year 1", "Year 3 vs Year 2"], itrm_yoy, label="ITRM", alpha=0.7)
+
+    ax.set_ylabel("Amount / Change ($) / Percentage")
+    ax.set_title("Year-over-Year Comparison")
+    ax.legend()
+    st.pyplot(fig)
+
     # Recommendations Based on ITRM
     st.markdown("### Dynamic Recommendations")
     for year in ["Year 1", "Year 2", "Year 3"]:
