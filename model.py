@@ -674,9 +674,15 @@ elif section == "📝 IT Maturity Assessment":
                     return "I can assist you with IT maturity and recommendations based on your inputs."
             
             # Display the AI Assistant interaction in the app
-            st.sidebar.title("AI Assistant")
-            query = st.text_input("Ask the AI Assistant:", placeholder="e.g., What are the cybersecurity recommendations?", key=f"ai_assistant_query_ITMaturity_{section_unique}_{uuid.uuid4()}"
-)
+            # Ensure unique keys using st.session_state
+            if f"unique_id_{section_unique}" not in st.session_state:
+                st.session_state[f"unique_id_{section_unique}"] = str(uuid.uuid4())
+            
+            query = st.text_input(
+                "Ask the AI Assistant:",
+                placeholder="e.g., What are the cybersecurity recommendations?",
+                key=f"ai_assistant_query_ITMaturity_{section_unique}_{st.session_state[f'unique_id_{section_unique}']}"
+            )
             
             if query:
                 response = ai_assistant(query)
