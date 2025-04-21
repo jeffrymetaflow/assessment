@@ -412,11 +412,10 @@ if section == "💰 ITRM Financial Summary":
         if i == 0:
             projected_revenue[year] = revenue_input[year]
         else:
-            projected_revenue[year] = projected_revenue[f"Year {i}"] * (1 + growth_percentage)
-        list(revenue_input.keys())[i - 1]
-                projected_revenue[year] = (
-                    projected_revenue[previous_year] * (1 + growth_percentage)
-        )
+            previous_year = list(revenue_input.keys())[i - 1]
+            projected_revenue[year] = (
+                projected_revenue[previous_year] * (1 + growth_percentage)
+            )
 
     st.write("Projected Revenue:", projected_revenue)
 
