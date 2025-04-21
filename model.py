@@ -428,7 +428,15 @@ if section == "💰 ITRM Financial Summary":
     
     # Display the projected revenue
     st.write("Projected Revenue:", projected_revenue)
+       
+    # Ensure expense_input exists
+    if "expense_input" not in st.session_state:
+        st.error("Please configure the inputs in the 'ITRM Calculator' tab first.")
+        st.stop()
     
+    # Retrieve expense_input
+    expense_input = st.session_state.expense_input
+
     # Projected Expenses Calculation
     projected_expenses = {}
     for i, year in enumerate(expense_input.keys()):
@@ -437,14 +445,9 @@ if section == "💰 ITRM Financial Summary":
             projected_expenses[year] = expense_input[year]
         else:
             projected_expenses[year] = projected_expenses[f"Year {i}"] * (1 + growth_percentage)
-    
-    # Ensure expense_input exists
-    if "expense_input" not in st.session_state:
-        st.error("Please configure the inputs in the 'ITRM Calculator' tab first.")
-        st.stop()
-    
-    # Retrieve expense_input
-    expense_input = st.session_state.expense_input
+
+    # Display the projected expenses
+    st.write("Projected Expenses:", projected_expenses)    
     
     # Display Calculated Revenue and Expenses for Each Year
     st.markdown(f"Year 1 Projected Revenue: ${projected_revenue['Year 1']:,}")
