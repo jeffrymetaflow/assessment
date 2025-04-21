@@ -483,10 +483,12 @@ if section == "💰 ITRM Financial Summary":
     years = ["Year 1", "Year 2", "Year 3"]
     itrms = [itrm["Year 1"], itrm["Year 2"], itrm["Year 3"]]
 
-    fig, ax = plt.subplots()
-    ax.plot(years, itrms, marker='o', linewidth=2)
-    ax.set_ylabel("IT Revenue Margin (%)")
-    ax.set_title("ITRM Over Time")
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.plot(years, itrms, marker='o', linestyle='-', linewidth=2, color='b', label='ITRM')
+    ax.set_xlabel('Year')
+    ax.set_ylabel('IT Revenue Margin (%)')
+    ax.set_title('ITRM Trend Over Time')
+    ax.legend()
     st.pyplot(fig)
 
     # Year-over-Year Comparison Chart
@@ -498,15 +500,14 @@ if section == "💰 ITRM Financial Summary":
     itrm_yoy = [itrm["Year 2"] - itrm["Year 1"], itrm["Year 3"] - itrm["Year 2"]]
 
     # Plot Year-over-Year Comparison
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.bar(["Year 2 vs Year 1", "Year 3 vs Year 2"], revenue_yoy, label="Revenue")
-    ax.bar(["Year 2 vs Year 1", "Year 3 vs Year 2"], expense_yoy, label="Expenses", alpha=0.7)
-    ax.bar(["Year 2 vs Year 1", "Year 3 vs Year 2"], itrm_yoy, label="ITRM", alpha=0.7)
-
-    ax.set_ylabel("Amount / Change ($) / Percentage")
-    ax.set_title("Year-over-Year Comparison")
-    ax.legend()
-    st.pyplot(fig)
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
+    ax2.bar(years, revenue_values, color='green', alpha=0.6, label='Projected Revenue')
+    ax2.bar(years, expense_values, color='red', alpha=0.6, label='Projected Expenses')
+    ax2.set_xlabel('Year')
+    ax2.set_ylabel('Amount ($)')
+    ax2.set_title('Year-over-Year Comparison of Revenue and Expenses')
+    ax2.legend()
+    st.pyplot(fig2)
 
     # Recommendations Based on ITRM
     st.markdown("### Dynamic Recommendations")
