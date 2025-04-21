@@ -689,14 +689,8 @@ elif section == "📝 IT Maturity Assessment":
             
             # Ensure the unique ID is set for the session
             if 'unique_id' not in st.session_state:
-                st.session_state['unique_id'] = str(uuid.uuid4())  # Unique session ID for each user
-            
-            # Sidebar navigation to choose the section
-            section = st.sidebar.radio(
-                "Go to", 
-                ["🧠 Overview Summary", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🧭 Strategic Roadmap", "🤖 AI Assistant"]
-            )
-            
+                st.session_state['unique_id'] = str(uuid.uuid4())  # Unique session ID for each user    
+           
             # AI Assistant Section
             if section == "🤖 AI Assistant":
                 st.title("AI Assistant")
