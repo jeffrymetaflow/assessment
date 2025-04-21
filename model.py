@@ -394,7 +394,16 @@ if section == "💰 ITRM Financial Summary":
     )
     growth_rates.append(growth)
     revenue_growth.append(growth)
-    expense_growth = [st.slider(f"Year {i+1} Expense Growth (%)", 0.0, 100.0, value=3) for i in range(3)]  # 3% default growth
+    expense_growth = []
+    for i in range(3):
+        growth = st.slider(
+            f"Year {i+1} Expense Growth (%)",
+            0.0,
+            100.0,
+            value=3,
+            key=f"expense_growth_slider_{i}"  # Unique key
+        )
+        expense_growth.append(growth)
     
     # Projected Revenue Calculation
     projected_revenue = {}
