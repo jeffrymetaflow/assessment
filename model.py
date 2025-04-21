@@ -93,18 +93,7 @@ if section == "🧠 Overview Summary":
     - **Focus on Cybersecurity** to mitigate risks.
     - **Optimize IT Costs** to improve profitability.
     """)
-
-if section == "🤖 AI Assistant":
-    st.title("Ask the AI Assistant")
-    query = st.text_input("Ask the Assistant:", placeholder="e.g., What are my IT revenue growth recommendations?")
-    
-    if query:
-        st.write(f"**You asked:** {query}")
-        # Implement the logic to generate response from AI Assistant here
-        # Placeholder for AI response logic (can integrate OpenAI or pre-defined responses)
-        response = f"Response based on the input: {query}"
-        st.write(f"**AI Response:** {response}")
-        
+       
 # Strategic Roadmap Tab
 if section == "🧭 Strategic Roadmap":
     st.title("🧭 Strategic Roadmap")
@@ -393,7 +382,16 @@ if section == "💰 ITRM Financial Summary":
     # Calculate the updated revenue and expenses
     # Assuming the 'inputs' section already collects baseline revenue and expense information
     # Revenue Growth & Expense Growth Sliders
-    revenue_growth = [st.slider(f"Year {i+1} Revenue Growth (%)", 0.0, 100.0, value=5) for i in range(3)]  # 5% default growth
+    revenue_growth = []
+    for i in range(3):
+        growth = st.slider(
+            f"Year {i+1} Revenue Growth (%)",
+            0.0,  # Minimum value
+            100.0,  # Maximum value
+            value=5,  # Default value
+            key=f"revenue_growth_{i}"  # Unique key for each slider
+        )
+    revenue_growth.append(growth)
     expense_growth = [st.slider(f"Year {i+1} Expense Growth (%)", 0.0, 100.0, value=3) for i in range(3)]  # 3% default growth
     
     # Projected Revenue Calculation
