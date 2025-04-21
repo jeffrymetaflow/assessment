@@ -686,12 +686,11 @@ elif section == "📝 IT Maturity Assessment":
             
             # Generate a unique key for the text_input widget based on the current section
             section = "ITMaturity"  # Example, you can dynamically fetch this as needed
+            context = "example_context"  # Replace with your logic
             query = st.text_input(
-                "Ask the AI Assistant:", 
-                placeholder="e.g., What are the cybersecurity recommendations?", 
-                key=f"ai_assistant_query_{section}_{st.session_state['unique_id']}"
+                "Enter your query",
+                key=f"text_input_{context}"
             )
-
             # You can now use this input and process it as needed
             if query:
                 # Process the query
