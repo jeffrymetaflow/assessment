@@ -691,6 +691,7 @@ elif section == "📝 IT Maturity Assessment":
                 if query:
                     response = ai_assistant(query)
                     st.markdown(f"**AI Assistant Response:**\n{response}")
+                    
             # Generate a unique identifier for the session if it doesn't already exist
             if 'unique_id' not in st.session_state:
                 st.session_state['unique_id'] = str(uuid.uuid4())
