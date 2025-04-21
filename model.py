@@ -390,7 +390,7 @@ if section == "💰 ITRM Financial Summary":
             min_value=0.0,
             max_value=100.0,
             value=5.0,
-            key=f"growth_slider_{i}"  # Unique key
+            key=f"revenue_growth_slider_{i}"  # Unique key
     )
     revenue_growth.append(growth)
     expense_growth = []
