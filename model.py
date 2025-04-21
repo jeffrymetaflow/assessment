@@ -688,11 +688,6 @@ elif section == "📝 IT Maturity Assessment":
             
             sections = list(set(sections))  # Remove duplicates
             for i, section in enumerate(sections):
-                query = st.text_input(
-                    f"Ask for {section}:",
-                    placeholder="e.g., What are the recommendations for {section}?",
-                    key=f"text_input_{section}_{i}"  # Ensures unique key
-                )
             
             if query:
                 response = ai_assistant(query)
