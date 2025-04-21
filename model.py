@@ -679,7 +679,22 @@ elif section == "📝 IT Maturity Assessment":
             if query:
                 response = ai_assistant(query)
                 st.markdown(f"**AI Assistant Response:**\n{response}")
+            # Generate a unique identifier for the session if it doesn't already exist
+            if 'unique_id' not in st.session_state:
+                st.session_state['unique_id'] = str(uuid.uuid4())
             
+            # Generate a unique key for the text_input widget based on the current section
+            section = "ITMaturity"  # Example, you can dynamically fetch this as needed
+            query = st.text_input(
+                "Ask the AI Assistant:", 
+                placeholder="e.g., What are the cybersecurity recommendations?", 
+                key=f"ai_assistant_query_{section}_{st.session_state['unique_id']}"
+            )
+
+            # You can now use this input and process it as needed
+            if query:
+                # Process the query
+                st.write(f"Your query: {query}")
             # Sidebar navigation for the app
             # Define a unique identifier for your section
             unique_identifier = "sidebar_radio"
