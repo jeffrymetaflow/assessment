@@ -683,7 +683,7 @@ elif section == "📝 IT Maturity Assessment":
             # Sidebar navigation for the app
             # Define a unique identifier for your section
             unique_identifier = "IT_Maturity"  # Replace this with the actual dynamic value you want to use.
-            
+            unique_identifier = "sidebar_radio"
             # Now use it in the key
             section = st.sidebar.radio(
                 "Go to", 
