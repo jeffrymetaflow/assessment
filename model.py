@@ -713,9 +713,10 @@ elif section == "📝 IT Maturity Assessment":
             # Generate a unique key for the text_input widget based on the current section
             section = "ITMaturity"  # Example, you can dynamically fetch this as needed
             context = "user_input_section"  # Replace with relevant context
+        for i in range(3):
             query = st.text_input(
-                "Enter your query",
-                key="unique_text_input_key_716"
+                f"Query {i + 1}",
+                key=f"text_input_key_{i}"
             )
             
             # You can now use this input and process it as needed
