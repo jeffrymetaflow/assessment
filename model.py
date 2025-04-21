@@ -688,8 +688,7 @@ elif section == "📝 IT Maturity Assessment":
                  "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🧭 Strategic Roadmap", 
                  "📊 Benchmarking & Persona", "🤖 AI Assistant"], 
                 key=f"ai_assistant_query_ITMaturity_{section}")
-            )
-            
+                    
             # AI Assistant Tab Content
             if section == "🤖 AI Assistant":
                 st.title("AI Assistant")
