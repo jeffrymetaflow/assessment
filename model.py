@@ -682,13 +682,20 @@ elif section == "📝 IT Maturity Assessment":
             
             # Sidebar navigation for the app
             # Assign a dynamic key for the radio button based on the section name
+            section_name = "overview"  # Example dynamic assignment
             section = st.sidebar.radio(
-                "Go to", 
-                ["🧠 Overview Summary", "📊 ITRM Calculator", "💰 ITRM Financial Summary", 
-                 "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🧭 Strategic Roadmap", 
-                 "📊 Benchmarking & Persona", "🤖 AI Assistant"], 
+                "Go to",
+                [
+                    "🧠 Overview Summary", 
+                    "⚙️ Inputs Setup", 
+                    "📊 ITRM Calculator", 
+                    "💰 ITRM Financial Summary", 
+                    "🔐 Cybersecurity Assessment", 
+                    "📝 IT Maturity Assessment", 
+                    "🤖 AI Assistant"
+                ],
                 key=f"sidebar_radio_{section_name}"
-)
+            )
                     
             # AI Assistant Tab Content
             if section == "🤖 AI Assistant":
