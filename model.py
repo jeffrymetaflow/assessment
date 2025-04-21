@@ -687,7 +687,7 @@ elif section == "📝 IT Maturity Assessment":
                 ["🧠 Overview Summary", "📊 ITRM Calculator", "💰 ITRM Financial Summary", 
                  "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🧭 Strategic Roadmap", 
                  "📊 Benchmarking & Persona", "🤖 AI Assistant"], 
-                key=f"ai_assistant_query_ITMaturity_{section}")
+                key="sidebar_navigation_unique")
                     
             # AI Assistant Tab Content
             if section == "🤖 AI Assistant":
