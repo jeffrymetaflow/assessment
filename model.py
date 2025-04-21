@@ -66,16 +66,25 @@ if section == "🧠 Overview Summary":
     st.pyplot(fig)
 
     # IT Maturity Heatmap
+    # IT Maturity Heatmap (Matplotlib version)
     st.subheader("IT Maturity Scores")
     maturity_scores = pd.DataFrame({
         'Category': ['Performance', 'Security', 'Compliance', 'Cost Efficiency', 'Innovation'],
         'Score (%)': [80, 70, 60, 90, 75]
     })
-
-    plt.figure(figsize=(8, 4))
-    sns.heatmap(maturity_scores[['Score (%)']].transpose(), annot=True, cmap='coolwarm', cbar=True)
-    plt.title("IT Maturity Heatmap")
-    st.pyplot(plt)
+    
+    fig, ax = plt.subplots(figsize=(8, 4))
+    cax = ax.matshow([maturity_scores['Score (%)'].values], cmap='coolwarm')
+    
+    # Add color bar
+    fig.colorbar(cax)
+    
+    # Set the x-ticks and labels
+    ax.set_xticks(range(len(maturity_scores['Category'])))
+    ax.set_xticklabels(maturity_scores['Category'], rotation=45, ha='right')
+    
+    ax.set_title("IT Maturity Heatmap")
+    st.pyplot(fig)
 
     # AI Assistant Recommendations
     st.subheader("AI-Powered Recommendations")
