@@ -682,7 +682,7 @@ elif section == "📝 IT Maturity Assessment":
             
             # Sidebar navigation for the app
             # Assign a dynamic key for the radio button based on the section name
-            section_name = "overview"  # Example dynamic assignment
+            section_name = "default_section"
             section = st.sidebar.radio(
                 "Go to",
                 [
