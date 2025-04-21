@@ -683,6 +683,7 @@ elif section == "📝 IT Maturity Assessment":
             
             # Ensure unique keys for each text input
             sections = ["section1", "section2", "section3"]  # Example sections
+            sections = list(set(sections))  # Remove duplicates
             for i, section in enumerate(sections):
                 query = st.text_input(
                     f"Ask for {section}:",
