@@ -428,6 +428,7 @@ if section == "💰 ITRM Financial Summary":
     
     # Display the projected revenue
     st.write("Projected Revenue:", projected_revenue)
+    
     # Projected Expenses Calculation
     projected_expenses = {}
     for i, year in enumerate(expense_input.keys()):
@@ -436,6 +437,14 @@ if section == "💰 ITRM Financial Summary":
             projected_expenses[year] = expense_input[year]
         else:
             projected_expenses[year] = projected_expenses[f"Year {i}"] * (1 + growth_percentage)
+    
+    # Ensure expense_input exists
+    if "expense_input" not in st.session_state:
+        st.error("Please configure the inputs in the 'ITRM Calculator' tab first.")
+        st.stop()
+    
+    # Retrieve expense_input
+    expense_input = st.session_state.expense_input
     
     # Display Calculated Revenue and Expenses for Each Year
     st.markdown(f"Year 1 Projected Revenue: ${projected_revenue['Year 1']:,}")
@@ -1119,3 +1128,20 @@ if section == "📊 ITRM Calculator":
         # Save to session state
         st.session_state.revenue_input = revenue_input
         st.session_state.revenue_growth = revenue_growth
+
+    if section == "📊 ITRM Calculator":
+        st.title("📊 ITRM Multi-Year Calculator")
+    
+        # Get baseline IT expense and growth inputs
+        baseline_expense = st.number_input("Baseline Expense ($)", min_value=0, step=1000)
+        expense_growth = [st.slider(f"Year {i+1} Expense Growth (%)", 0.0, 100.0, 3.0) for i in range(3)]
+    
+        # Define expense input as a dictionary
+        expense_input = {
+            f"Year {i+1}": baseline_expense * (1 + sum([expense_growth[j] / 100 for j in range(i)]))
+            for i in range(3)
+        }
+    
+        # Save to session state
+        st.session_state.expense_input = expense_input
+        st.session_state.expense_growth = expense_growth
