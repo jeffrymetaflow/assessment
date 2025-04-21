@@ -685,7 +685,7 @@ elif section == "📝 IT Maturity Assessment":
             section = st.sidebar.radio(
                 "Go to",
                 ["🧠 Overview Summary", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🤖 AI Assistant"],
-                key="sidebar_navigation_radio"
+                key=f"sidebar_radio_{unique_identifier}"
             )
             
             # AI Assistant Tab Content
