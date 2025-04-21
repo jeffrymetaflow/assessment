@@ -681,19 +681,16 @@ elif section == "📝 IT Maturity Assessment":
                 st.markdown(f"**AI Assistant Response:**\n{response}")
             
             # Sidebar navigation for the app
-            section_name = "overview" 
+            # Define a unique identifier for your section
+            unique_identifier = "IT_Maturity"  # Replace this with the actual dynamic value you want to use.
+            
+            # Now use it in the key
             section = st.sidebar.radio(
-                "Go to",
-                [
-                    "🧠 Overview Summary", 
-                    "⚙️ Inputs Setup", 
-                    "📊 ITRM Calculator", 
-                    "💰 ITRM Financial Summary", 
-                    "🔐 Cybersecurity Assessment", 
-                    "📝 IT Maturity Assessment", 
-                    "🤖 AI Assistant"
-                ],
-                key="sidebar_radio_unique"
+                "Go to", 
+                ["🧠 Overview Summary", "📊 ITRM Calculator", "💰 ITRM Financial Summary", 
+                 "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🧭 Strategic Roadmap", 
+                 "📊 Benchmarking & Persona", "🤖 AI Assistant"], 
+                key=f"sidebar_radio_{unique_identifier}"
             )
                     
             # AI Assistant Tab Content
