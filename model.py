@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
 from fpdf import FPDF
+import uuid
 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
