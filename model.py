@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 from fpdf import FPDF
 import uuid
-import seaborn as sns
 import numpy as np
 
 # Sidebar Navigation
