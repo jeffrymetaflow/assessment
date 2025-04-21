@@ -715,7 +715,7 @@ elif section == "📝 IT Maturity Assessment":
             context = "user_input_section"  # Replace with relevant context
             query = st.text_input(
                 "Enter your query",
-                key=f"text_input_{context}"
+                key="unique_text_input_key_716"
             )
             
             # You can now use this input and process it as needed
