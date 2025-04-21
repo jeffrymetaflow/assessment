@@ -380,21 +380,18 @@ if section == "💰 ITRM Financial Summary":
     new_expense_growth = [st.slider(f"Year {i+1} Expense Growth (%)", 0.0, 100.0, value=float(expense_growth[i] * 100)) for i in range(3)]
 
     # Calculate the updated revenue and expenses
-    # Assuming the 'inputs' section already collects baseline revenue and expense information
     # Revenue Growth & Expense Growth Sliders
     revenue_growth = []
-    growth_rates = []
     for i in range(3):
         growth = st.slider(
             f"Year {i+1} Growth Rate (%)",
-            min_value=0.0, # Float
-            max_value=100.0, # Float
-            value=5.0, #Float
+            min_value=0.0,
+            max_value=100.0,
+            value=5.0,
             key=f"revenue_growth_slider_{i}"  # Unique key
-    )
+        )
         revenue_growth.append(growth)
     expense_growth = []
-    growth_rates = []
     for i in range(3):
         growth = st.slider(
             f"Year {i+1} Expense Growth (%)",
@@ -412,7 +409,6 @@ if section == "💰 ITRM Financial Summary":
     
     # Retrieve revenue_input
     revenue_input = st.session_state.revenue_input
-    revenue_growth = st.session_state.revenue_growth
     
     # Projected Revenue Calculation
     projected_revenue = {}
@@ -457,6 +453,7 @@ if section == "💰 ITRM Financial Summary":
     st.markdown(f"Year 1 Projected Expenses: ${projected_expenses['Year 1']:,}")
     st.markdown(f"Year 2 Projected Expenses: ${projected_expenses['Year 2']:,}")
     st.markdown(f"Year 3 Projected Expenses: ${projected_expenses['Year 3']:,}") 
+    
     # Show updated revenue and expenses
     st.markdown("### Updated Revenue:")
     for year, revenue in revenue_input.items():
@@ -483,30 +480,26 @@ if section == "💰 ITRM Financial Summary":
     years = ["Year 1", "Year 2", "Year 3"]
     itrms = [itrm["Year 1"], itrm["Year 2"], itrm["Year 3"]]
 
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.plot(years, itrms, marker='o', linestyle='-', linewidth=2, color='b', label='ITRM')
-    ax.set_xlabel('Year')
-    ax.set_ylabel('IT Revenue Margin (%)')
-    ax.set_title('ITRM Trend Over Time')
-    ax.legend()
+    fig, ax = plt.subplots()
+    ax.plot(years, itrms, marker='o', linewidth=2)
+    ax.set_ylabel("IT Revenue Margin (%)")
+    ax.set_title("ITRM Over Time")
     st.pyplot(fig)
 
-    # Year-over-Year Comparison Chart
+    # Year-over-Year Comparison
     st.markdown("### 📊 Year-over-Year Comparison")
-    revenue_yoy = [projected_revenue["Year 2"] - projected_revenue["Year 1"],
-                   projected_revenue["Year 3"] - projected_revenue["Year 2"]]
-    expense_yoy = [projected_expenses["Year 2"] - projected_expenses["Year 1"],
-                   projected_expenses["Year 3"] - projected_expenses["Year 2"]]
-    itrm_yoy = [itrm["Year 2"] - itrm["Year 1"], itrm["Year 3"] - itrm["Year 2"]]
+    revenue_values = [projected_revenue["Year 1"], projected_revenue["Year 2"], projected_revenue["Year 3"]]
+    expense_values = [projected_expenses["Year 1"], projected_expenses["Year 2"], projected_expenses["Year 3"]]
 
-    # Plot Year-over-Year Comparison
     fig2, ax2 = plt.subplots(figsize=(8, 6))
     ax2.bar(years, revenue_values, color='green', alpha=0.6, label='Projected Revenue')
     ax2.bar(years, expense_values, color='red', alpha=0.6, label='Projected Expenses')
+
     ax2.set_xlabel('Year')
     ax2.set_ylabel('Amount ($)')
     ax2.set_title('Year-over-Year Comparison of Revenue and Expenses')
     ax2.legend()
+
     st.pyplot(fig2)
 
     # Recommendations Based on ITRM
