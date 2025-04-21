@@ -37,6 +37,72 @@ if "revenue_growth" not in st.session_state:
 if "expense_growth" not in st.session_state:
     st.session_state.expense_growth = [0.03] * 3  # Default growth rate: 3% per year for 3 years
 
+# Sidebar Navigation
+st.sidebar.title("Navigation")
+section = st.sidebar.radio("Go to", ["🧠 Overview Summary", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🧭 Strategic Roadmap", "🤖 AI Assistant"])
+
+# Client Overview
+if section == "🧠 Overview Summary":
+    st.title("Overview of IT Revenue Margin")
+    st.markdown("""
+    Welcome to the IT Revenue Margin (ITRM) Dashboard. Here you will find an overview of the revenue, expenses, and IT maturity for your company.
+    """)
+
+    # Client name input
+    client_name = st.text_input("Enter Client Name:", "Acme Corp")
+    st.markdown(f"**Client Name:** {client_name}")
+
+    # ITRM Score
+    itrm_score = st.number_input("Overall IT Revenue Margin Score", min_value=0, max_value=100, value=75, step=1)
+    st.markdown(f"**ITRM Score:** {itrm_score}%")
+
+    # Revenue and Expense Growth
+    st.subheader("Revenue and Expense Growth Over Time")
+    years = ['Year 1', 'Year 2', 'Year 3']
+    revenue = [8000000000, 8500000000, 9000000000]  # Example revenue data
+    expenses = [150000000, 160000000, 170000000]   # Example expense data
+
+    fig, ax = plt.subplots()
+    ax.plot(years, revenue, label="Revenue", color='blue')
+    ax.plot(years, expenses, label="Expenses", color='red')
+    ax.set_xlabel("Years")
+    ax.set_ylabel("Amount ($)")
+    ax.legend()
+    st.pyplot(fig)
+
+    # IT Maturity Heatmap
+    st.subheader("IT Maturity Scores")
+    maturity_scores = pd.DataFrame({
+        'Category': ['Performance', 'Security', 'Compliance', 'Cost Efficiency', 'Innovation'],
+        'Score (%)': [80, 70, 60, 90, 75]
+    })
+
+    plt.figure(figsize=(8, 4))
+    sns.heatmap(maturity_scores[['Score (%)']].transpose(), annot=True, cmap='coolwarm', cbar=True)
+    plt.title("IT Maturity Heatmap")
+    st.pyplot(plt)
+
+    # AI Assistant Recommendations
+    st.subheader("AI-Powered Recommendations")
+    st.markdown("""
+    Based on your inputs, the AI Assistant recommends the following actions to improve IT maturity and revenue margin:
+    - **Increase Automation** in IT processes.
+    - **Focus on Cybersecurity** to mitigate risks.
+    - **Optimize IT Costs** to improve profitability.
+    """)
+
+# AI Assistant Tab (to be customized further)
+if section == "🤖 AI Assistant":
+    st.title("Ask the AI Assistant")
+    query = st.text_input("Ask the Assistant:", placeholder="e.g., What are my IT revenue growth recommendations?")
+    
+    if query:
+        st.write(f"**You asked:** {query}")
+        # Implement the logic to generate response from AI Assistant here
+        # Placeholder for AI response logic (can integrate OpenAI or pre-defined responses)
+        response = f"Response based on the input: {query}"
+        st.write(f"**AI Response:** {response}")
+
 # Strategic Roadmap Tab
 if section == "🧭 Strategic Roadmap":
     st.title("🧭 Strategic Roadmap")
