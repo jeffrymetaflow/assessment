@@ -675,7 +675,7 @@ elif section == "📝 IT Maturity Assessment":
             
             # Display the AI Assistant interaction in the app
             # Ensure unique keys using st.session_state
-             sections = ["section1", "section2", "section3"]  # Example sections
+            sections = ["section1", "section2", "section3"]  # Example sections
             
             for section_unique in sections:
                 if f"unique_id_{section_unique}" not in st.session_state:
