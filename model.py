@@ -743,10 +743,10 @@ elif section == "📝 IT Maturity Assessment":
     
         This framework helps businesses not only measure IT profitability but also continuously optimize their IT operations to reduce waste, drive efficiency, and achieve better alignment with overall business performance.
         """
-    elif section == "🤖 AI Assistant":
+    elif section == "AI Assistant":
         from streamlit_chat import message
     
-        st.title("🤖 AI Assistant")
+        st.title("AI Assistant")
     
         if "messages" not in st.session_state:
             st.session_state.messages = [
