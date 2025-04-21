@@ -694,7 +694,7 @@ elif section == "📝 IT Maturity Assessment":
                     "📝 IT Maturity Assessment", 
                     "🤖 AI Assistant"
                 ],
-                key=f"sidebar_radio_{section_name}"
+                key="sidebar_radio_unique"
             )
                     
             # AI Assistant Tab Content
