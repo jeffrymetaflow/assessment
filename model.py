@@ -387,12 +387,12 @@ if section == "💰 ITRM Financial Summary":
     for i in range(3):
         growth = st.slider(
             f"Year {i+1} Growth Rate (%)",
-            min_value=0.0,
-            max_value=100.0,
-            value=5.0,
+            min_value=0.0, # Float
+            max_value=100.0, # Float
+            value=5.0, #Float
             key=f"revenue_growth_slider_{i}"  # Unique key
     )
-    revenue_growth.append(growth)
+        revenue_growth.append(growth)
     expense_growth = []
     growth_rates = []
     for i in range(3):
@@ -400,7 +400,7 @@ if section == "💰 ITRM Financial Summary":
             f"Year {i+1} Expense Growth (%)",
             min_value=0.0,
             max_value=100.0,
-            value=3,
+            value=3.0,
             key=f"expense_growth_slider_{i}"  # Unique key
         )
         expense_growth.append(growth)
