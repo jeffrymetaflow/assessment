@@ -682,7 +682,8 @@ elif section == "📝 IT Maturity Assessment":
             
             # Sidebar navigation for the app
             # Assign a dynamic key for the radio button based on the section name
-            section_name = "default_section"
+            section_name = "overview" 
+            # Replace with your logic to determine the section name
             section = st.sidebar.radio(
                 "Go to",
                 [
@@ -694,8 +695,8 @@ elif section == "📝 IT Maturity Assessment":
                     "📝 IT Maturity Assessment", 
                     "🤖 AI Assistant"
                 ],
-                key="sidebar_radio_unique"
-            )
+                key=f"sidebar_radio_{section_name}"
+)
                     
             # AI Assistant Tab Content
             if section == "🤖 AI Assistant":
