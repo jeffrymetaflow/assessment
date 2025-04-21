@@ -351,14 +351,14 @@ if section == "💰 ITRM Financial Summary":
     st.markdown(f"Year 1 Projected Expenses: ${projected_expenses['Year 1']:,}")
     st.markdown(f"Year 2 Projected Expenses: ${projected_expenses['Year 2']:,}")
     st.markdown(f"Year 3 Projected Expenses: ${projected_expenses['Year 3']:,}") 
-        # Show updated revenue and expenses
-        st.markdown("### Updated Revenue:")
-        for year, revenue in revenue_input.items():
-            st.markdown(f"- **{year}:** ${revenue:,.2f}")
-    
-        st.markdown("### Updated Expenses:")
-        for year, expense in expense_input.items():
-            st.markdown(f"- **{year}:** ${expense:,.2f}")
+    # Show updated revenue and expenses
+    st.markdown("### Updated Revenue:")
+    for year, revenue in revenue_input.items():
+        st.markdown(f"- **{year}:** ${revenue:,.2f}")
+
+    st.markdown("### Updated Expenses:")
+    for year, expense in expense_input.items():
+        st.markdown(f"- **{year}:** ${expense:,.2f}")
 
     # Calculate IT Revenue Margin (ITRM) for each year
     itrm = {
