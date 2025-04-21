@@ -687,18 +687,14 @@ elif section == "📝 IT Maturity Assessment":
                 st.session_state[f"unique_id_{section}"] = str(uuid.uuid4())
             
             sections = list(set(sections))  # Remove duplicates
-            for i, section in enumerate(sections):
-            
-            if query:
-                response = ai_assistant(query)
-                st.markdown(f"**AI Assistant Response:**\n{response}")
+            for i, section in enumerate(sections):   
+                if query:
+                    response = ai_assistant(query)
+                    st.markdown(f"**AI Assistant Response:**\n{response}")
             # Generate a unique identifier for the session if it doesn't already exist
             if 'unique_id' not in st.session_state:
                 st.session_state['unique_id'] = str(uuid.uuid4())
-
-            import streamlit as st
-            import uuid
-            
+           
             # Ensure the unique ID is set for the session
             if 'unique_id' not in st.session_state:
                 st.session_state['unique_id'] = str(uuid.uuid4())  # Unique session ID for each user    
