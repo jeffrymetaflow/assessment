@@ -681,10 +681,12 @@ elif section == "📝 IT Maturity Assessment":
                 if f"unique_id_{section_unique}" not in st.session_state:
                     st.session_state[f"unique_id_{section_unique}"] = str(uuid.uuid4())
             
+            # Ensure unique keys for each text input
             sections = ["section1", "section2", "section3"]  # Example sections
             for i, section in enumerate(sections):
                 query = st.text_input(
                     f"Ask for {section}:",
+                    placeholder="e.g., What are the recommendations for {section}?",
                     key=f"text_input_{section}_{i}"
                 )
             
