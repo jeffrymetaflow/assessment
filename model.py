@@ -383,11 +383,12 @@ if section == "💰 ITRM Financial Summary":
     # Assuming the 'inputs' section already collects baseline revenue and expense information
     # Revenue Growth & Expense Growth Sliders
     revenue_growth = []
+    growth_rates = []
     for i in range(3):
         growth = st.slider(
             f"Year {i+1} Revenue Growth (%)",
-            0.0,  # Minimum value
-            100.0,  # Maximum value
+            min_value=0.0,
+            max_value=100.0,
             value=5,  # Default value
             key=f"revenue_growth_{i}"  # Unique key for each slider
         )
