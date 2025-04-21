@@ -688,8 +688,7 @@ elif section == "📝 IT Maturity Assessment":
             
             sections = list(set(sections))  # Remove duplicates
             for i, section in enumerate(sections):   
-            if query:
-                response = ai_assistant(query)
+                if query: response = ai_assistant(query)
                     st.markdown(f"**AI Assistant Response:**\n{response}")
                     
             # Generate a unique identifier for the session if it doesn't already exist
