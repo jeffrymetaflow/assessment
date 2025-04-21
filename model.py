@@ -94,6 +94,17 @@ if section == "🧠 Overview Summary":
     - **Optimize IT Costs** to improve profitability.
     """)
 
+if section == "🤖 AI Assistant":
+    st.title("Ask the AI Assistant")
+    query = st.text_input("Ask the Assistant:", placeholder="e.g., What are my IT revenue growth recommendations?")
+    
+    if query:
+        st.write(f"**You asked:** {query}")
+        # Implement the logic to generate response from AI Assistant here
+        # Placeholder for AI response logic (can integrate OpenAI or pre-defined responses)
+        response = f"Response based on the input: {query}"
+        st.write(f"**AI Response:** {response}")
+        
 # Strategic Roadmap Tab
 if section == "🧭 Strategic Roadmap":
     st.title("🧭 Strategic Roadmap")
