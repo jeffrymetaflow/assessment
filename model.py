@@ -1092,3 +1092,21 @@ if section == "📊 ITRM Calculator":
     ax.set_ylabel("IT Revenue Margin (%)")
     ax.set_title("ITRM Over Time")
     st.pyplot(fig)
+
+    # Example in the ITRM Calculator tab
+    if section == "📊 ITRM Calculator":
+        st.title("📊 ITRM Multi-Year Calculator")
+    
+        # Retrieve baseline revenue and inputs
+        baseline_revenue = st.number_input("Baseline Revenue ($)", min_value=0)
+        revenue_growth = [st.slider(f"Year {i+1} Revenue Growth (%)", 0.0, 100.0, 5.0) for i in range(3)]
+    
+        # Define revenue input based on baseline revenue and years
+        revenue_input = {
+            f"Year {i+1}": baseline_revenue * (1 + sum([revenue_growth[j] / 100 for j in range(i)]))
+            for i in range(3)
+        }
+    
+        # Save to session state
+        st.session_state.revenue_input = revenue_input
+        st.session_state.revenue_growth = revenue_growth
