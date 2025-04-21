@@ -689,8 +689,8 @@ elif section == "📝 IT Maturity Assessment":
             context = "search_box"  # Replace with your logic
             query = st.text_input(
                 "Enter your query",
-                key=f"text_input_{context}"
-            )
+                key="unique_text_input_key")
+            
             # You can now use this input and process it as needed
             if query:
                 # Process the query
