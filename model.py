@@ -392,7 +392,6 @@ if section == "💰 ITRM Financial Summary":
             value=5.0,
             key=f"growth_slider_{i}"  # Unique key
     )
-    growth_rates.append(growth)
     revenue_growth.append(growth)
     expense_growth = []
     for i in range(3):
