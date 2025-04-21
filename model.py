@@ -682,6 +682,15 @@ elif section == "📝 IT Maturity Assessment":
                     st.session_state[f"unique_id_{section_unique}"] = str(uuid.uuid4())
             
             # Ensure unique keys for each text input
+            section = "example_section"  # Example unique section
+            if f"unique_id_{section}" not in st.session_state:
+                st.session_state[f"unique_id_{section}"] = str(uuid.uuid4())
+            
+            query = st.text_input(
+                "Ask the AI Assistant:",
+                placeholder="e.g., What are the cybersecurity recommendations?",
+                key=f"ai_assistant_query_{section}_{st.session_state[f'unique_id_{section}']}"
+            )
             sections = ["section1", "section2", "section3"]  # Example sections
             sections = list(set(sections))  # Remove duplicates
             for i, section in enumerate(sections):
