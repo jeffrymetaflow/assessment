@@ -743,6 +743,26 @@ elif section == "📝 IT Maturity Assessment":
     
         This framework helps businesses not only measure IT profitability but also continuously optimize their IT operations to reduce waste, drive efficiency, and achieve better alignment with overall business performance.
         """
+    elif section == "🤖 AI Assistant":
+        from streamlit_chat import message
+    
+        st.title("🤖 AI Assistant")
+    
+        if "messages" not in st.session_state:
+            st.session_state.messages = [
+                {"role": "system", "content": "You are an expert IT strategy assistant helping explain IT Revenue Margin modeling to business leaders."}
+            ]
+    
+        user_input = st.text_input("Ask the assistant anything about your IT model or strategy:")
+    
+        if user_input:
+            # Append user input to session state
+            st.session_state.messages.append({"role": "user", "content": user_input})
+    
+        # Render chat messages
+        for i, msg in enumerate(st.session_state.messages[1:]):
+            is_user = (i % 2 == 0)
+            message(msg["content"], is_user=is_user, key=f"message_{i}")
 
 # Inputs Tab
 if section == "⚙️ Inputs Setup":
