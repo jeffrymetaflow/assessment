@@ -683,7 +683,39 @@ elif section == "📝 IT Maturity Assessment":
             # Generate a unique identifier for the session if it doesn't already exist
             if 'unique_id' not in st.session_state:
                 st.session_state['unique_id'] = str(uuid.uuid4())
+
+            import streamlit as st
+            import uuid
             
+            # Ensure the unique ID is set for the session
+            if 'unique_id' not in st.session_state:
+                st.session_state['unique_id'] = str(uuid.uuid4())  # Unique session ID for each user
+            
+            # Sidebar navigation to choose the section
+            section = st.sidebar.radio(
+                "Go to", 
+                ["🧠 Overview Summary", "📊 ITRM Calculator", "💰 ITRM Financial Summary", "🔐 Cybersecurity Assessment", "📝 IT Maturity Assessment", "🧭 Strategic Roadmap", "🤖 AI Assistant"]
+            )
+            
+            # AI Assistant Section
+            if section == "🤖 AI Assistant":
+                st.title("AI Assistant")
+                
+                # Generate a unique key using section and unique_id
+                query_key = f"ai_assistant_query_{section}_{st.session_state['unique_id']}"
+                
+                # Ask the user to input a query to the AI assistant with the unique key
+                query = st.text_input(
+                    "Ask the AI Assistant:", 
+                    placeholder="e.g., What are the cybersecurity recommendations?", 
+                    key=query_key  # Using the unique key
+                )
+            
+                if query:
+                    # Handle the input and process the AI response
+                    st.write(f"Your query: {query}")
+                    # Process the query with the AI model here (e.g., pass it to OpenAI API)
+                        
             # Generate a unique key for the text_input widget based on the current section
             section = "ITMaturity"  # Example, you can dynamically fetch this as needed
             context = "search_box"  # Replace with logic to generate a unique identifier
