@@ -394,6 +394,7 @@ if section == "💰 ITRM Financial Summary":
     )
     revenue_growth.append(growth)
     expense_growth = []
+    growth_rates = []
     for i in range(3):
         growth = st.slider(
             f"Year {i+1} Expense Growth (%)",
