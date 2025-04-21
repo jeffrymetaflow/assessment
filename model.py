@@ -675,15 +675,17 @@ elif section == "📝 IT Maturity Assessment":
             
             # Display the AI Assistant interaction in the app
             # Ensure unique keys using st.session_state
-            section_unique = st.text_input("Enter a unique section identifier:")
-            if section_unique and f"unique_id_{section_unique}" not in st.session_state:
-                st.session_state[f"unique_id_{section_unique}"] = "some_value"
+             sections = ["section1", "section2", "section3"]  # Example sections
             
-            query = st.text_input(
-                "Ask the AI Assistant:",
-                placeholder="e.g., What are the cybersecurity recommendations?",
-                key=f"ai_assistant_query_ITMaturity_{section_unique}_{st.session_state[f'unique_id_{section_unique}']}"
-            )
+            for section_unique in sections:
+                if f"unique_id_{section_unique}" not in st.session_state:
+                    st.session_state[f"unique_id_{section_unique}"] = str(uuid.uuid4())
+            
+                query = st.text_input(
+                    f"Ask the AI Assistant for {section_unique}:",
+                    placeholder="e.g., What are the cybersecurity recommendations?",
+                    key=f"ai_assistant_query_ITMaturity_{section_unique}_{st.session_state[f'unique_id_{section_unique}']}"
+                )
             
             if query:
                 response = ai_assistant(query)
