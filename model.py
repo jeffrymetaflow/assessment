@@ -398,8 +398,8 @@ if section == "💰 ITRM Financial Summary":
     for i in range(3):
         growth = st.slider(
             f"Year {i+1} Expense Growth (%)",
-            0.0,
-            100.0,
+            min_value=0.0,
+            max_value=100.0,
             value=3,
             key=f"expense_growth_slider_{i}"  # Unique key
         )
