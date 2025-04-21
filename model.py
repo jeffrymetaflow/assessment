@@ -320,38 +320,7 @@ if section == "💰 ITRM Financial Summary":
     new_expense_growth = [st.slider(f"Year {i+1} Expense Growth (%)", 0.0, 100.0, value=float(expense_growth[i] * 100)) for i in range(3)]
 
     # Calculate the updated revenue and expenses
-    # Assuming the 'inputs' section already collects baseline revenue and expense information
-    # Revenue Growth & Expense Growth Sliders
-    revenue_growth = [st.slider(f"Year {i+1} Revenue Growth (%)", 0.0, 100.0, value=5) for i in range(3)]  # 5% default growth
-    expense_growth = [st.slider(f"Year {i+1} Expense Growth (%)", 0.0, 100.0, value=3) for i in range(3)]  # 3% default growth
-    
-    # Projected Revenue Calculation
-    projected_revenue = {}
-    for i, year in enumerate(revenue_input.keys()):
-        growth_percentage = revenue_growth[i] / 100
-        if i == 0:
-            projected_revenue[year] = revenue_input[year]
-        else:
-            projected_revenue[year] = projected_revenue[f"Year {i}"] * (1 + growth_percentage)
-    
-    # Projected Expenses Calculation
-    projected_expenses = {}
-    for i, year in enumerate(expense_input.keys()):
-        growth_percentage = expense_growth[i] / 100
-        if i == 0:
-            projected_expenses[year] = expense_input[year]
-        else:
-            projected_expenses[year] = projected_expenses[f"Year {i}"] * (1 + growth_percentage)
-    
-    # Display Calculated Revenue and Expenses for Each Year
-    st.markdown(f"Year 1 Projected Revenue: ${projected_revenue['Year 1']:,}")
-    st.markdown(f"Year 2 Projected Revenue: ${projected_revenue['Year 2']:,}")
-    st.markdown(f"Year 3 Projected Revenue: ${projected_revenue['Year 3']:,}")
-    
-    st.markdown(f"Year 1 Projected Expenses: ${projected_expenses['Year 1']:,}")
-    st.markdown(f"Year 2 Projected Expenses: ${projected_expenses['Year 2']:,}")
-    st.markdown(f"Year 3 Projected Expenses: ${projected_expenses['Year 3']:,}")
-
+ 
     # Show updated revenue and expenses
     st.markdown("### Updated Revenue:")
     for year, revenue in revenue_input.items():
