@@ -9,7 +9,7 @@ import numpy as np
 st.set_page_config(page_title="Benchmarking_Personas", layout="wide")
 st.title("📈 Benchmarking Personas")
 
-section = "🧭 Benchmarking Personas"  # Define the variable
+section = "📊 Benchmarking Personas"  # Define the variable
 
 # Benchmarking & Persona Tab
 if section == "📊 Benchmarking & Persona":
