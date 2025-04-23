@@ -60,7 +60,7 @@ if section == "⚙️ Inputs Setup":
         default_revenue = st.session_state.get("revenue", 5_000_000)
         default_expense = df["Spend"].sum() if "Spend" in df.columns else 0
 
-        category_totals = df.groupby("Category")["Spend"].sum()
+        category_totals = df.groupby("Category")["Spend"].sum() if "Category" in df.columns and "Spend" in df.columns else pd.Series(dtype=float)
         full_total = category_totals.sum()
         category_expenses_to_total = [category_totals.get(cat, 0) / full_total for cat in [
             "Hardware", "Software", "Personnel", "Maintenance", "Telecom"
@@ -184,7 +184,6 @@ elif section == "🧠 Overview Summary":
 3. Integrate Toolkits
 """
     st.markdown(summary)
-
 
 
 
