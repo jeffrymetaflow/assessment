@@ -93,6 +93,7 @@ elif section == "💰 ITRM Financial Summary":
     revenue = st.session_state.revenue_input
     expenses = st.session_state.expense_input
 
+    st.markdown("### Projected Revenue and Expenses")
     for year in revenue:
         st.markdown(f"**{year}**: Revenue = ${revenue[year]:,.2f}, Expenses = ${expenses[year]:,.2f}")
 
@@ -101,8 +102,35 @@ elif section == "💰 ITRM Financial Summary":
         for year in revenue
     }
 
+    st.markdown("### ITRM by Year")
     for year in itrm:
         st.markdown(f"**{year} ITRM:** {itrm[year]:.2f}%")
+
+    # Year-over-Year Revenue vs Expense Comparison
+    st.markdown("### 📊 Year-over-Year Revenue vs. Expenses")
+    years = list(revenue.keys())
+    revenue_values = list(revenue.values())
+    expense_values = list(expenses.values())
+
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
+    ax2.bar(years, revenue_values, color='green', alpha=0.6, label='Revenue')
+    ax2.bar(years, expense_values, color='red', alpha=0.6, label='Expenses')
+    ax2.set_title("Year-over-Year Comparison")
+    ax2.set_xlabel("Year")
+    ax2.set_ylabel("Amount ($)")
+    ax2.legend()
+    st.pyplot(fig2)
+
+    # Recommendations based on ITRM
+    st.markdown("### 📌 Recommendations")
+    for year in itrm:
+        margin = itrm[year]
+        if margin < 20:
+            st.error(f"{year}: 🔴 Low Margin - Consider automation and reducing waste.")
+        elif margin < 40:
+            st.warning(f"{year}: 🟡 Medium Margin - Improve IT operations and cost control.")
+        else:
+            st.success(f"{year}: 🟢 Healthy Margin - Maintain and enhance automation.")
 
 # ---------- Overview Summary ----------
 elif section == "🧠 Overview Summary":
