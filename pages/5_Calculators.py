@@ -172,6 +172,7 @@ elif section == "🧠 Overview Summary":
     st.title("🧠 IT Revenue Margin Strategy Summary")
 
     summary = f"""
+    
     st.markdown(summary)
     
     from utils.ai_assist import ai_assist_overlay
