@@ -10,7 +10,7 @@ from utils.bootstrap import page_bootstrap
 st.set_page_config(page_title="Benchmarking_Personas", layout="wide")
 st.title("📈 Benchmarking Personas")
 
-page_bootstrap(current_page="Forecast Simulator")  # Or "Risk Model", etc.
+page_bootstrap(current_page="Benchmarking Personas")  # Or "Risk Model", etc.
 
 section = "📊 Benchmarking Personas"  # Define the variable
 
