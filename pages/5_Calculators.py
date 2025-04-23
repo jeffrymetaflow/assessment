@@ -172,6 +172,9 @@ elif section == "🧠 Overview Summary":
     st.title("🧠 IT Revenue Margin Strategy Summary")
 
     summary = f"""
+    from utils.ai_assist import ai_assist_overlay
+    with st.expander("💬 Need Help? Ask the AI Assistant", expanded=True):
+        ai_assist_overlay()
 **Client Name:** {client_name or '<Client>'}
 
 ## Strategy Overview
