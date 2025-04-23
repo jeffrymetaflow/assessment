@@ -172,6 +172,7 @@ elif section == "🧠 Overview Summary":
     st.title("🧠 IT Revenue Margin Strategy Summary")
 
     summary = f"""
+    
     st.markdown(summary)     
     
 **Client Name:** {client_name or '<Client>'}
