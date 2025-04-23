@@ -34,3 +34,11 @@ controller.run_simulation()
 st.write("🧮 Total Components:", len(controller.components))
 if controller.components:
     st.dataframe(pd.DataFrame(controller.components))
+
+from utils.component_utils import init_session_state_from_components
+
+# After running the simulation
+controller.run_simulation()
+
+# Update session state
+init_session_state_from_components(controller)
