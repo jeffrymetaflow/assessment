@@ -6,7 +6,7 @@ from utils.bootstrap import page_bootstrap
 st.set_page_config(page_title="Unified Executive Dashboard", layout="wide")
 st.title("\U0001F4CA Unified Executive Dashboard")
 
-page_bootstrap(current_page="Executive_Dashboard")  # Or "Risk Model", etc.
+page_bootstrap(current_page="Executive Dashboard")  # Or "Risk Model", etc.
 
 # --- Sample Inputs (would eventually link to live modules) ---
 st.sidebar.header("\U0001F4B0 High-Level Inputs")
