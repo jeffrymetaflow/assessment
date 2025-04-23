@@ -41,8 +41,8 @@ if section == "📊 Benchmarking & Persona":
     st.dataframe(benchmark_df)
 
     if 'it_maturity_scores' in st.session_state:
-        user_df = st.session_state['it_maturity_scores']
-        compare_df = pd.merge(user_df, benchmark_df, on="Category")
+        score_df = st.session_state['it_maturity_scores']
+        compare_df = pd.merge(score_df, benchmark_df, on="Category")
         compare_df["Gap"] = compare_df["Score (%)"] - compare_df["Industry Average (%)"]
         st.subheader("📊 Your Score vs Industry Average")
         st.dataframe(compare_df)
@@ -70,8 +70,8 @@ elif section == "📊 Benchmarking & Persona":
     st.dataframe(bench_df)
 
     if 'it_assessment_scores' in st.session_state:
-        user_df = st.session_state['it_maturity_scores']
-        compare_df = pd.merge(user_df, bench_df, on="Category")
+        score_df = st.session_state['it_maturity_scores']
+        compare_df = pd.merge(score_df, bench_df, on="Category")
         compare_df["Gap"] = compare_df["Score (%)"] - compare_df["Industry Average (%)"]
         st.subheader("📊 Your Score vs Industry Average")
         st.dataframe(compare_df)
