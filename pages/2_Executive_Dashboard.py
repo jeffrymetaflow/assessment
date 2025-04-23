@@ -1,9 +1,12 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+from utils.bootstrap import page_bootstrap
 
 st.set_page_config(page_title="Unified Executive Dashboard", layout="wide")
 st.title("\U0001F4CA Unified Executive Dashboard")
+
+page_bootstrap()
 
 # --- Sample Inputs (would eventually link to live modules) ---
 st.sidebar.header("\U0001F4B0 High-Level Inputs")
