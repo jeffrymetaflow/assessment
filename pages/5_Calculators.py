@@ -44,7 +44,7 @@ def forecast_values(baseline, growth_rates):
             forecast[year] = baseline
         else:
             prev = forecast[f"Year {i}"]
-            growth_rate = growth_rate[i] if i < len(growth_rates) else 0
+            growth_rate = growth_rates[i] if i < len(growth_rates) else 0
             forecast[year] = prev * (1 + growth_rates[i] / 100)
     return forecast
 
