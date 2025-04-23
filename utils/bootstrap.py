@@ -15,3 +15,4 @@ def page_bootstrap(current_page="Overview"):
 
     with st.sidebar.expander("💬 AI Assistant", expanded=False):
         ai_assist_overlay(context)
+
