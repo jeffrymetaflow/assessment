@@ -6,7 +6,7 @@ from fpdf import FPDF
 
 # ---------- Default Session State Initialization ----------
 default_state = {
-    "baseline_revenue": 739_000_000,
+    "revenue": 739_000_000,
     "it_expense": 4_977_370,
     "revenue_growth": [5.0, 5.0, 5.0],
     "expense_growth": [3.0, 3.0, 3.0],
@@ -25,7 +25,6 @@ section = st.sidebar.radio("Go to", [
     "⚙️ Inputs Setup",
     "📊 ITRM Calculator",
     "💰 ITRM Financial Summary",
-    "🔐 Cybersecurity Assessment"
 ])
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
 
@@ -64,11 +63,11 @@ if section == "⚙️ Inputs Setup":
             "Hardware", "Software", "Personnel", "Maintenance", "Telecom"
         ]]
     else:
-        default_revenue = st.session_state.baseline_revenue
+        default_revenue = st.session_state.revenue
         default_expense = st.session_state.it_expense
         category_expenses_to_total = st.session_state.category_expenses_to_total
 
-    baseline_revenue = st.number_input("Baseline Revenue ($)", value=default_revenue)
+    revenue = st.number_input("Revenue ($)", value=default_revenue)
     it_expense = st.number_input("IT Expense Baseline ($)", value=default_expense)
 
     categories = ["Hardware", "Software", "Personnel", "Maintenance", "Telecom"]
@@ -83,7 +82,7 @@ if section == "⚙️ Inputs Setup":
 
     if st.button("Save Inputs"):
         st.session_state.update({
-            "baseline_revenue": baseline_revenue,
+            "revenue": revenue,
             "it_expense": it_expense,
             "category_expenses_to_total": category_expenses,
             "category_revenue_to_total": category_revenue,
@@ -96,7 +95,7 @@ if section == "⚙️ Inputs Setup":
 elif section == "📊 ITRM Calculator":
     st.title("📊 ITRM Multi-Year Calculator")
 
-    revenue = forecast_values(st.session_state.baseline_revenue, st.session_state.revenue_growth)
+    revenue = forecast_values(st.session_state.revenue, st.session_state.revenue_growth)
     expenses = forecast_values(st.session_state.it_expense, st.session_state.expense_growth)
 
     st.session_state.revenue_input = revenue
@@ -183,25 +182,5 @@ elif section == "🧠 Overview Summary":
 """
     st.markdown(summary)
 
-# ---------- Cybersecurity Assessment ----------
-elif section == "🔐 Cybersecurity Assessment":
-    st.title("🔐 Cybersecurity Maturity Assessment")
-
-    categories = [
-        "Identify - Asset Mgmt", "Protect - Access Control", "Protect - Data Security",
-        "Detect - Anomalies", "Respond - Planning", "Recover - Planning"
-    ]
-
-    scores = [st.slider(cat, 1, 5, 3, key=cat) for cat in categories]
-    avg = sum(scores) / len(scores)
-    st.session_state.cybersecurity_scores = dict(zip(categories, scores))
-
-    st.markdown(f"**Overall Maturity Score:** {avg:.2f} / 5")
-    if avg >= 4.5:
-        st.success("Excellent cybersecurity posture.")
-    elif avg >= 3:
-        st.info("Moderate maturity. Consider improvements.")
-    else:
-        st.warning("Low maturity. Immediate enhancements needed.")
 
 
