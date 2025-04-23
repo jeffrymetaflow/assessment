@@ -176,3 +176,24 @@ if submitted:
         else:
             rec = f"❌ *{category}* is low maturity. Prioritize modernization, documentation, and automation."
         st.markdown(rec)
+
+# ---------------- Admin Tab: Edit Questions ----------------
+st.markdown("---")
+st.subheader("✏️ Edit Assessment Questions")
+
+if 'grouped_questions' not in st.session_state:
+    st.session_state.grouped_questions = grouped_questions.copy()
+
+edited_category = st.selectbox("Select Category to Edit", list(st.session_state.grouped_questions.keys()))
+new_question = st.text_input("Add a new question to this category:")
+
+if st.button("➕ Add Question") and new_question:
+    st.session_state.grouped_questions[edited_category].append(new_question)
+    st.success(f"Question added to {edited_category}!")
+
+if st.button("🗑️ Remove Last Question") and st.session_state.grouped_questions[edited_category]:
+    removed = st.session_state.grouped_questions[edited_category].pop()
+    st.warning(f"Removed: {removed}")
+
+st.markdown("### Current Questions in Selected Category:")
+st.write(st.session_state.grouped_questions[edited_category])
