@@ -1,3 +1,14 @@
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+from io import BytesIO
+from fpdf import FPDF
+import uuid
+import numpy as np
+
+st.set_page_config(page_title="Strategic_Roadmap", layout="wide")
+st.title("📈 Strategic_Roadmap")
+
 # Strategic Roadmap Tab
 if section == "🧭 Strategic Roadmap":
     st.title("🧭 Strategic Roadmap")
