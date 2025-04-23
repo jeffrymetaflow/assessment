@@ -186,8 +186,5 @@ elif section == "🧠 Overview Summary":
 3. Integrate Toolkits
 """
 
-st.markdown(summary)
 
-from utils.ai_assist import ai_assist_overlay
-with st.expander("💬 Need Help? Ask the AI Assistant", expanded=True): ai_assist_overlay()
 
