@@ -145,6 +145,7 @@ if submitted:
 
     score_df = pd.DataFrame(score_data).sort_values(by="Category")
     st.dataframe(score_df, use_container_width=True)
+    
     st.session_state['it_maturity_scores'] = score_df
     
     # Heatmap visual (Streamlit-compatible, no matplotlib)
