@@ -29,7 +29,7 @@ section = st.sidebar.radio("Go to", [
 ])
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
 
-page_bootstrap(current_page="Forecast Simulator")  # Or "Risk Model", etc.
+page_bootstrap(current_page="Calculators")  # Or "Risk Model", etc.
 
 # ---------- Input Requirement Guard ----------
 required_keys = ["revenue", "it_expense", "revenue_growth", "expense_growth"]
