@@ -37,4 +37,4 @@ from utils.ai_assist import ai_assist_overlay
 # Inject AI Assistant in the sidebar globally
 with st.sidebar.expander("💬 AI Assistant", expanded=False):
  
-page_bootstrap(current_page="Main")
+    page_bootstrap(current_page="Main")
