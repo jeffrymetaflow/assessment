@@ -121,7 +121,7 @@ across several technology domains.
 responses = {}
 st.sidebar.header("Navigation")
 
-page_bootstrap(current_page="Forecast Simulator")  # Or "Risk Model", etc.
+page_bootstrap(current_page="IT Assessment")  # Or "Risk Model", etc.
 
 # Questionnaire Form
 with st.form("maturity_form"):
