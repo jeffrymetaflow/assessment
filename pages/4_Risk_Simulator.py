@@ -6,7 +6,7 @@ from utils.bootstrap import page_bootstrap
 st.set_page_config(page_title="Revenue-at-Risk Model", layout="wide")
 st.title("📈 Revenue-at-Risk Simulator")
 
-page_bootstrap(current_page="Forecast Simulator")  # Or "Risk Model", etc.
+page_bootstrap(current_page="Risk Simulator")  # Or "Risk Model", etc.
 
 # --- Inputs ---
 st.sidebar.header("🔧 Model Inputs")
