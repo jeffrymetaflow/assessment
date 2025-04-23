@@ -50,7 +50,7 @@ for cat in categories:
     data[cat] = {"Year 1": spend, "Growth %": growth}
 
     # Save growth pattern across 3 years
-    st.session_state.expense_growth[cat] = [growth / 100] * 3
+    st.session_state.category_expense_growth[cat] = [growth / 100] * 3
 
 # --------------------------
 # Forecast for 3 Years
