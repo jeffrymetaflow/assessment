@@ -30,7 +30,7 @@ section = st.sidebar.radio("Go to", [
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
 
 # ---------- Input Requirement Guard ----------
-required_keys = ["baseline_revenue", "it_expense", "revenue_growth", "expense_growth"]
+required_keys = ["revenue", "it_expense", "revenue_growth", "expense_growth"]
 missing = [key for key in required_keys if key not in st.session_state]
 if missing and section != "⚙️ Inputs Setup":
     st.warning("⚠️ Please configure your inputs in the '⚙️ Inputs Setup' tab first.")
