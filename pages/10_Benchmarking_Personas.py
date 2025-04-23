@@ -12,8 +12,8 @@ st.title("📈 Benchmarking Personas")
 section = "📊 Benchmarking Personas"  # Define the variable
 
 # Benchmarking & Persona Tab
-if section == "📊 Benchmarking & Persona":
-    st.title("📊 Benchmarking & Persona")
+if section == "📊 Benchmarking & Personas":
+    st.title("📊 Benchmarking & Personas")
 
     industry = st.selectbox("Select Industry", ["Healthcare", "Financial Services", "Retail", "Manufacturing", "Education", "Other"])
     company_size = st.selectbox("Select Company Size", ["< 500 employees", "500–5000", "> 5000"])
@@ -49,8 +49,8 @@ if section == "📊 Benchmarking & Persona":
         st.bar_chart(compare_df.set_index("Category")[["Score (%)", "Industry Average (%)"]])
     else:
         st.info("Complete the IT Assessment to see benchmark comparisons.")
-elif section == "📊 Benchmarking & Persona":
-    st.title("📊 Benchmarking & Persona")
+elif section == "📊 Benchmarking & Personas":
+    st.title("📊 Benchmarking & Personas")
 
     industry = st.selectbox("Select Industry", ["Healthcare", "Financial Services", "Retail", "Manufacturing", "Education", "Other"])
     company_size = st.selectbox("Select Company Size", ["< 500 employees", "500–5000", "> 5000"])
