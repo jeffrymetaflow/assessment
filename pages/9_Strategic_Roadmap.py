@@ -12,7 +12,7 @@ st.title("📈 Strategic_Roadmap")
 
 section = "🧭 Strategic Roadmap"  # Define the variable
 
-page_bootstrap(current_page="Forecast Simulator")  # Or "Risk Model", etc.
+page_bootstrap(current_page="Strategic Roadmap")  # Or "Risk Model", etc.
 
 # Strategic Roadmap Tab
 if section == "🧭 Strategic Roadmap":
