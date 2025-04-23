@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
 from fpdf import FPDF
+from utils.bootstrap import page_bootstrap
 
 # ---------- Default Session State Initialization ----------
 default_state = {
@@ -27,6 +28,8 @@ section = st.sidebar.radio("Go to", [
     "💰 ITRM Financial Summary",
 ])
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
+
+page_bootstrap()
 
 # ---------- Input Requirement Guard ----------
 required_keys = ["revenue", "it_expense", "revenue_growth", "expense_growth"]
