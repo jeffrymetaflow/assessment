@@ -32,12 +32,13 @@ def ai_assist_overlay(context=None):
     if context:
         st.info("**Context:** " + ", ".join([f"{k}: {v}" for k, v in context.items() if v]))
 
+    st.session_state.setdefault("conversation_history", [])
+
     user_prompt = st.text_input("What's your question or command?", key="ai_input")
 
     if st.button("Submit", key="ai_submit") and user_prompt:
         action = classify_intent(user_prompt)
 
-        # Simple real-time adjustments (example)
         if "increase cybersecurity" in user_prompt.lower():
             st.session_state["Cybersecurity"] = st.session_state.get("Cybersecurity", 200000) * 1.10
             st.success("🔒 Cybersecurity budget increased by 10%.")
@@ -45,9 +46,18 @@ def ai_assist_overlay(context=None):
 
         try:
             response = agent.run(user_prompt)
+            st.session_state.conversation_history.append({"user": user_prompt, "ai": response})
             st.success(response)
         except Exception as e:
             st.error(f"AI Error: {e}")
+
+    # Conversation History
+    if st.session_state.conversation_history:
+        with st.expander("🧾 Conversation History"):
+            for turn in st.session_state.conversation_history:
+                st.markdown(f"**You:** {turn['user']}")
+                if "ai" in turn:
+                    st.markdown(f"**AI:** {turn['ai']}")
 
     # User journaling
     st.markdown("### 📝 Notes & Takeaways")
@@ -70,3 +80,24 @@ def ai_assist_overlay(context=None):
         st.session_state[category] = current_val * (1 + adjustment / 100)
         st.success(f"{category} adjusted by {adjustment}% → ${st.session_state[category]:,.0f}")
 
+    # Strategic Summary Generation
+    if st.button("🧠 Summarize My Strategy", key="summarize_btn"):
+        summary_prompt = f"""
+        Provide a concise strategic recommendation summary based on:
+        - Revenue: {st.session_state.get('revenue')}
+        - IT Expense: {st.session_state.get('it_expense')}
+        - Cybersecurity Spend: {st.session_state.get('Cybersecurity')}
+        - BC/DR: {st.session_state.get('BC/DR')}
+        - Growth Rates: {st.session_state.get('revenue_growth')} / {st.session_state.get('expense_growth')}
+        """
+        try:
+            summary = agent.run(summary_prompt)
+            st.success(summary)
+        except Exception as e:
+            st.error(f"AI Summary Error: {e}")
+
+    # Prompt suggestions
+    st.markdown("### 💡 Suggested Prompts:")
+    st.markdown("- What’s my IT-to-Revenue ratio?")
+    st.markdown("- Where am I overspending?")
+    st.markdown("- Suggest categories to consolidate")
