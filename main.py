@@ -30,3 +30,10 @@ with col1:
 
 with col2:
     st.image("Market image.png", width=200)
+
+import streamlit as st
+from utils.ai_assist import ai_assist_overlay
+
+# Inject AI Assistant in the sidebar globally
+with st.sidebar.expander("💬 AI Assistant", expanded=False):
+    ai_assist_overlay()
