@@ -58,7 +58,7 @@ if section == "⚙️ Inputs Setup":
     if controller and hasattr(controller, "components"):
         df = pd.DataFrame(controller.components)
         default_revenue = st.session_state.get("revenue", 5_000_000)
-        default_expense = df["Spend"].sum()
+        default_expense = df["Spend"].sum() if "Spend" in df.columns else 0
 
         category_totals = df.groupby("Category")["Spend"].sum()
         full_total = category_totals.sum()
@@ -184,6 +184,7 @@ elif section == "🧠 Overview Summary":
 3. Integrate Toolkits
 """
     st.markdown(summary)
+
 
 
 
