@@ -185,7 +185,6 @@ elif section == "🧠 Overview Summary":
 2. Deploy Dashboards
 3. Integrate Toolkits
 """
-    st.markdown(summary)
 
 st.markdown(summary)
 
