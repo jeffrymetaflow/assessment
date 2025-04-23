@@ -9,6 +9,8 @@ import numpy as np
 st.set_page_config(page_title="Strategic_Roadmap", layout="wide")
 st.title("📈 Strategic_Roadmap")
 
+section = "🧭 Strategic Roadmap"  # Define the variable
+
 # Strategic Roadmap Tab
 if section == "🧭 Strategic Roadmap":
     st.title("🧭 Strategic Roadmap")
