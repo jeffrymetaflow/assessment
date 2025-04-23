@@ -1,6 +1,5 @@
 import streamlit as st
 from controller.controller import ITRMController
-from utils.bootstrap import page_bootstrap
 
 # Initialize the shared controller (only once)
 if "controller" not in st.session_state:
@@ -32,8 +31,6 @@ with col1:
 with col2:
     st.image("Market image.png", width=200)
 
-import streamlit as st
-from utils.ai_assist import ai_assist_overlay
-
-# Inject AI Assistant in the sidebar globally
+# Inject AI Assistant with full context
+from utils.bootstrap import page_bootstrap
 page_bootstrap(current_page="Main")
