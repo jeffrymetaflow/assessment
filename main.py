@@ -16,6 +16,7 @@ col1, col2 = st.columns([6, 1])  # 6:1 ratio for left vs right
 
 with col1:
     st.image("ITRM logo.png", width=200)
+    
     st.title("💡 ITRM Unified Platform")
     st.markdown("""
     Welcome to the **IT Revenue Management (ITRM)** platform.
