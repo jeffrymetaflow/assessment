@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from utils.bootstrap import page_bootstrap
 
 # Embedded grouped questions JSON (shortened for readability — insert full content below)
 grouped_questions = {
@@ -119,6 +120,8 @@ across several technology domains.
 
 responses = {}
 st.sidebar.header("Navigation")
+
+page_bootstrap()
 
 # Questionnaire Form
 with st.form("maturity_form"):
