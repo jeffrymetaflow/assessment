@@ -6,7 +6,7 @@ from utils.bootstrap import page_bootstrap
 st.set_page_config(page_title="IT Forecast & Sensitivity Simulator", layout="wide")
 st.title("📊 IT Spend Forecast & Sensitivity Model")
 
-page_bootstrap()
+page_bootstrap(current_page="Forecast Simulator")  # Or "Risk Model", etc.
 
 # --------------------------
 # Shared Revenue from Master Input
