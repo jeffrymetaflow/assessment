@@ -29,4 +29,4 @@ with col1:
     """)
 
 with col2:
-    st.image("ITRM Logo.png", width=200)
+    st.image("Market image.png", width=200)
