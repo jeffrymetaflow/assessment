@@ -96,8 +96,21 @@ def ai_assist_overlay(context=None):
         except Exception as e:
             st.error(f"AI Summary Error: {e}")
 
+    # Scenario Simulation
+    st.markdown("### 🔮 Simulate Future Scenario")
+    sim_category = st.selectbox("Which category would you like to simulate?", ["Cybersecurity", "BC/DR", "Hardware", "Personnel", "Software", "Telecom"], key="sim_category")
+    sim_growth = st.slider("Growth Impact (%)", -50, 100, 15, step=5, key="sim_growth")
+    sim_years = st.slider("Years to Project", 1, 5, 3, key="sim_years")
+
+    if st.button("📈 Run Simulation", key="run_simulation"):
+        base_val = st.session_state.get(sim_category, 100000)
+        projected = [base_val * ((1 + sim_growth / 100) ** year) for year in range(sim_years)]
+        result_str = "\n".join([f"Year {i+1}: ${val:,.0f}" for i, val in enumerate(projected)])
+        st.success(f"Projected {sim_category} Spend over {sim_years} years with {sim_growth}% growth:\n\n{result_str}")
+
     # Prompt suggestions
     st.markdown("### 💡 Suggested Prompts:")
     st.markdown("- What’s my IT-to-Revenue ratio?")
     st.markdown("- Where am I overspending?")
     st.markdown("- Suggest categories to consolidate")
+    st.markdown("- Simulate what happens if BC/DR grows 30% over 3 years")
