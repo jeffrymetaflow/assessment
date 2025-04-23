@@ -52,10 +52,30 @@ def forecast_values(baseline, growth_rates):
 if section == "⚙️ Inputs Setup":
     st.title("⚙️ Inputs Setup")
 
-    baseline_revenue = st.number_input("Baseline Revenue ($)", value=st.session_state.baseline_revenue)
-    it_expense = st.number_input("IT Expense Baseline ($)", value=st.session_state.it_expense)
+    controller = st.session_state.get("controller", None)
+    if controller and hasattr(controller, "components"):
+        df = pd.DataFrame(controller.components)
+        default_revenue = st.session_state.get("revenue", 5_000_000)
+        default_expense = df["Spend"].sum()
 
-    category_expenses = [st.number_input(f"Category {i+1} % of IT Expenses", value=st.session_state.category_expenses_to_total[i]) for i in range(5)]
+        category_totals = df.groupby("Category")["Spend"].sum()
+        full_total = category_totals.sum()
+        category_expenses_to_total = [category_totals.get(cat, 0) / full_total for cat in [
+            "Hardware", "Software", "Personnel", "Maintenance", "Telecom"
+        ]]
+    else:
+        default_revenue = st.session_state.baseline_revenue
+        default_expense = st.session_state.it_expense
+        category_expenses_to_total = st.session_state.category_expenses_to_total
+
+    baseline_revenue = st.number_input("Baseline Revenue ($)", value=default_revenue)
+    it_expense = st.number_input("IT Expense Baseline ($)", value=default_expense)
+
+    categories = ["Hardware", "Software", "Personnel", "Maintenance", "Telecom"]
+    category_expenses = [
+        st.number_input(f"{cat} % of IT Expenses", value=category_expenses_to_total[i])
+        for i, cat in enumerate(categories)
+    ]
     category_revenue = [st.number_input(f"Category {i+1} % of Revenue", value=st.session_state.category_revenue_to_total[i]) for i in range(5)]
 
     revenue_growth = [st.number_input(f"Year {i+1} Revenue Growth (%)", value=st.session_state.revenue_growth[i]) for i in range(3)]
@@ -183,4 +203,5 @@ elif section == "🔐 Cybersecurity Assessment":
         st.info("Moderate maturity. Consider improvements.")
     else:
         st.warning("Low maturity. Immediate enhancements needed.")
+
 
