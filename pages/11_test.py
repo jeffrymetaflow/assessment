@@ -6,8 +6,8 @@ from fpdf import FPDF
 
 # ---------- Default Session State Initialization ----------
 default_state = {
-    "revenue": 739_000_000,
-    "it_expense": 4_977_370,
+    "revenue": 1_000_000,
+    "it_expense": 1_000_000,
     "revenue_growth": [5.0, 5.0, 5.0],
     "expense_growth": [3.0, 3.0, 3.0],
     "category_expenses_to_total": [0.1] * 5,
