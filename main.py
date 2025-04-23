@@ -15,7 +15,7 @@ st.set_page_config(
 col1, col2 = st.columns([6, 1])  # 6:1 ratio for left vs right
 
 with col1:
-    st.image("ITRM logo.png", width=200)
+    st.image("ITRM logo.png", width=100)
     
     st.title("💡 ITRM Unified Platform")
     st.markdown("""
