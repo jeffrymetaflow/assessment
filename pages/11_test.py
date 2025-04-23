@@ -4,6 +4,19 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 from fpdf import FPDF
 
+# ---------- Default Session State Initialization ----------
+default_state = {
+    "baseline_revenue": 739_000_000,
+    "it_expense": 4_977_370,
+    "revenue_growth": [5.0, 5.0, 5.0],
+    "expense_growth": [3.0, 3.0, 3.0],
+    "category_expenses_to_total": [0.1] * 5,
+    "category_revenue_to_total": [0.05] * 5
+}
+for key, val in default_state.items():
+    if key not in st.session_state:
+        st.session_state[key] = val
+
 # ---------- Sidebar Navigation ----------
 st.set_page_config(page_title="ITRM Dashboard", layout="wide")
 st.sidebar.title("Navigation")
@@ -15,6 +28,13 @@ section = st.sidebar.radio("Go to", [
     "🔐 Cybersecurity Assessment"
 ])
 client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
+
+# ---------- Input Requirement Guard ----------
+required_keys = ["baseline_revenue", "it_expense", "revenue_growth", "expense_growth"]
+missing = [key for key in required_keys if key not in st.session_state]
+if missing and section != "⚙️ Inputs Setup":
+    st.warning("⚠️ Please configure your inputs in the '⚙️ Inputs Setup' tab first.")
+    st.stop()
 
 # ---------- Utility: Forecast Function ----------
 def forecast_values(baseline, growth_rates):
@@ -32,14 +52,14 @@ def forecast_values(baseline, growth_rates):
 if section == "⚙️ Inputs Setup":
     st.title("⚙️ Inputs Setup")
 
-    baseline_revenue = st.number_input("Baseline Revenue ($)", value=739_000_000)
-    it_expense = st.number_input("IT Expense Baseline ($)", value=4_977_370)
+    baseline_revenue = st.number_input("Baseline Revenue ($)", value=st.session_state.baseline_revenue)
+    it_expense = st.number_input("IT Expense Baseline ($)", value=st.session_state.it_expense)
 
-    category_expenses = [st.number_input(f"Category {i+1} % of IT Expenses", value=0.1) for i in range(5)]
-    category_revenue = [st.number_input(f"Category {i+1} % of Revenue", value=0.05) for i in range(5)]
+    category_expenses = [st.number_input(f"Category {i+1} % of IT Expenses", value=st.session_state.category_expenses_to_total[i]) for i in range(5)]
+    category_revenue = [st.number_input(f"Category {i+1} % of Revenue", value=st.session_state.category_revenue_to_total[i]) for i in range(5)]
 
-    revenue_growth = [st.number_input(f"Year {i+1} Revenue Growth (%)", value=5.0) for i in range(3)]
-    expense_growth = [st.number_input(f"Year {i+1} Expense Growth (%)", value=3.0) for i in range(3)]
+    revenue_growth = [st.number_input(f"Year {i+1} Revenue Growth (%)", value=st.session_state.revenue_growth[i]) for i in range(3)]
+    expense_growth = [st.number_input(f"Year {i+1} Expense Growth (%)", value=st.session_state.expense_growth[i]) for i in range(3)]
 
     if st.button("Save Inputs"):
         st.session_state.update({
@@ -55,10 +75,6 @@ if section == "⚙️ Inputs Setup":
 # ---------- ITRM Calculator ----------
 elif section == "📊 ITRM Calculator":
     st.title("📊 ITRM Multi-Year Calculator")
-
-    if 'baseline_revenue' not in st.session_state:
-        st.warning("Please configure inputs in the Inputs Setup tab first.")
-        st.stop()
 
     revenue = forecast_values(st.session_state.baseline_revenue, st.session_state.revenue_growth)
     expenses = forecast_values(st.session_state.it_expense, st.session_state.expense_growth)
@@ -85,10 +101,6 @@ elif section == "📊 ITRM Calculator":
 # ---------- Financial Summary ----------
 elif section == "💰 ITRM Financial Summary":
     st.title("💰 ITRM Financial Summary")
-
-    if 'revenue_input' not in st.session_state or 'expense_input' not in st.session_state:
-        st.warning("Run the ITRM Calculator first.")
-        st.stop()
 
     revenue = st.session_state.revenue_input
     expenses = st.session_state.expense_input
