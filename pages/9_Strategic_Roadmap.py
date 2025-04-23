@@ -5,11 +5,14 @@ from io import BytesIO
 from fpdf import FPDF
 import uuid
 import numpy as np
+from utils.bootstrap import page_bootstrap
 
 st.set_page_config(page_title="Strategic_Roadmap", layout="wide")
 st.title("📈 Strategic_Roadmap")
 
 section = "🧭 Strategic Roadmap"  # Define the variable
+
+page_bootstrap()
 
 # Strategic Roadmap Tab
 if section == "🧭 Strategic Roadmap":
