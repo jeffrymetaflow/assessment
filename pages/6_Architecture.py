@@ -4,6 +4,7 @@ import networkx as nx
 import plotly.graph_objects as go
 
 from controller.controller import ITRMController
+from utils.bootstrap import page_bootstrap
 
 # 🔁 Initialize shared controller only once
 if "controller" not in st.session_state:
@@ -13,6 +14,8 @@ controller = st.session_state.controller
 
 st.set_page_config(page_title="IT Architecture to Financial Mapping", layout="wide")
 st.title("\U0001F5FA️ IT Architecture - Financial Impact Mapper")
+
+page_bootstrap()
 
 # --- Tabs ---
 tabs = st.tabs(["Component Mapping", "Architecture Diagram", "External Import"])
