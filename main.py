@@ -1,5 +1,6 @@
 import streamlit as st
 from controller.controller import ITRMController
+from utils.bootstrap import page_bootstrap
 
 # Initialize the shared controller (only once)
 if "controller" not in st.session_state:
@@ -35,3 +36,4 @@ import streamlit as st
 from utils.ai_assist import ai_assist_overlay
 
 # Inject AI Assistant in the sidebar globally
+page_bootstrap(current_page="Main")
