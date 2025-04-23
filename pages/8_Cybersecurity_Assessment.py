@@ -12,7 +12,7 @@ st.title("📈 Cybersecurity_Assessment")
 
 section = "🔐 Cybersecurity Assessment"  # Define the variable
 
-page_bootstrap(current_page="Forecast Simulator")  # Or "Risk Model", etc.
+page_bootstrap(current_page="Cybersecurity Assessment")  # Or "Risk Model", etc.
 
 # Cybersecurity Assessment Tab
 if section == "🔐 Cybersecurity Assessment":
