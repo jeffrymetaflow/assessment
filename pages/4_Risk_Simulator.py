@@ -1,9 +1,12 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+from utils.bootstrap import page_bootstrap
 
 st.set_page_config(page_title="Revenue-at-Risk Model", layout="wide")
 st.title("📈 Revenue-at-Risk Simulator")
+
+page_bootstrap()
 
 # --- Inputs ---
 st.sidebar.header("🔧 Model Inputs")
