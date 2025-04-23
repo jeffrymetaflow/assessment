@@ -8,12 +8,16 @@ st.title("📈 Revenue-at-Risk Simulator")
 # --- Inputs ---
 st.sidebar.header("🔧 Model Inputs")
 
-# Company Financials
-total_revenue = st.sidebar.number_input("Total Annual Revenue ($M)", min_value=1, value=100, step=1) * 1_000_000
-cyber_investment = st.sidebar.number_input("Annual Cybersecurity Investment ($K)", min_value=0, value=1000, step=100) * 1_000
-bcdr_investment = st.sidebar.number_input("Annual BC/DR Investment ($K)", min_value=0, value=500, step=100) * 1_000
+# Pull from shared state or use default
+total_revenue = st.session_state.get("revenue", 100_000_000)
+cyber_investment = st.session_state.get("expense_by_category", {}).get("Cybersecurity", 1_000_000)
+bcdr_investment = st.session_state.get("expense_by_category", {}).get("BC/DR", 500_000)
 
-# Risk Exposure
+st.sidebar.info(f"Using Revenue: ${total_revenue:,.0f}")
+st.sidebar.info(f"Using Cybersecurity Investment: ${cyber_investment:,.0f}")
+st.sidebar.info(f"Using BC/DR Investment: ${bcdr_investment:,.0f}")
+
+# Risk Exposure Inputs
 risk_exposure_percent = st.sidebar.slider("% of Revenue at Risk without Protection", min_value=0, max_value=100, value=40)
 risk_mitigation_effectiveness = st.sidebar.slider("Effectiveness of Cyber/BC Spend in Risk Reduction (%)", 0, 100, 75)
 
@@ -22,6 +26,17 @@ total_protective_investment = cyber_investment + bcdr_investment
 revenue_at_risk = total_revenue * (risk_exposure_percent / 100)
 avoided_loss = revenue_at_risk * (risk_mitigation_effectiveness / 100)
 ropr = (avoided_loss - total_protective_investment) / total_protective_investment if total_protective_investment > 0 else 0
+
+# Store in session for cross-tab use
+st.session_state.risk_model = {
+    "Revenue at Risk": revenue_at_risk,
+    "Avoided Loss": avoided_loss,
+    "ROPR": ropr,
+    "Investments": {
+        "Cybersecurity": cyber_investment,
+        "BC/DR": bcdr_investment
+    }
+}
 
 # --- Results ---
 st.subheader("📊 Results Summary")
