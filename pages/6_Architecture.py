@@ -15,7 +15,7 @@ controller = st.session_state.controller
 st.set_page_config(page_title="IT Architecture to Financial Mapping", layout="wide")
 st.title("\U0001F5FA️ IT Architecture - Financial Impact Mapper")
 
-page_bootstrap(current_page="Forecast Simulator")  # Or "Risk Model", etc.
+page_bootstrap(current_page="Architecture")  # Or "Risk Model", etc.
 
 # --- Tabs ---
 tabs = st.tabs(["Component Mapping", "Architecture Diagram", "External Import"])
