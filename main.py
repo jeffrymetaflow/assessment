@@ -11,16 +11,22 @@ st.set_page_config(
     layout="wide"
 )
 
-# Landing page content
-st.title("💡 ITRM Unified Platform")
-st.markdown("""
-Welcome to the **IT Revenue Management (ITRM)** platform.
+# --- Layout with logo ---
+col1, col2 = st.columns([6, 1])  # 6:1 ratio for left vs right
 
-Use the sidebar navigation to access modules like:
-- 🧩 Component Mapping
-- 🗺️ Architecture Visualization
-- 📊 Forecast & Risk Simulation
-- 🤖 AI Strategy Assistant
+with col1:
+    st.title("💡 ITRM Unified Platform")
+    st.markdown("""
+    Welcome to the **IT Revenue Management (ITRM)** platform.
 
-This tool helps IT leaders align architecture to financial and strategic impact — all in one place.
-""")
+    Use the sidebar to access modules like:
+    - 🧩 Component Mapping
+    - 🗺️ Architecture Visualization
+    - 📊 Forecast & Risk Simulation
+    - 🤖 AI Strategy Assistant
+
+    This tool helps IT leaders align architecture to financial and strategic impact — all in one place.
+    """)
+
+with col2:
+    st.image("ITRM Logo.png", width=100)
