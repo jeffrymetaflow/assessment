@@ -1,6 +1,12 @@
 import streamlit as st
 import pandas as pd
+from controller.controller import ITRMController
 
+# Ensure controller exists
+if "controller" not in st.session_state:
+    st.session_state.controller = ITRMController()
+
+controller = st.session_state.controller
 controller = st.session_state.controller
 
 st.title("🧩 Component Mapping")
