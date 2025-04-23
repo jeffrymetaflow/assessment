@@ -53,9 +53,9 @@ def ai_assist_overlay(context=None):
     "Do not answer like a personal finance assistant. Focus on enterprise-level IT planning."
 )
 
-            response = agent.run(f"{context_prefix}
+            response = agent.run(f"""{context_prefix}
 
-{user_prompt}")
+{user_prompt}""")
             st.session_state.conversation_history.append({"user": user_prompt, "ai": response})
             st.success(response)
         except Exception as e:
