@@ -46,7 +46,16 @@ def ai_assist_overlay(context=None):
             return
 
         try:
-            response = agent.run(user_prompt)
+            context_prefix = (
+    "You are a strategic assistant for an IT Revenue Management (ITRM) platform. "
+    "Your job is to guide users through budgeting decisions, category forecasting, IT-to-revenue ratio analysis, "
+    "and strategic optimization across Cybersecurity, BC/DR, Hardware, Software, and Personnel. "
+    "Do not answer like a personal finance assistant. Focus on enterprise-level IT planning."
+)
+
+            response = agent.run(f"{context_prefix}
+
+{user_prompt}")
             st.session_state.conversation_history.append({"user": user_prompt, "ai": response})
             st.success(response)
         except Exception as e:
@@ -127,4 +136,3 @@ def ai_assist_overlay(context=None):
         st.markdown("- Where am I overspending?")
         st.markdown("- Suggest categories to consolidate")
         st.markdown("- Simulate what happens if BC/DR grows 30% over 3 years")
-
