@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from controller.controller import ITRMController
 from utils.component_utils import init_session_state_from_components
+from utils.bootstrap import page_bootstrap
 
 # 🔄 Ensure controller exists
 if "controller" not in st.session_state:
