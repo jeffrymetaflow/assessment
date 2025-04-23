@@ -7,10 +7,10 @@ import uuid
 import numpy as np
 from utils.bootstrap import page_bootstrap
 
-page_bootstrap()
-
 st.set_page_config(page_title="Benchmarking_Personas", layout="wide")
 st.title("📈 Benchmarking Personas")
+
+page_bootstrap()
 
 section = "📊 Benchmarking Personas"  # Define the variable
 
