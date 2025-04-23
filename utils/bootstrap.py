@@ -1,3 +1,4 @@
+# utils/bootstrap.py
 import streamlit as st
 from utils.ai_assist import ai_assist_overlay
 
