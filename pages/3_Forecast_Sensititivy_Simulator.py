@@ -1,9 +1,12 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+from utils.bootstrap import page_bootstrap
 
 st.set_page_config(page_title="IT Forecast & Sensitivity Simulator", layout="wide")
 st.title("📊 IT Spend Forecast & Sensitivity Model")
+
+page_bootstrap()
 
 # --------------------------
 # Shared Revenue from Master Input
