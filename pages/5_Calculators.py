@@ -173,7 +173,7 @@ elif section == "🧠 Overview Summary":
 
     summary = f"""
     
-    st.markdown(summary)     
+st.markdown(summary)     
     
 **Client Name:** {client_name or '<Client>'}
 
