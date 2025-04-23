@@ -5,15 +5,15 @@ from controller.controller import ITRMController
 if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
 
-# Inject AI Assistant with full context
-from utils.bootstrap import page_bootstrap
-page_bootstrap(current_page="Main")
-
 # Configure the app
 st.set_page_config(
     page_title="ITRM Unified App",
     layout="wide"
 )
+
+# Inject AI Assistant with full context
+from utils.bootstrap import page_bootstrap
+page_bootstrap(current_page="Main")
 
 # --- Layout with logo ---
 col1, col2 = st.columns([6, 1])  # 6:1 ratio for left vs right
