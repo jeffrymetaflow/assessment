@@ -5,11 +5,14 @@ from io import BytesIO
 from fpdf import FPDF
 import uuid
 import numpy as np
+from utils.bootstrap import page_bootstrap
 
 st.set_page_config(page_title="Cybersecurity_Assessment", layout="wide")
 st.title("📈 Cybersecurity_Assessment")
 
 section = "🔐 Cybersecurity Assessment"  # Define the variable
+
+page_bootstrap()
 
 # Cybersecurity Assessment Tab
 if section == "🔐 Cybersecurity Assessment":
