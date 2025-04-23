@@ -9,10 +9,10 @@ import numpy as np
 st.set_page_config(page_title="Cybersecurity_Assessment", layout="wide")
 st.title("📈 Cybersecurity_Assessment")
 
-section = "🧭 Cybersecurity Assessment"  # Define the variable
+section = "🔐 Cybersecurity Assessment"  # Define the variable
 
 # Cybersecurity Assessment Tab
-section == "🔐 Cybersecurity Assessment":
+if section == "🔐 Cybersecurity Assessment":
     st.title("🔐 Cybersecurity Maturity Assessment")
     st.markdown("For more details, visit the [NIST Cybersecurity Framework website](https://www.nist.gov/).")
 
