@@ -5,17 +5,16 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="IT Forecast & Sensitivity Simulator", layout="wide")
 st.title("📊 IT Spend Forecast & Sensitivity Model")
 
-st.sidebar.header("\U0001F4CA Base Inputs")
-revenue = st.sidebar.number_input("Baseline Revenue ($M)", min_value=1, value=100) * 1_000_000
+# --------------------------
+# Shared Revenue from Master Input
+# --------------------------
+revenue = st.session_state.get("revenue", 5_000_000)
+st.sidebar.header("📊 Base Revenue")
+st.sidebar.info(f"Using Baseline Revenue: ${revenue:,.0f}")
 
-def category_input(label, default_growth, default_spend):
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        growth = st.slider(f"{label} Growth % per Year", -50, 100, default_growth)
-    with col2:
-        spend = st.number_input(f"Year 1 Spend ($K) - {label}", min_value=0, value=default_spend, step=10)
-    return spend * 1000, growth
-
+# --------------------------
+# Category Definitions
+# --------------------------
 categories = ["Hardware", "Software", "Personnel", "Maintenance", "Telecom", "Cybersecurity", "BC/DR"]
 defaults = {
     "Hardware": (10, 300),
@@ -27,31 +26,59 @@ defaults = {
     "BC/DR": (3, 120)
 }
 
+expense_by_category = st.session_state.get("expense_by_category", {})
+
+def category_input(label, default_growth, default_spend):
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        growth = st.slider(f"{label} Growth % per Year", -50, 100, default_growth)
+    with col2:
+        spend = st.number_input(f"Year 1 Spend ($K) - {label}", min_value=0, value=default_spend, step=10)
+    return spend * 1000, growth
+
+# --------------------------
+# Inputs
+# --------------------------
 st.subheader("📊 Forecast Parameters")
 data = {}
+if "expense_growth" not in st.session_state:
+    st.session_state.expense_growth = {}
+
 for cat in categories:
-    spend, growth = category_input(cat, defaults[cat][0], defaults[cat][1])
+    default_spend = int(expense_by_category.get(cat, defaults[cat][1] * 1000) / 1000)
+    spend, growth = category_input(cat, defaults[cat][0], default_spend)
     data[cat] = {"Year 1": spend, "Growth %": growth}
 
-# Forecast for 3 years
+    # Save growth pattern across 3 years
+    st.session_state.expense_growth[cat] = [growth / 100] * 3
+
+# --------------------------
+# Forecast for 3 Years
+# --------------------------
 years = ["Year 1", "Year 2", "Year 3"]
 forecast = {"Category": [], "Year": [], "Spend": []}
 
 for cat, values in data.items():
     y1 = values["Year 1"]
-    growth = values["Growth %"] / 100
-    y2 = y1 * (1 + growth)
-    y3 = y2 * (1 + growth)
+    g = values["Growth %"] / 100
+    y2 = y1 * (1 + g)
+    y3 = y2 * (1 + g)
     forecast["Category"].extend([cat] * 3)
     forecast["Year"].extend(years)
     forecast["Spend"].extend([y1, y2, y3])
 
 forecast_df = pd.DataFrame(forecast)
 
+# --------------------------
+# Display Forecast Table
+# --------------------------
 st.subheader("📊 IT Spend Forecast Table")
-st.dataframe(forecast_df.pivot(index="Category", columns="Year", values="Spend"), use_container_width=True)
+pivot_df = forecast_df.pivot(index="Category", columns="Year", values="Spend")
+st.dataframe(pivot_df.style.format("${:,.0f}"), use_container_width=True)
 
-# Plot forecast chart
+# --------------------------
+# Plot Forecast Chart
+# --------------------------
 st.subheader("📊 IT Spend Over 3 Years")
 fig = go.Figure()
 for cat in categories:
@@ -70,10 +97,11 @@ fig.update_layout(
     yaxis_title='Total Spend ($)',
     height=500
 )
-
 st.plotly_chart(fig, use_container_width=True)
 
-# --- IT-to-Revenue Ratio Tracker ---
+# --------------------------
+# IT-to-Revenue Ratio
+# --------------------------
 st.subheader("📉 IT-to-Revenue Ratio Over Time")
 it_spend_by_year = forecast_df.groupby("Year")["Spend"].sum()
 ratios = (it_spend_by_year / revenue).reset_index()
@@ -93,10 +121,11 @@ fig_ratio.update_layout(
     yaxis_title="IT Spend / Revenue (%)",
     height=400
 )
-
 st.plotly_chart(fig_ratio, use_container_width=True)
 
-# Sensitivity toggle
+# --------------------------
+# Sensitivity Toggle
+# --------------------------
 st.subheader("🌪️ Sensitivity Analysis")
 if st.checkbox("Run Sensitivity Analysis"):
     min_factor = st.slider("Minimum Adjustment %", -50, 0, -20)
@@ -110,27 +139,26 @@ if st.checkbox("Run Sensitivity Analysis"):
         sensitivity_results.append((cat, min_val, base, max_val))
 
     sens_df = pd.DataFrame(sensitivity_results, columns=["Category", "Min Spend", "Base Spend", "Max Spend"])
-    st.dataframe(sens_df.set_index("Category"))
+    st.dataframe(sens_df.set_index("Category").style.format("${:,.0f}"))
 
-    # Chart it
     fig2 = go.Figure()
     for _, row in sens_df.iterrows():
         fig2.add_trace(go.Bar(
-            x=[row.name],
+            x=[row["Category"]],
             y=[row["Min Spend"]],
             name="Min",
             marker_color='lightblue',
             offsetgroup=0
         ))
         fig2.add_trace(go.Bar(
-            x=[row.name],
+            x=[row["Category"]],
             y=[row["Base Spend"]],
             name="Base",
             marker_color='gray',
             offsetgroup=1
         ))
         fig2.add_trace(go.Bar(
-            x=[row.name],
+            x=[row["Category"]],
             y=[row["Max Spend"]],
             name="Max",
             marker_color='salmon',
@@ -145,3 +173,5 @@ if st.checkbox("Run Sensitivity Analysis"):
         height=500
     )
     st.plotly_chart(fig2, use_container_width=True)
+
+ 
