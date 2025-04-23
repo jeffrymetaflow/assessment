@@ -14,9 +14,7 @@ st.set_page_config(
 # --- Layout with logo ---
 col1, col2 = st.columns([6, 1])  # 6:1 ratio for left vs right
 
-    st.image("ITRM logo.png", width=100)
-    
-with col1:
+ with col1:
     st.title("💡 ITRM Unified Platform")
     st.markdown("""
     Welcome to the **IT Revenue Management (ITRM)** platform.
