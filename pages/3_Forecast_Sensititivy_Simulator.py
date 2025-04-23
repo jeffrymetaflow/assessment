@@ -50,6 +50,9 @@ for cat in categories:
     data[cat] = {"Year 1": spend, "Growth %": growth}
 
     # Save growth pattern across 3 years
+    if "category_expense_growth" not in st.session_state:
+        st.session_state.category_expense_growth = {}
+    
     st.session_state.category_expense_growth[cat] = [growth / 100] * 3
 
 # --------------------------
