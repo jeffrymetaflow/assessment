@@ -48,7 +48,7 @@ if section == "📊 Benchmarking & Persona":
         st.dataframe(compare_df)
         st.bar_chart(compare_df.set_index("Category")[["Score (%)", "Industry Average (%)"]])
     else:
-        st.info("Complete the IT Maturity Assessment to see benchmark comparisons.")
+        st.info("Complete the IT Assessment to see benchmark comparisons.")
 elif section == "📊 Benchmarking & Persona":
     st.title("📊 Benchmarking & Persona")
 
@@ -69,12 +69,12 @@ elif section == "📊 Benchmarking & Persona":
     })
     st.dataframe(bench_df)
 
-    if 'it_maturity_scores' in st.session_state:
-        user_df = st.session_state.it_maturity_scores
+    if 'it_assessment_scores' in st.session_state:
+        user_df = st.session_state.it_assessment_scores
         compare_df = pd.merge(user_df, bench_df, on="Category")
         compare_df["Gap"] = compare_df["Score (%)"] - compare_df["Industry Average (%)"]
         st.subheader("📊 Your Score vs Industry Average")
         st.dataframe(compare_df)
         st.bar_chart(compare_df.set_index("Category")[["Score (%)", "Industry Average (%)"]])
     else:
-        st.info("Complete the IT Maturity Assessment to see benchmark comparisons.")
+        st.info("Complete the IT Assessment to see benchmark comparisons.")
