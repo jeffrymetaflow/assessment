@@ -5,7 +5,6 @@ from io import BytesIO
 from fpdf import FPDF
 import uuid
 import numpy as np
-
 from utils.bootstrap import page_bootstrap
 page_bootstrap()
 
