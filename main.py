@@ -5,6 +5,10 @@ from controller.controller import ITRMController
 if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
 
+# Inject AI Assistant with full context
+from utils.bootstrap import page_bootstrap
+page_bootstrap(current_page="Main")
+
 # Configure the app
 st.set_page_config(
     page_title="ITRM Unified App",
@@ -31,6 +35,4 @@ with col1:
 with col2:
     st.image("Market image.png", width=200)
 
-# Inject AI Assistant with full context
-from utils.bootstrap import page_bootstrap
-page_bootstrap(current_page="Main")
+
