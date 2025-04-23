@@ -6,4 +6,11 @@ fpdf==1.7.2
 fpdf2==2.7.8
 streamlit-chat
 openai>=1.0.0
-
+plotly
+networkx
+openai
+langchain
+tavily-python
+langchain_openai
+tavily-python
+langchain_community
