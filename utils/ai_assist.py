@@ -5,6 +5,7 @@ from utils.intent_classifier import classify_intent
 from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
+import matplotlib.pyplot as plt
 
 # --- Overlay Entry Point ---
 def ai_assist_overlay(context=None):
@@ -107,6 +108,15 @@ def ai_assist_overlay(context=None):
         projected = [base_val * ((1 + sim_growth / 100) ** year) for year in range(sim_years)]
         result_str = "\n".join([f"Year {i+1}: ${val:,.0f}" for i, val in enumerate(projected)])
         st.success(f"Projected {sim_category} Spend over {sim_years} years with {sim_growth}% growth:\n\n{result_str}")
+
+        # Chart visualization
+        st.markdown("### 📊 Simulation Chart")
+        fig, ax = plt.subplots()
+        ax.plot([f"Year {i+1}" for i in range(sim_years)], projected, marker='o')
+        ax.set_title(f"{sim_category} Spend Simulation")
+        ax.set_ylabel("Spend ($)")
+        ax.set_xlabel("Year")
+        st.pyplot(fig)
 
     # Prompt suggestions
     st.markdown("### 💡 Suggested Prompts:")
