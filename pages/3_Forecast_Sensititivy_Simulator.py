@@ -5,16 +5,20 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="IT Forecast & Sensitivity Simulator", layout="wide")
 st.title("📊 IT Spend Forecast & Sensitivity Model")
 
-# --------------------------
-# Shared Revenue from Master Input
-# --------------------------
+# 🧠 Pull revenue from session state
 revenue = st.session_state.get("revenue", 5_000_000)
-st.sidebar.header("📊 Base Revenue")
+st.sidebar.header("📈 Master Financial Inputs")
 st.sidebar.info(f"Using Baseline Revenue: ${revenue:,.0f}")
 
-# --------------------------
-# Category Definitions
-# --------------------------
+def category_input(label, default_growth, default_spend):
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        growth = st.slider(f"{label} Growth % per Year", -50, 100, default_growth)
+    with col2:
+        spend = st.number_input(f"Year 1 Spend ($K) - {label}", min_value=0, value=default_spend, step=10)
+    return spend * 1000, growth
+
+# 🔢 Define categories and defaults
 categories = ["Hardware", "Software", "Personnel", "Maintenance", "Telecom", "Cybersecurity", "BC/DR"]
 defaults = {
     "Hardware": (10, 300),
@@ -26,59 +30,44 @@ defaults = {
     "BC/DR": (3, 120)
 }
 
-expense_by_category = st.session_state.get("expense_by_category", {})
-
-def category_input(label, default_growth, default_spend):
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        growth = st.slider(f"{label} Growth % per Year", -50, 100, default_growth)
-    with col2:
-        spend = st.number_input(f"Year 1 Spend ($K) - {label}", min_value=0, value=default_spend, step=10)
-    return spend * 1000, growth
-
-# --------------------------
-# Inputs
-# --------------------------
+# 📊 Collect forecast inputs
 st.subheader("📊 Forecast Parameters")
 data = {}
 if "expense_growth" not in st.session_state:
     st.session_state.expense_growth = {}
 
+expense_by_category = st.session_state.get("expense_by_category", {})
+
 for cat in categories:
-    default_spend = int(expense_by_category.get(cat, defaults[cat][1] * 1000) / 1000)
-    spend, growth = category_input(cat, defaults[cat][0], default_spend)
+    # Pull fallback value from expense_by_category if available
+    fallback_spend = int(expense_by_category.get(cat, defaults[cat][1] * 1000) / 1000)
+    spend, growth = category_input(cat, defaults[cat][0], fallback_spend)
     data[cat] = {"Year 1": spend, "Growth %": growth}
 
-    # Save growth pattern across 3 years
+    # Save to session state for reuse
     st.session_state.expense_growth[cat] = [growth / 100] * 3
 
-# --------------------------
-# Forecast for 3 Years
-# --------------------------
+# 📈 3-Year Forecast Logic
 years = ["Year 1", "Year 2", "Year 3"]
 forecast = {"Category": [], "Year": [], "Spend": []}
 
 for cat, values in data.items():
     y1 = values["Year 1"]
-    g = values["Growth %"] / 100
-    y2 = y1 * (1 + g)
-    y3 = y2 * (1 + g)
+    growth = values["Growth %"] / 100
+    y2 = y1 * (1 + growth)
+    y3 = y2 * (1 + growth)
     forecast["Category"].extend([cat] * 3)
     forecast["Year"].extend(years)
     forecast["Spend"].extend([y1, y2, y3])
 
 forecast_df = pd.DataFrame(forecast)
 
-# --------------------------
-# Display Forecast Table
-# --------------------------
+# 📊 Show Forecast Table
 st.subheader("📊 IT Spend Forecast Table")
-pivot_df = forecast_df.pivot(index="Category", columns="Year", values="Spend")
-st.dataframe(pivot_df.style.format("${:,.0f}"), use_container_width=True)
+styled_df = forecast_df.pivot(index="Category", columns="Year", values="Spend").style.format("${:,.0f}")
+st.dataframe(styled_df, use_container_width=True)
 
-# --------------------------
-# Plot Forecast Chart
-# --------------------------
+# 📊 Stacked Forecast Chart
 st.subheader("📊 IT Spend Over 3 Years")
 fig = go.Figure()
 for cat in categories:
@@ -89,7 +78,6 @@ for cat in categories:
         text=forecast_df[forecast_df["Category"] == cat]["Spend"].apply(lambda x: f"${x:,.0f}"),
         textposition='auto'
     ))
-
 fig.update_layout(
     barmode='stack',
     title='Projected IT Spend by Category',
@@ -99,9 +87,7 @@ fig.update_layout(
 )
 st.plotly_chart(fig, use_container_width=True)
 
-# --------------------------
-# IT-to-Revenue Ratio
-# --------------------------
+# 📉 IT-to-Revenue Ratio Tracker
 st.subheader("📉 IT-to-Revenue Ratio Over Time")
 it_spend_by_year = forecast_df.groupby("Year")["Spend"].sum()
 ratios = (it_spend_by_year / revenue).reset_index()
@@ -123,9 +109,7 @@ fig_ratio.update_layout(
 )
 st.plotly_chart(fig_ratio, use_container_width=True)
 
-# --------------------------
-# Sensitivity Toggle
-# --------------------------
+# 🌪️ Sensitivity Analysis
 st.subheader("🌪️ Sensitivity Analysis")
 if st.checkbox("Run Sensitivity Analysis"):
     min_factor = st.slider("Minimum Adjustment %", -50, 0, -20)
@@ -141,6 +125,7 @@ if st.checkbox("Run Sensitivity Analysis"):
     sens_df = pd.DataFrame(sensitivity_results, columns=["Category", "Min Spend", "Base Spend", "Max Spend"])
     st.dataframe(sens_df.set_index("Category").style.format("${:,.0f}"))
 
+    # 📊 Sensitivity Range Chart
     fig2 = go.Figure()
     for _, row in sens_df.iterrows():
         fig2.add_trace(go.Bar(
@@ -164,7 +149,6 @@ if st.checkbox("Run Sensitivity Analysis"):
             marker_color='salmon',
             offsetgroup=2
         ))
-
     fig2.update_layout(
         title="Sensitivity Ranges by IT Category",
         barmode='group',
@@ -173,5 +157,3 @@ if st.checkbox("Run Sensitivity Analysis"):
         height=500
     )
     st.plotly_chart(fig2, use_container_width=True)
-
- 
