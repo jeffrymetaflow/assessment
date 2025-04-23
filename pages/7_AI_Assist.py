@@ -1,7 +1,7 @@
 import streamlit as st
 import openai
 import os
-from intent_classifier import classify_intent
+from utils.intent_classifier import classify_intent
 from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
