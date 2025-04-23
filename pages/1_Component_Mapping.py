@@ -1,15 +1,22 @@
 import streamlit as st
 import pandas as pd
 from controller.controller import ITRMController
+from utils.component_utils import init_session_state_from_components
 
-# Ensure controller exists
+# 🔄 Ensure controller exists
 if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
 
 controller = st.session_state.controller
-controller = st.session_state.controller
 
-st.title("🧩 Component Mapping")
+st.title("🧩 Component Mapping & Master Inputs")
+
+# 🏛️ Global Master Inputs (used across app)
+st.subheader("💼 Organization Financial Inputs")
+st.session_state.revenue = st.number_input("Total Revenue ($)", value=5_000_000, step=100_000)
+
+# 🧱 IT Component Builder
+st.subheader("🧩 Add a New IT Component")
 
 name = st.text_input("Component Name", key="mapping_comp_name_input")
 category = st.selectbox("Category", [
@@ -19,6 +26,7 @@ spend = st.number_input("Annual Spend ($K)", min_value=0, value=100, step=10, ke
 revenue_support = st.slider("% Revenue Supported", 0, 100, 20, key="mapping_revenue_slider")
 risk_score = st.slider("Risk if Fails (0 = none, 100 = catastrophic)", 0, 100, 50, key="mapping_risk_slider")
 
+# ➕ Add Component
 if name and st.button("Add IT Component", key="mapping_add_button"):
     component = {
         "Name": name,
@@ -28,17 +36,19 @@ if name and st.button("Add IT Component", key="mapping_add_button"):
         "Risk Score": risk_score
     }
     controller.add_component(component)
+    st.success(f"Component '{name}' added.")
 
-controller.run_simulation()
+# 🧠 Run simulation and sync session state
+try:
+    controller.run_simulation()
+    init_session_state_from_components(controller)
+except Exception as e:
+    st.error(f"Simulation or sync error: {e}")
 
-st.write("🧮 Total Components:", len(controller.components))
+# 📊 Display Existing Components
+st.subheader("📋 Current Component Inventory")
 if controller.components:
-    st.dataframe(pd.DataFrame(controller.components))
-
-from utils.component_utils import init_session_state_from_components
-
-# After running the simulation
-controller.run_simulation()
-
-# Update session state
-init_session_state_from_components(controller)
+    df = pd.DataFrame(controller.components)
+    st.dataframe(df)
+else:
+    st.info("No components added yet. Use the form above to get started.")
