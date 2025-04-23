@@ -55,13 +55,13 @@ def ai_assist_overlay(context=None):
     # --- Grouping remainder in a main container (avoids nested expander issues) ---
     with st.container():
 
-        # Conversation History
+        # Conversation History (Flat Display - avoids nested expanders)
         if st.session_state.conversation_history:
-            with st.expander("🧾 Conversation History"):
-                for turn in st.session_state.conversation_history:
-                    st.markdown(f"**You:** {turn['user']}")
-                    if "ai" in turn:
-                        st.markdown(f"**AI:** {turn['ai']}")
+            st.markdown("### 🧾 Conversation History")
+            for turn in st.session_state.conversation_history:
+                st.markdown(f"**You:** {turn['user']}")
+                if "ai" in turn:
+                    st.markdown(f"**AI:** {turn['ai']}")
 
         # User journaling
         st.markdown("### 📝 Notes & Takeaways")
@@ -127,3 +127,4 @@ def ai_assist_overlay(context=None):
         st.markdown("- Where am I overspending?")
         st.markdown("- Suggest categories to consolidate")
         st.markdown("- Simulate what happens if BC/DR grows 30% over 3 years")
+
