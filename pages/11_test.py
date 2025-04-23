@@ -171,3 +171,4 @@ elif section == "🔐 Cybersecurity Assessment":
         st.info("Moderate maturity. Consider improvements.")
     else:
         st.warning("Low maturity. Immediate enhancements needed.")
+
