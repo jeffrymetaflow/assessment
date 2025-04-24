@@ -17,6 +17,24 @@ from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from controller.controller import ITRMController
 from utils.bootstrap import page_bootstrap
 
+# --- AI Agent: Vendor Alternative Suggestion ---
+def get_vendor_replacement_suggestion(component_name, category):
+    llm = ChatOpenAI(model_name="gpt-4", temperature=0.3)
+    tools = [TavilySearchResults()]
+    agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=False)
+
+    prompt = (
+        f"Act as an IT procurement strategist. For a component named '{component_name}' in category '{category}', "
+        f"suggest 1-2 modern vendor alternatives and briefly explain the benefits. Include cost or lifecycle improvement if known."
+    )
+
+    try:
+        result = agent.run(prompt)
+    except Exception as e:
+        result = f"(AI Suggestion failed: {e})"
+
+    return result
+
 # --- Sample Component Metadata for AI Scoring ---
 def enrich_component_metadata(component):
     metadata = {
@@ -199,7 +217,20 @@ if st.session_state.components:
     low_score_df = df[df["Recommendation"].str.contains("Optimize")].sort_values("AI Score")
     if not low_score_df.empty:
         st.write("Below are the most critical components to address:")
-        st.dataframe(low_score_df[["Name", "Category", "Spend", "Risk Score", "AI Score", "Suggested Action"]])
+        for i, row in low_score_df.iterrows():
+            st.markdown(f"**{row['Name']}** ({row['Category']})")
+            st.markdown(f"- Spend: ${row['Spend']:,.0f}")
+            st.markdown(f"- Risk Score: {row['Risk Score']} | AI Score: {row['AI Score']}")
+            st.markdown(f"- Suggested Action: _{row['Suggested Action']}_")
+            if i < 3:
+                if f"ai_{row['Name']}" not in st.session_state:
+                    st.session_state[f"ai_{row['Name']}"] = get_vendor_replacement_suggestion(row['Name'], row['Category'])
+                st.markdown(f"- **AI Suggested Vendors:** {st.session_state[f'ai_{row['Name']}']}")
+            else:
+                if st.button(f"Suggest Alternatives for {row['Name']}", key=f"btn_{i}"):
+                    st.session_state[f"ai_{row['Name']}"] = get_vendor_replacement_suggestion(row['Name'], row['Category'])
+                if f"ai_{row['Name']}" in st.session_state:
+                    st.markdown(f"- **AI Suggested Vendors:** {st.session_state[f'ai_{row['Name']}']}")
     else:
         st.success("No critical components flagged for optimization.")
 
