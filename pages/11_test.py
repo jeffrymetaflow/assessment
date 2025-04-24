@@ -143,9 +143,9 @@ with tabs[0]:
     "Review for vendor alternatives / consolidation opportunities"
 ))
             with st.expander(f"{cat} - {len(cat_df)} Components"):
-                st.dataframe(
-                    cat_df.style.apply(lambda x: [f'background-color: {c}' for c in x["Color"]], axis=1, subset=['AI Score'])
-                )
+                def highlight_row(row):
+                    return ['background-color: {}'.format(row['Color']) if col == 'AI Score' else '' for col in row.index]
+                st.dataframe(cat_df.style.apply(highlight_row, axis=1))
     else:
         st.info("Add components using the form above to get started.")
 
