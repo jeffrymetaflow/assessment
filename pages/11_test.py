@@ -181,6 +181,61 @@ with tabs[1]:
     else:
         st.info("Add components in the first tab to generate an architecture diagram.")
 
+# --- Roadmap Recommendations Tab ---
+st.subheader("🛣️ AI-Powered Roadmap Recommendations")
+if st.session_state.components:
+    df = pd.DataFrame(st.session_state.components)
+    df = df.copy()
+    df[["AI Score", "Recommendation", "Color"]] = df.apply(
+        lambda row: pd.Series(score_component(enrich_component_metadata(row.to_dict()))), axis=1
+    )
+    df["Suggested Action"] = df["Recommendation"].apply(lambda rec: (
+        "Maintain current configuration" if "Healthy" in rec else
+        "Flag for quarterly review" if "Monitor" in rec else
+        "Review for vendor alternatives / consolidation opportunities"
+    ))
+
+    st.markdown("### 🔍 Priority Actions")
+    low_score_df = df[df["Recommendation"].str.contains("Optimize")].sort_values("AI Score")
+    if not low_score_df.empty:
+        st.write("Below are the most critical components to address:")
+        st.dataframe(low_score_df[["Name", "Category", "Spend", "Risk Score", "AI Score", "Suggested Action"]])
+    else:
+        st.success("No critical components flagged for optimization.")
+
+    st.markdown("### ⬇️ Export Plan")
+    csv = low_score_df.to_csv(index=False).encode('utf-8')
+    st.download_button("Download Optimization Roadmap (CSV)", csv, "optimization_roadmap.csv", "text/csv")
+
+    st.markdown("### 📊 Gantt Chart: Prioritized Remediation Timeline")
+    low_score_df = low_score_df.copy()
+    low_score_df["Priority Index"] = low_score_df["Spend"] / (low_score_df["Risk Score"] + 1)  # Prevent divide-by-zero
+    low_score_df = low_score_df.sort_values("Priority Index", ascending=False)
+    low_score_df["Start"] = pd.to_datetime("today")
+    low_score_df["Finish"] = low_score_df["Start"] + pd.to_timedelta((low_score_df["Priority Index"] * 2).astype(int), unit='D')
+
+    gantt_fig = go.Figure()
+    for _, row in low_score_df.iterrows():
+        gantt_fig.add_trace(go.Bar(
+            x=[(row["Finish"] - row["Start"]).days],
+            y=[row["Name"]],
+            base=row["Start"],
+            orientation='h',
+            marker=dict(color='crimson' if row["Risk Score"] > 70 else 'gold' if row["Risk Score"] > 40 else 'lightgreen'),
+            name=row["Category"],
+            hovertext=f"Spend: ${row['Spend']:,.0f}<br>Risk: {row['Risk Score']}<br>Priority: {row['Priority Index']:.2f}"
+        ))
+
+    gantt_fig.update_layout(
+        title="Remediation Timeline by Priority (Gantt View)",
+        barmode='stack',
+        xaxis_title="Date",
+        yaxis_title="Component",
+        height=600,
+        margin=dict(l=40, r=40, t=60, b=40)
+    )
+    st.plotly_chart(gantt_fig, use_container_width=True)
+
 # --- External Import Tab ---
 with tabs[2]:
     st.subheader("\U0001F4C2 Upload External Architecture (Visio / AIOps")
@@ -196,4 +251,3 @@ with tabs[2]:
 
 if st.sidebar.checkbox("Show session state (dev only)"):
     st.write(st.session_state)
-
