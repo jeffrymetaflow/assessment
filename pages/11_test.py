@@ -19,7 +19,7 @@ from utils.bootstrap import page_bootstrap
 
 # --- AI Agent: Vendor Alternative Suggestion ---
 def get_vendor_replacement_suggestion(component_name, category):
-    llm = ChatOpenAI(model_name="gpt-4", temperature=0.3)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3, openai_api_key=st.secrets["openai_api_key"])
     tools = [TavilySearchResults()]
     agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=False)
 
