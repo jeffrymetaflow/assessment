@@ -71,10 +71,21 @@ with tabs[0]:
                 else:
                     st.warning("Invalid or duplicate link.")
 
+    # --- Filter by Category ---
     if st.session_state.components:
         df = pd.DataFrame(st.session_state.components)
+        category_filter = st.multiselect("Filter by Category", df["Category"].unique().tolist(), default=df["Category"].unique().tolist())
+        df = df[df["Category"].isin(category_filter)]
+
         st.subheader("\U0001F4CA Component Mapping Table")
         st.dataframe(df)
+
+        st.subheader("\U0001F52C Detailed Category Breakdown")
+        categories = df["Category"].unique()
+        for cat in categories:
+            cat_df = df[df["Category"] == cat]
+            with st.expander(f"{cat} - {len(cat_df)} Components"):
+                st.dataframe(cat_df)
     else:
         st.info("Add components using the form above to get started.")
 
@@ -128,5 +139,17 @@ with tabs[1]:
     else:
         st.info("Add components in the first tab to generate an architecture diagram.")
 
-# Cleaned up duplicate inputs and isolated initialization
+# --- External Import Tab ---
+with tabs[2]:
+    st.subheader("\U0001F4C2 Upload External Architecture (Visio / AIOps)")
+    visio_file = st.file_uploader("Upload Visio Diagram (.vsdx)", type="vsdx")
+    if visio_file:
+        st.info("(Placeholder) Parsing of Visio files will be added here.")
+        st.write("File name:", visio_file.name)
+
+    st.markdown("---")
+    st.subheader("\U0001F916 Optional AIOps Integration")
+    st.text_input("Enter AIOps API URL", key="aiops_url")
+    st.button("Test Connection", key="test_aiops")
+
 st.write(st.session_state)
