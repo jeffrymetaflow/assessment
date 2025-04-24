@@ -152,4 +152,5 @@ with tabs[2]:
     st.text_input("Enter AIOps API URL", key="aiops_url")
     st.button("Test Connection", key="test_aiops")
 
-st.write(st.session_state)
+if st.sidebar.checkbox("Show session state (dev only)"):
+    st.write(st.session_state)
