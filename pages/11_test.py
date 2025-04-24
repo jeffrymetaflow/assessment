@@ -283,7 +283,8 @@ if st.button("Inject Simulated API Feed"):
     st.session_state.components.extend(api_response_mock["components"])
     st.success("Simulated data injected into the component mapping.")
 
-st.code(json.dumps(api_response_mock, indent=2), language='json')
+with st.expander("View Mock API Payload"):
+    st.code(json.dumps(api_response_mock, indent=2), language='json')
 
 # --- External Import Tab ---
 with tabs[2]:
