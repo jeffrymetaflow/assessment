@@ -17,7 +17,38 @@ from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from controller.controller import ITRMController
 from utils.bootstrap import page_bootstrap
 
-# 🔁 Initialize shared controller only once
+# --- Sample Component Metadata for AI Scoring ---
+def enrich_component_metadata(component):
+    metadata = {
+        "name": component["Name"],
+        "category": component["Category"],
+        "spend": component["Spend"],
+        "revenue_impact": component["Revenue Impact %"],
+        "risk_score": component["Risk Score"],
+        "lifespan": 3,  # placeholder in years
+        "alternatives": ["AltA", "AltB"],  # placeholder
+        "vendor": "VendorX",  # placeholder
+    }
+    return metadata
+
+# --- AI Scoring Logic ---
+def score_component(metadata, weight_revenue=0.4, weight_risk=0.4, weight_cost=0.2):
+    revenue_score = metadata["revenue_impact"] / 100
+    risk_penalty = 1 - (metadata["risk_score"] / 100)
+    cost_factor = 1 - (metadata["spend"] / 1000000)  # normalized cost
+    score = round((weight_revenue * revenue_score) + (weight_risk * risk_penalty) + (weight_cost * cost_factor), 3)
+    if score >= 0.75:
+        recommendation = "✅ Healthy"
+        color = "#C8E6C9"  # light green
+    elif score >= 0.5:
+        recommendation = "⚠️ Monitor"
+        color = "#FFF9C4"  # light yellow
+    else:
+        recommendation = "❌ Optimize"
+        color = "#FFCDD2"  # light red
+    return score, recommendation, color
+
+# --- Controller Initialization ---
 if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
 
@@ -80,12 +111,18 @@ with tabs[0]:
         st.subheader("\U0001F4CA Component Mapping Table")
         st.dataframe(df)
 
-        st.subheader("\U0001F52C Detailed Category Breakdown")
+        st.subheader("\U0001F52C Detailed Category Breakdown with Scores")
         categories = df["Category"].unique()
         for cat in categories:
             cat_df = df[df["Category"] == cat]
+            cat_df = cat_df.copy()
+            cat_df[["AI Score", "Recommendation", "Color"]] = cat_df.apply(
+                lambda row: pd.Series(score_component(enrich_component_metadata(row.to_dict()))), axis=1
+            )
             with st.expander(f"{cat} - {len(cat_df)} Components"):
-                st.dataframe(cat_df)
+                st.dataframe(
+                    cat_df.style.apply(lambda x: [f'background-color: {c}' for c in x["Color"]], axis=1, subset=['AI Score'])
+                )
     else:
         st.info("Add components using the form above to get started.")
 
@@ -141,7 +178,7 @@ with tabs[1]:
 
 # --- External Import Tab ---
 with tabs[2]:
-    st.subheader("\U0001F4C2 Upload External Architecture (Visio / AIOps)")
+    st.subheader("\U0001F4C2 Upload External Architecture (Visio / AIOps")
     visio_file = st.file_uploader("Upload Visio Diagram (.vsdx)", type="vsdx")
     if visio_file:
         st.info("(Placeholder) Parsing of Visio files will be added here.")
