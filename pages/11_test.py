@@ -1,18 +1,18 @@
 import streamlit as st
 import openai
 import os
-from utils.intent_classifier import classify_intent
-from langchain.agents import initialize_agent, AgentType
-from langchain_openai import ChatOpenAI
-from langchain_community.tools.tavily_search.tool import TavilySearchResults
+import json
+import pandas as pd
+import networkx as nx
+import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 from PIL import Image
 import pytesseract
 
-import streamlit as st
-import pandas as pd
-import networkx as nx
-import plotly.graph_objects as go
+from utils.intent_classifier import classify_intent
+from langchain.agents import initialize_agent, AgentType
+from langchain_openai import ChatOpenAI
+from langchain_community.tools.tavily_search.tool import TavilySearchResults
 
 from controller.controller import ITRMController
 from utils.bootstrap import page_bootstrap
@@ -21,12 +21,21 @@ from utils.bootstrap import page_bootstrap
 if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
 
+def initialize_state():
+    if "components" not in st.session_state:
+        st.session_state.components = []
+    if "edges" not in st.session_state:
+        st.session_state.edges = []
+    if 'key' not in st.session_state:
+        st.session_state['key'] = 'default_value'
+
+initialize_state()
 controller = st.session_state.controller
 
 st.set_page_config(page_title="IT Architecture to Financial Mapping", layout="wide")
 st.title("\U0001F5FA️ IT Architecture - Financial Impact Mapper")
 
-page_bootstrap(current_page="Architecture")  # Or "Risk Model", etc.
+page_bootstrap(current_page="Architecture")
 
 # --- Tabs ---
 tabs = st.tabs(["Component Mapping", "Architecture Diagram", "External Import"])
@@ -35,12 +44,9 @@ tabs = st.tabs(["Component Mapping", "Architecture Diagram", "External Import"])
 with tabs[0]:
     st.header("\U0001F4C8 Define Components")
     with st.expander("+ Add IT Component"):
-        if "components" not in st.session_state:
-            st.session_state.components = []
-
         name = st.text_input("Component Name")
         category = st.selectbox("Category", ["Hardware", "Software", "Personnel", "Maintenance", "Telecom", "Cybersecurity", "BC/DR"])
-        spend = st.number_input("Annual Spend ($K)", min_value=0, value=100, step=10)
+        spend = st.number_input("Annual Spend ($)", min_value=0, value=100000, step=10000, format="%d")
         revenue_support = st.slider("% Revenue Supported", 0, 100, 20)
         risk_score = st.slider("Risk if Fails (0 = none, 100 = catastrophic)", 0, 100, 50)
 
@@ -48,24 +54,23 @@ with tabs[0]:
             st.session_state.components.append({
                 "Name": name,
                 "Category": category,
-                "Spend": spend * 1000,
+                "Spend": spend,
                 "Revenue Impact %": revenue_support,
                 "Risk Score": risk_score
             })
 
     with st.expander("+ Add Manual Link Between Components"):
-        if "edges" not in st.session_state:
-            st.session_state.edges = []
-
-        if st.session_state.components:
-            component_names = [c["Name"] for c in st.session_state.components]
+        component_names = [c["Name"] for c in st.session_state.components]
+        if component_names:
             source = st.selectbox("From Component", component_names, key="src")
             target = st.selectbox("To Component", component_names, key="tgt")
 
             if st.button("Add Link"):
-                st.session_state.edges.append((source, target))
+                if source != target and (source, target) not in st.session_state.edges:
+                    st.session_state.edges.append((source, target))
+                else:
+                    st.warning("Invalid or duplicate link.")
 
-    # Convert to DataFrame
     if st.session_state.components:
         df = pd.DataFrame(st.session_state.components)
         st.subheader("\U0001F4CA Component Mapping Table")
@@ -75,35 +80,28 @@ with tabs[0]:
 
 # --- Architecture Diagram Tab ---
 with tabs[1]:
-    if "components" in st.session_state and st.session_state.components:
+    if st.session_state.components:
         st.subheader("\U0001F4D0 Architecture Dependency Map")
         df = pd.DataFrame(st.session_state.components)
 
         G = nx.Graph()
-        for i, row in df.iterrows():
+        for _, row in df.iterrows():
             G.add_node(row['Name'], category=row['Category'], spend=row['Spend'], revenue=row['Revenue Impact %'], risk=row['Risk Score'])
 
-        # Manual linking: use user-defined edges
-        if "edges" in st.session_state:
-            for edge in st.session_state.edges:
-                G.add_edge(edge[0], edge[1])
+        for edge in st.session_state.edges:
+            G.add_edge(*edge)
 
         pos = nx.spring_layout(G, seed=42)
-
-        node_x = []
-        node_y = []
-        node_text = []
+        node_x, node_y, node_text = [], [], []
 
         for node in G.nodes():
             x, y = pos[node]
             node_x.append(x)
             node_y.append(y)
             attr = G.nodes[node]
-            text = f"{node}<br>Category: {attr['category']}<br>Spend: ${attr['spend']:,}<br>Revenue Support: {attr['revenue']}%<br>Risk: {attr['risk']}"
-            node_text.append(text)
+            node_text.append(f"{node}<br>Category: {attr['category']}<br>Spend: ${attr['spend']:,}<br>Revenue Support: {attr['revenue']}%<br>Risk: {attr['risk']}")
 
-        edge_x = []
-        edge_y = []
+        edge_x, edge_y = [], []
         for edge in G.edges():
             x0, y0 = pos[edge[0]]
             x1, y1 = pos[edge[1]]
@@ -111,230 +109,24 @@ with tabs[1]:
             edge_y.extend([y0, y1, None])
 
         fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=edge_x, y=edge_y,
-            line=dict(width=1, color='gray'),
-            hoverinfo='none', mode='lines'))
-
+        fig.add_trace(go.Scatter(x=edge_x, y=edge_y, line=dict(width=1, color='gray'), hoverinfo='none', mode='lines'))
         fig.add_trace(go.Scatter(
             x=node_x, y=node_y,
             mode='markers+text',
             textposition="top center",
-            marker=dict(
-                size=20,
-                color=df['Risk Score'],
-                colorscale='YlOrRd',
-                showscale=True,
-                colorbar=dict(title="Risk")
-            ),
-            text=df['Name'],
-            hovertext=node_text,
-            hoverinfo='text'))
+            marker=dict(size=20, color=df['Risk Score'], colorscale='YlOrRd', showscale=True, colorbar=dict(title="Risk")),
+            text=df['Name'], hovertext=node_text, hoverinfo='text'))
 
-        fig.update_layout(
-            title="\U0001F5FA️ Visual Architecture Layout",
-            showlegend=False,
-            height=600,
-            margin=dict(l=20, r=20, t=40, b=20)
-        )
-
+        fig.update_layout(title="\U0001F5FA️ Visual Architecture Layout", showlegend=False, height=600, margin=dict(l=20, r=20, t=40, b=20))
         st.plotly_chart(fig, use_container_width=True)
 
-        # Totals
         st.subheader("\U0001F4B0 Financial Summary")
-        total_spend = df['Spend'].sum()
-        avg_revenue_supported = df['Revenue Impact %'].mean()
-        avg_risk = df['Risk Score'].mean()
-
         col1, col2, col3 = st.columns(3)
-        col1.metric("Total IT Spend", f"${total_spend:,.0f}")
-        col2.metric("Avg. Revenue Supported", f"{avg_revenue_supported:.1f}%")
-        col3.metric("Avg. Risk Score", f"{avg_risk:.1f}")
+        col1.metric("Total IT Spend", f"${df['Spend'].sum():,.0f}")
+        col2.metric("Avg. Revenue Supported", f"{df['Revenue Impact %'].mean():.1f}%")
+        col3.metric("Avg. Risk Score", f"{df['Risk Score'].mean():.1f}")
     else:
         st.info("Add components in the first tab to generate an architecture diagram.")
 
-# Initialize session state
-if 'key' not in st.session_state:
-    st.session_state['key'] = 'default_value'
-
-# Your existing code
+# Cleaned up duplicate inputs and isolated initialization
 st.write(st.session_state)
-
-# --- External Import Tab ---
-with tabs[2]:
-    st.header("🔗 Import from External Sources")
-
-    # Visio Upload
-    uploaded_file = st.file_uploader("Upload Visio Diagram (.vsdx)", type="vsdx")
-    if uploaded_file:
-        st.success("Visio file received.")
-        st.write("Parsing logic would go here...")  # ← placeholder for Visio parsing logic
-
-    # AI Ops API Integration
-    st.subheader("🌐 AI Ops API Connection")
-    token = st.text_input("Enter AI Ops API Token", type="password")
-    base_url = st.text_input("Dynatrace Base URL", value="https://{your-env}.live.dynatrace.com")
-
-    if st.button("Fetch Architecture from Dynatrace") and token and base_url:
-        st.info("Connecting to Dynatrace...")
-        # Placeholder for Dynatrace Smartscape API fetch
-        # Example: fetch entities, services, and dependencies
-        # Then populate session_state.components and session_state.edges
-        st.warning("Dynatrace integration logic not yet implemented. This will populate components automatically.")
-
-# Input widgets with unique keys
-name = st.text_input("Component Name", key="comp_name_input")
-category = st.selectbox("Category", ["Hardware", "Software", "Personnel", "Maintenance", "Telecom", "Cybersecurity", "BC/DR"], key="comp_category_select")
-spend = st.number_input("Annual Spend ($K)", min_value=0, value=100, step=10, key="comp_spend_input")
-revenue_support = st.slider("% Revenue Supported", 0, 100, 20, key="comp_revenue_slider")
-risk_score = st.slider("Risk if Fails (0 = none, 100 = catastrophic)", 0, 100, 50, key="comp_risk_slider")
-
-# --- Architecture Upload and Interpretation ---
-def architecture_component():
-    st.title("🏗️ Architecture Ingestion & AIOps Preview")
-
-    st.subheader("📡 Upload Architecture Diagram or Ingest from Mock API")
-    source_option = st.radio("Choose Input Method", ["Upload File", "Mock API"], horizontal=True)
-
-    if source_option == "Upload File":
-        file = st.file_uploader("Upload Architecture Diagram (PDF, JPEG, or Visio)", type=["pdf", "jpeg", "jpg", "vsdx"])
-
-        if file:
-            file_type = file.type
-
-            if file_type in ["image/jpeg", "image/jpg"]:
-                image = Image.open(file)
-                st.image(image, caption="Uploaded JPEG Architecture Diagram", use_column_width=True)
-
-                st.markdown("### 🧠 Extracted Labels via OCR")
-                extracted_text = pytesseract.image_to_string(image)
-                st.text_area("Detected Text", value=extracted_text, height=200)
-
-                if st.button("🤖 Analyze Diagram Text"):
-                    try:
-                        openai_key = st.secrets["openai_api_key"]
-                        os.environ["OPENAI_API_KEY"] = openai_key
-
-                        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=openai_key)
-                        agent = initialize_agent(
-                            tools=[TavilySearchResults()],
-                            llm=llm,
-                            agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-                            verbose=False,
-                            handle_parsing_errors=True
-                        )
-
-                        analysis_prompt = (
-                            "Review this extracted architecture content and provide insight into potential risks, redundancies, "
-                            "and optimization opportunities in an enterprise IT environment:\n" + extracted_text
-                        )
-
-                        analysis_response = agent.run(analysis_prompt)
-                        st.success(analysis_response)
-
-                    except Exception as e:
-                        st.error(f"AI Analysis Error: {e}")
-
-            elif file_type == "application/pdf":
-                st.warning("🔧 PDF support coming soon for layered extraction and annotation.")
-
-            elif file_type == "application/vnd.visio" or file.name.endswith(".vsdx"):
-                st.warning("🔧 Visio parsing placeholder — convert to image or wait for AIOps API integration.")
-
-            else:
-                st.error("Unsupported file type.")
-
-        else:
-            st.info("📂 Upload an architecture file to begin analysis.")
-
-    elif source_option == "Mock API":
-        st.markdown("### 🧪 Using Mock AIOps API Response")
-
-        env_options = {
-            "Retail Storefront": {
-                "components": [
-                    {"type": "Web Server", "name": "store-nginx", "status": "healthy"},
-                    {"type": "App Server", "name": "checkout-core", "status": "degraded"},
-                    {"type": "Database", "name": "inventory-db", "status": "healthy"},
-                    {"type": "Load Balancer", "name": "store-elb", "status": "healthy"},
-                    {"type": "Cache", "name": "pricing-redis", "status": "unreachable"}
-                ],
-                "alerts": [
-                    {"severity": "high", "message": "Redis cache outage impacting price lookup"},
-                    {"severity": "medium", "message": "Latency spike in checkout-core"}
-                ]
-            },
-            "Healthcare System": {
-                "components": [
-                    {"type": "Web Server", "name": "ehr-gateway", "status": "healthy"},
-                    {"type": "App Server", "name": "patient-logic", "status": "unhealthy"},
-                    {"type": "Database", "name": "records-db", "status": "healthy"},
-                    {"type": "Cache", "name": "lab-cache", "status": "degraded"}
-                ],
-                "alerts": [
-                    {"severity": "high", "message": "Patient logic app unreachable"},
-                    {"severity": "low", "message": "Inconsistent cache refresh in lab-cache"}
-                ]
-            },
-            "Banking Microservices": {
-                "components": [
-                    {"type": "API Gateway", "name": "bank-api-gw", "status": "healthy"},
-                    {"type": "Service", "name": "loan-engine", "status": "healthy"},
-                    {"type": "Service", "name": "credit-risk", "status": "degraded"},
-                    {"type": "Database", "name": "loan-db", "status": "healthy"}
-                ],
-                "alerts": [
-                    {"severity": "medium", "message": "Credit risk scoring timeout"}
-                ]
-            }
-        }
-
-        selected_env = st.selectbox("Choose a Mock Architecture", list(env_options.keys()))
-        mock_json = env_options[selected_env]
-        st.json(mock_json)
-
-        if st.button("🧠 Analyze Mock Architecture"):
-            try:
-                openai_key = st.secrets["openai_api_key"]
-                os.environ["OPENAI_API_KEY"] = openai_key
-
-                llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=openai_key)
-                agent = initialize_agent(
-                    tools=[TavilySearchResults()],
-                    llm=llm,
-                    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-                    verbose=False,
-                    handle_parsing_errors=True
-                )
-
-                prompt = (
-                    "Review this synthetic enterprise architecture and active alerts."
-                    " Identify critical failure points, dependency risk, and any recommendations for mitigation.\n\n"
-                    + json.dumps(mock_json, indent=2)
-                )
-
-                ai_result = agent.run(prompt)
-                st.success(ai_result)
-
-            except Exception as e:
-                st.error(f"Mock AIOps Analysis Error: {e}")
-
-st.markdown("### 🏗️ Or Choose a Mock Architecture")
-mock_architecture = st.selectbox("Select a predefined environment", ["Retail Storefront", "Healthcare System", "Banking Microservices"])
-
-if mock_architecture:
-    if mock_architecture == "Retail Storefront":
-        st.json({
-            "infra": ["Load Balancer", "Web Server", "POS Gateway", "SQL DB"],
-            "alerts": ["POS latency spike", "Checkout API error rate"]
-        })
-    elif mock_architecture == "Healthcare System":
-        st.json({
-            "infra": ["Patient Portal", "FHIR API", "EHR Backend", "Imaging Server"],
-            "alerts": ["EHR delay", "API auth failures"]
-        })
-    elif mock_architecture == "Banking Microservices":
-        st.json({
-            "infra": ["Auth Service", "Transaction Engine", "Ledger Store", "Notification Hub"],
-            "alerts": ["Transaction timeout", "Ledger sync lag"]
-        })
