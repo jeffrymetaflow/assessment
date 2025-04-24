@@ -117,8 +117,13 @@ with tabs[0]:
             cat_df = df[df["Category"] == cat]
             cat_df = cat_df.copy()
             cat_df[["AI Score", "Recommendation", "Color"]] = cat_df.apply(
-                lambda row: pd.Series(score_component(enrich_component_metadata(row.to_dict()))), axis=1
-            )
+    lambda row: pd.Series(score_component(enrich_component_metadata(row.to_dict()))), axis=1
+)
+cat_df["Suggested Action"] = cat_df["Recommendation"].apply(lambda rec: (
+    "Maintain current configuration" if "Healthy" in rec else
+    "Flag for quarterly review" if "Monitor" in rec else
+    "Review for vendor alternatives / consolidation opportunities"
+))
             with st.expander(f"{cat} - {len(cat_df)} Components"):
                 st.dataframe(
                     cat_df.style.apply(lambda x: [f'background-color: {c}' for c in x["Color"]], axis=1, subset=['AI Score'])
@@ -191,3 +196,5 @@ with tabs[2]:
 
 if st.sidebar.checkbox("Show session state (dev only)"):
     st.write(st.session_state)
+
+
