@@ -120,11 +120,6 @@ with tabs[0]:
                 lambda row: pd.Series(score_component(enrich_component_metadata(row.to_dict()))), axis=1
             )
             cat_df["Suggested Action"] = cat_df["Recommendation"].apply(lambda rec: (
-                "Maintain current configuration" if "Healthy" in rec else
-                "Flag for quarterly review" if "Monitor" in rec else
-                "Review for vendor alternatives / consolidation opportunities"
-            ))
-cat_df["Suggested Action"] = cat_df["Recommendation"].apply(lambda rec: (
     "Maintain current configuration" if "Healthy" in rec else
     "Flag for quarterly review" if "Monitor" in rec else
     "Review for vendor alternatives / consolidation opportunities"
@@ -201,3 +196,4 @@ with tabs[2]:
 
 if st.sidebar.checkbox("Show session state (dev only)"):
     st.write(st.session_state)
+
