@@ -17,7 +17,56 @@ from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from controller.controller import ITRMController
 from utils.bootstrap import page_bootstrap
 
-# 🔁 Initialize shared controller only once
+# --- AI Agent: Vendor Alternative Suggestion ---
+def get_vendor_replacement_suggestion(component_name, category):
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3, openai_api_key=st.secrets["openai_api_key"])
+    tools = [TavilySearchResults()]
+    agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=False)
+
+    prompt = (
+        f"Act as an IT procurement strategist. For a component named '{component_name}' in category '{category}', "
+        f"suggest 1-2 modern vendor alternatives and briefly explain the benefits. Include cost or lifecycle improvement if known."
+    )
+
+    try:
+        result = agent.run(prompt)
+    except Exception as e:
+        result = f"(AI Suggestion failed: {e})"
+
+    return result
+
+# --- Sample Component Metadata for AI Scoring ---
+def enrich_component_metadata(component):
+    metadata = {
+        "name": component["Name"],
+        "category": component["Category"],
+        "spend": component["Spend"],
+        "revenue_impact": component["Revenue Impact %"],
+        "risk_score": component["Risk Score"],
+        "lifespan": 3,  # placeholder in years
+        "alternatives": ["AltA", "AltB"],  # placeholder
+        "vendor": "VendorX",  # placeholder
+    }
+    return metadata
+
+# --- AI Scoring Logic ---
+def score_component(metadata, weight_revenue=0.4, weight_risk=0.4, weight_cost=0.2):
+    revenue_score = metadata["revenue_impact"] / 100
+    risk_penalty = 1 - (metadata["risk_score"] / 100)
+    cost_factor = 1 - (metadata["spend"] / 1000000)  # normalized cost
+    score = round((weight_revenue * revenue_score) + (weight_risk * risk_penalty) + (weight_cost * cost_factor), 3)
+    if score >= 0.75:
+        recommendation = "✅ Healthy"
+        color = "#C8E6C9"  # light green
+    elif score >= 0.5:
+        recommendation = "⚠️ Monitor"
+        color = "#FFF9C4"  # light yellow
+    else:
+        recommendation = "❌ Optimize"
+        color = "#FFCDD2"  # light red
+    return score, recommendation, color
+
+# --- Controller Initialization ---
 if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
 
@@ -80,12 +129,23 @@ with tabs[0]:
         st.subheader("\U0001F4CA Component Mapping Table")
         st.dataframe(df)
 
-        st.subheader("\U0001F52C Detailed Category Breakdown")
+        st.subheader("\U0001F52C Detailed Category Breakdown with Scores")
         categories = df["Category"].unique()
         for cat in categories:
             cat_df = df[df["Category"] == cat]
+            cat_df = cat_df.copy()
+            cat_df[["AI Score", "Recommendation", "Color"]] = cat_df.apply(
+                lambda row: pd.Series(score_component(enrich_component_metadata(row.to_dict()))), axis=1
+            )
+            cat_df["Suggested Action"] = cat_df["Recommendation"].apply(lambda rec: (
+    "Maintain current configuration" if "Healthy" in rec else
+    "Flag for quarterly review" if "Monitor" in rec else
+    "Review for vendor alternatives / consolidation opportunities"
+))
             with st.expander(f"{cat} - {len(cat_df)} Components"):
-                st.dataframe(cat_df)
+                def highlight_row(row):
+                    return ['background-color: {}'.format(row['Color']) if col == 'AI Score' else '' for col in row.index]
+                st.dataframe(cat_df.style.apply(highlight_row, axis=1))
     else:
         st.info("Add components using the form above to get started.")
 
@@ -139,9 +199,96 @@ with tabs[1]:
     else:
         st.info("Add components in the first tab to generate an architecture diagram.")
 
+# --- Roadmap Recommendations Tab ---
+st.subheader("🛣️ AI-Powered Roadmap Recommendations")
+if st.session_state.components:
+    df = pd.DataFrame(st.session_state.components)
+    df = df.copy()
+    df[["AI Score", "Recommendation", "Color"]] = df.apply(
+        lambda row: pd.Series(score_component(enrich_component_metadata(row.to_dict()))), axis=1
+    )
+    df["Suggested Action"] = df["Recommendation"].apply(lambda rec: (
+        "Maintain current configuration" if "Healthy" in rec else
+        "Flag for quarterly review" if "Monitor" in rec else
+        "Review for vendor alternatives / consolidation opportunities"
+    ))
+
+    st.markdown("### 🔍 Priority Actions")
+    low_score_df = df[df["Recommendation"].str.contains("Optimize")].sort_values("AI Score")
+    if not low_score_df.empty:
+        st.write("Below are the most critical components to address:")
+        for i, row in low_score_df.iterrows():
+            st.markdown(f"**{row['Name']}** ({row['Category']})")
+            st.markdown(f"- Spend: ${row['Spend']:,.0f}")
+            st.markdown(f"- Risk Score: {row['Risk Score']} | AI Score: {row['AI Score']}")
+            st.markdown(f"- Suggested Action: _{row['Suggested Action']}_")
+            if i < 3:
+                if f"ai_{row['Name']}" not in st.session_state:
+                    st.session_state[f"ai_{row['Name']}"] = get_vendor_replacement_suggestion(row['Name'], row['Category'])
+                st.markdown(f"- **AI Suggested Vendors:** {st.session_state[f'ai_{row['Name']}']}")
+            else:
+                if st.button(f"Suggest Alternatives for {row['Name']}", key=f"btn_{i}"):
+                    st.session_state[f"ai_{row['Name']}"] = get_vendor_replacement_suggestion(row['Name'], row['Category'])
+                if f"ai_{row['Name']}" in st.session_state:
+                    st.markdown(f"- **AI Suggested Vendors:** {st.session_state[f'ai_{row['Name']}']}")
+    else:
+        st.success("No critical components flagged for optimization.")
+
+    st.markdown("### ⬇️ Export Plan")
+    csv = low_score_df.to_csv(index=False).encode('utf-8')
+    st.download_button("Download Optimization Roadmap (CSV)", csv, "optimization_roadmap.csv", "text/csv")
+
+    st.markdown("### 📊 Gantt Chart: Prioritized Remediation Timeline")
+    low_score_df = low_score_df.copy()
+    low_score_df["Priority Index"] = low_score_df["Spend"] / (low_score_df["Risk Score"] + 1)  # Prevent divide-by-zero
+    low_score_df = low_score_df.sort_values("Priority Index", ascending=False)
+    low_score_df["Start"] = pd.to_datetime("today")
+    low_score_df["Finish"] = low_score_df["Start"] + pd.to_timedelta((low_score_df["Priority Index"] * 2).astype(int), unit='D')
+
+    gantt_fig = go.Figure()
+    for _, row in low_score_df.iterrows():
+        gantt_fig.add_trace(go.Bar(
+            x=[(row["Finish"] - row["Start"]).days],
+            y=[row["Name"]],
+            base=row["Start"],
+            orientation='h',
+            marker=dict(color='crimson' if row["Risk Score"] > 70 else 'gold' if row["Risk Score"] > 40 else 'lightgreen'),
+            name=row["Category"],
+            hovertext=f"Spend: ${row['Spend']:,.0f}<br>Risk: {row['Risk Score']}<br>Priority: {row['Priority Index']:.2f}"
+        ))
+
+    gantt_fig.update_layout(
+        title="Remediation Timeline by Priority (Gantt View)",
+        barmode='stack',
+        xaxis_title="Date",
+        yaxis_title="Component",
+        height=600,
+        margin=dict(l=40, r=40, t=60, b=40)
+    )
+    st.plotly_chart(gantt_fig, use_container_width=True)
+
+# --- Simulation Tab ---
+st.subheader("🧪 Simulation Mode: Live Feed Preview")
+st.markdown("Use this simulator to preview how real-time architecture updates might flow into the system from an external AIOps or CMDB API.")
+
+api_response_mock = {
+    "components": [
+        {"Name": "Simulated Switch X930", "Category": "Hardware", "Spend": 125000, "Revenue Impact %": 12, "Risk Score": 66},
+        {"Name": "Simulated WAF Cluster", "Category": "Cybersecurity", "Spend": 89000, "Revenue Impact %": 18, "Risk Score": 72},
+        {"Name": "Simulated HRIS System", "Category": "Software", "Spend": 210000, "Revenue Impact %": 25, "Risk Score": 55}
+    ]
+}
+
+if st.button("Inject Simulated API Feed"):
+    st.session_state.components.extend(api_response_mock["components"])
+    st.success("Simulated data injected into the component mapping.")
+
+with st.expander("View Mock API Payload"):
+    st.code(json.dumps(api_response_mock, indent=2), language='json')
+
 # --- External Import Tab ---
 with tabs[2]:
-    st.subheader("\U0001F4C2 Upload External Architecture (Visio / AIOps)")
+    st.subheader("\U0001F4C2 Upload External Architecture (Visio / AIOps")
     visio_file = st.file_uploader("Upload Visio Diagram (.vsdx)", type="vsdx")
     if visio_file:
         st.info("(Placeholder) Parsing of Visio files will be added here.")
@@ -154,4 +301,3 @@ with tabs[2]:
 
 if st.sidebar.checkbox("Show session state (dev only)"):
     st.write(st.session_state)
-
