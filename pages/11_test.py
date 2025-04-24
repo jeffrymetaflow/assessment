@@ -193,60 +193,6 @@ risk_score = st.slider("Risk if Fails (0 = none, 100 = catastrophic)", 0, 100, 5
 def architecture_component():
     st.title("🏗️ Architecture Ingestion & AIOps Preview")
 
-    file = st.file_uploader("Upload Architecture Diagram (PDF, JPEG, or Visio)", type=["pdf", "jpeg", "jpg", "vsdx"])
-
-    if file:
-        file_type = file.type
-
-        if file_type in ["image/jpeg", "image/jpg"]:
-            image = Image.open(file)
-            st.image(image, caption="Uploaded JPEG Architecture Diagram", use_column_width=True)
-
-            st.markdown("### 🧠 Extracted Labels via OCR")
-            extracted_text = pytesseract.image_to_string(image)
-            st.text_area("Detected Text", value=extracted_text, height=200)
-
-            if st.button("🤖 Analyze Diagram Text"):
-                try:
-                    openai_key = st.secrets["openai_api_key"]
-                    os.environ["OPENAI_API_KEY"] = openai_key
-
-                    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=openai_key)
-                    agent = initialize_agent(
-                        tools=[TavilySearchResults()],
-                        llm=llm,
-                        agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-                        verbose=False,
-                        handle_parsing_errors=True
-                    )
-
-                    analysis_prompt = (
-                        "Review this extracted architecture content and provide insight into potential risks, redundancies, \
-                        and optimization opportunities in an enterprise IT environment:\n" + extracted_text
-                    )
-
-                    analysis_response = agent.run(analysis_prompt)
-                    st.success(analysis_response)
-
-                except Exception as e:
-                    st.error(f"AI Analysis Error: {e}")
-
-        elif file_type == "application/pdf":
-            st.warning("🔧 PDF support coming soon for layered extraction and annotation.")
-
-        elif file_type == "application/vnd.visio" or file.name.endswith(".vsdx"):
-            st.warning("🔧 Visio parsing placeholder — convert to image or wait for AIOps API integration.")
-
-        else:
-            st.error("Unsupported file type.")
-
-    else:
-        st.info("📂 Upload an architecture file to begin analysis.")
-
-# --- Architecture Upload and Interpretation ---
-def architecture_component():
-    st.title("🏗️ Architecture Ingestion & AIOps Preview")
-
     st.subheader("📡 Upload Architecture Diagram or Ingest from Mock API")
     source_option = st.radio("Choose Input Method", ["Upload File", "Mock API"], horizontal=True)
 
@@ -304,20 +250,47 @@ def architecture_component():
     elif source_option == "Mock API":
         st.markdown("### 🧪 Using Mock AIOps API Response")
 
-        mock_json = {
-            "components": [
-                {"type": "Web Server", "name": "nginx-frontend", "status": "healthy"},
-                {"type": "App Server", "name": "app-core-vm1", "status": "degraded"},
-                {"type": "Database", "name": "mysql-db1", "status": "healthy"},
-                {"type": "Load Balancer", "name": "aws-elb-1", "status": "healthy"},
-                {"type": "Cache", "name": "redis-cache", "status": "unreachable"}
-            ],
-            "alerts": [
-                {"severity": "high", "message": "Redis cache unreachable"},
-                {"severity": "medium", "message": "App latency spike detected"}
-            ]
+        env_options = {
+            "Retail Storefront": {
+                "components": [
+                    {"type": "Web Server", "name": "store-nginx", "status": "healthy"},
+                    {"type": "App Server", "name": "checkout-core", "status": "degraded"},
+                    {"type": "Database", "name": "inventory-db", "status": "healthy"},
+                    {"type": "Load Balancer", "name": "store-elb", "status": "healthy"},
+                    {"type": "Cache", "name": "pricing-redis", "status": "unreachable"}
+                ],
+                "alerts": [
+                    {"severity": "high", "message": "Redis cache outage impacting price lookup"},
+                    {"severity": "medium", "message": "Latency spike in checkout-core"}
+                ]
+            },
+            "Healthcare System": {
+                "components": [
+                    {"type": "Web Server", "name": "ehr-gateway", "status": "healthy"},
+                    {"type": "App Server", "name": "patient-logic", "status": "unhealthy"},
+                    {"type": "Database", "name": "records-db", "status": "healthy"},
+                    {"type": "Cache", "name": "lab-cache", "status": "degraded"}
+                ],
+                "alerts": [
+                    {"severity": "high", "message": "Patient logic app unreachable"},
+                    {"severity": "low", "message": "Inconsistent cache refresh in lab-cache"}
+                ]
+            },
+            "Banking Microservices": {
+                "components": [
+                    {"type": "API Gateway", "name": "bank-api-gw", "status": "healthy"},
+                    {"type": "Service", "name": "loan-engine", "status": "healthy"},
+                    {"type": "Service", "name": "credit-risk", "status": "degraded"},
+                    {"type": "Database", "name": "loan-db", "status": "healthy"}
+                ],
+                "alerts": [
+                    {"severity": "medium", "message": "Credit risk scoring timeout"}
+                ]
+            }
         }
 
+        selected_env = st.selectbox("Choose a Mock Architecture", list(env_options.keys()))
+        mock_json = env_options[selected_env]
         st.json(mock_json)
 
         if st.button("🧠 Analyze Mock Architecture"):
