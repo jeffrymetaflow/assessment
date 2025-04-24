@@ -267,6 +267,24 @@ if st.session_state.components:
     )
     st.plotly_chart(gantt_fig, use_container_width=True)
 
+# --- Simulation Tab ---
+st.subheader("🧪 Simulation Mode: Live Feed Preview")
+st.markdown("Use this simulator to preview how real-time architecture updates might flow into the system from an external AIOps or CMDB API.")
+
+api_response_mock = {
+    "components": [
+        {"Name": "Simulated Switch X930", "Category": "Hardware", "Spend": 125000, "Revenue Impact %": 12, "Risk Score": 66},
+        {"Name": "Simulated WAF Cluster", "Category": "Cybersecurity", "Spend": 89000, "Revenue Impact %": 18, "Risk Score": 72},
+        {"Name": "Simulated HRIS System", "Category": "Software", "Spend": 210000, "Revenue Impact %": 25, "Risk Score": 55}
+    ]
+}
+
+if st.button("Inject Simulated API Feed"):
+    st.session_state.components.extend(api_response_mock["components"])
+    st.success("Simulated data injected into the component mapping.")
+
+st.code(json.dumps(api_response_mock, indent=2), language='json')
+
 # --- External Import Tab ---
 with tabs[2]:
     st.subheader("\U0001F4C2 Upload External Architecture (Visio / AIOps")
