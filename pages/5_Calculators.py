@@ -85,7 +85,7 @@ if section == "⚙️ Inputs Setup":
     category_revenue = [st.number_input(f"Category {i+1} % of Revenue", value=st.session_state.category_revenue_to_total[i]) for i in range(5)]
 
     revenue_growth = [st.number_input(f"Year {i+1} Revenue Growth (%)", value=st.session_state.revenue_growth[i]) for i in range(3)]
-    expense_growth = [st.number_input(f"Year {i+1} Expense Growth (%)", value=st.session_state.expense_growth[i]) for i in range(3)]
+    expense_growth = [st.number_input(f"Year {i+1} Expense Growth (%)", value=st.session_state.expense_growth[i] if i < len(st.session_state.expense_growth) else 0) for i in range(3)]
 
     if st.button("Save Inputs"):
         st.session_state.update({
