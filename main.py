@@ -85,7 +85,7 @@ if "project_id" not in st.session_state:
                     st.session_state["project_name"] = project_name
                     st.session_state["project_id"] = str(uuid.uuid4())
                     st.success(f"Started project: {client_name} - {project_name}")
-                    st.experimental_rerun()
+                    st.stop()
                 else:
                     st.error("Please enter both Client and Project names.")
 
@@ -96,7 +96,7 @@ if "project_id" not in st.session_state:
                 selected_file = st.selectbox("Select a saved project to load", project_files)
                 if st.button("Load Selected Project"):
                     load_project(selected_file)
-                    st.experimental_rerun()
+                    st.stop()
             else:
                 st.warning("No saved projects found. Please create a new assessment first.")
         else:
@@ -129,5 +129,6 @@ else:
 
     with col2:
         st.image("Market image.png", width=200)
+
 
 
