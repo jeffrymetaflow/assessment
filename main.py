@@ -62,6 +62,18 @@ def generate_spend_saving_estimate(category, spend, modernization_action):
         return f"Network Optimization Savings: ~${int(savings):,}"
     return "Savings Estimate: N/A"
 
+# --- Simulated External Pricing Lookup ---
+def simulate_external_pricing_lookup(category):
+    market_pricing = {
+        "Hardware": 300000,
+        "Software": 150000,
+        "Security": 100000,
+        "Networking": 120000,
+        "Cloud": 80000,
+        "Storage": 200000
+    }
+    return market_pricing.get(category, 100000)
+
 # --- AI Assistant Reasoning Enhancement ---
 def assist_modernization_reasoning(name, category, spend, renewal_date, risk_score):
     modernization = dynamic_generate_modernization_suggestion(category, spend, renewal_date, risk_score)
@@ -87,10 +99,19 @@ if components:
     st.header("Client Architecture Components")
     for comp in components:
         with st.expander(f"{comp.get('Name', 'Unnamed Component')}"):
-            st.write(f"**Category:** {comp.get('Category', 'N/A')}")
-            st.write(f"**Spend:** ${comp.get('Spend', 0):,}")
+            category = comp.get('Category', 'N/A')
+            spend_val = comp.get('Spend', 0)
+            st.write(f"**Category:** {category}")
+            st.write(f"**Spend:** ${spend_val:,}")
             st.write(f"**Renewal Date:** {comp.get('Renewal Date', 'TBD')}")
             st.write(f"**Risk Score:** {comp.get('Risk Score', 5)}/10")
+
+            # Show simulated external market comparison
+            avg_market_spend = simulate_external_pricing_lookup(category)
+            st.write(f"**Industry Average Spend:** ~${avg_market_spend:,}")
+            if avg_market_spend:
+                variance = ((spend_val - avg_market_spend) / avg_market_spend) * 100
+                st.write(f"**Variance:** {variance:+.1f}% vs. Market")
 
             if st.button(f"Ask AI Why ({comp.get('Name', 'Component')})"):
                 reasoning = assist_modernization_reasoning(
