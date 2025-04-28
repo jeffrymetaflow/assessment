@@ -41,9 +41,6 @@ def generate_modernization_suggestion(category):
     }
     return suggestions.get(category, "Explore modernization opportunities specific to this category.")
 
-# --- Project Save/Load Functions ---
-(definitions remain unchanged)
-
 # --- PDF Generation Function with Timeline Staging ---
 def generate_roadmap_pdf():
     pdf = FPDF()
