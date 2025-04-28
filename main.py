@@ -58,17 +58,57 @@ def dynamic_generate_modernization_suggestion(category, spend, renewal_date, ris
 
     return suggestion
 
-# --- Spend Savings Estimation Function ---
-# (unchanged)
-
 # --- Simulated External Pricing Lookup ---
-# (unchanged)
+def simulate_external_pricing_lookup(category):
+    market_pricing = {
+        "Hardware": 300000,
+        "Software": 150000,
+        "Security": 100000,
+        "Networking": 120000,
+        "Cloud": 80000,
+        "Storage": 200000,
+        "Cybersecurity": 120000,
+        "BC/DR": 100000,
+        "Compliance": 90000
+    }
+    return market_pricing.get(category, 100000)
+
+# --- Spend Savings Estimation Function ---
+def generate_spend_saving_estimate(category, spend, modernization_action):
+    if "cloud" in modernization_action.lower():
+        savings = spend * 0.25
+        return f"Estimated Savings: ~${int(savings):,} over 3 years"
+    if "saas" in modernization_action.lower():
+        savings = spend * 0.15
+        return f"Estimated Operational Savings: ~${int(savings):,}"
+    if "sd-wan" in modernization_action.lower():
+        savings = spend * 0.10
+        return f"Network Optimization Savings: ~${int(savings):,}"
+    return "Savings Estimate: N/A"
 
 # --- Simulated AWS Service Pricing Lookup ---
-# (unchanged)
+def simulate_aws_service_pricing(service_name):
+    service_pricing = {
+        "EC2": 100,
+        "S3": 20,
+        "RDS": 50,
+        "ECS": 30,
+        "EFS": 25
+    }
+    return service_pricing.get(service_name, 75)
 
 # --- Simulated AWS Cloud Pricing Lookup ---
-# (unchanged)
+def simulate_aws_cloud_pricing(category, spend):
+    discount_mapping = {
+        "Hardware": 0.6,
+        "Software": 0.8,
+        "Security": 0.95,
+        "Networking": 0.7,
+        "Cloud": 0.9,
+        "Storage": 0.5
+    }
+    discount = discount_mapping.get(category, 0.8)
+    return int(spend * discount)
 
 # --- AI Assistant Reasoning Enhancement ---
 def assist_modernization_reasoning(name, category, spend, renewal_date, risk_score):
