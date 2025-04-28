@@ -78,6 +78,8 @@ def simulate_external_pricing_lookup(category):
 def assist_modernization_reasoning(name, category, spend, renewal_date, risk_score):
     modernization = dynamic_generate_modernization_suggestion(category, spend, renewal_date, risk_score)
     savings = generate_spend_saving_estimate(category, spend, modernization)
+    avg_market_spend = simulate_external_pricing_lookup(category)
+    variance = ((spend - avg_market_spend) / avg_market_spend) * 100 if avg_market_spend else 0
 
     reasoning = f"""
 Component: {name}
@@ -85,11 +87,13 @@ Category: {category}
 Spend: ${spend:,}
 Renewal Date: {renewal_date}
 Risk Score: {risk_score}/10
+Industry Average Spend: ~${avg_market_spend:,}
+Variance vs Market: {variance:+.1f}%
 
 Modernization Recommendation: {modernization}
 {savings}
 
-Reasoning: Based on high spend, risk profile, and renewal timing, modernization is prioritized to optimize cost, performance, and security.
+Reasoning: Based on high spend, risk profile, renewal timing, and variance against market average, modernization is prioritized to optimize cost, performance, and security.
 """
     return reasoning
 
@@ -106,7 +110,6 @@ if components:
             st.write(f"**Renewal Date:** {comp.get('Renewal Date', 'TBD')}")
             st.write(f"**Risk Score:** {comp.get('Risk Score', 5)}/10")
 
-            # Show simulated external market comparison
             avg_market_spend = simulate_external_pricing_lookup(category)
             st.write(f"**Industry Average Spend:** ~${avg_market_spend:,}")
             if avg_market_spend:
