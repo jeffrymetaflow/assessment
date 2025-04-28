@@ -74,7 +74,13 @@ def generate_roadmap_pdf():
     components = st.session_state.controller.get_components()
     if components:
         for comp in components:
-            pdf.cell(0, 10, f"- {comp}", ln=True)
+            if isinstance(comp, dict):
+                name = comp.get('Name', 'Unknown')
+                category = comp.get('Category', 'N/A')
+                spend = comp.get('Spend', 0)
+                pdf.cell(0, 10, f"- {name} ({category}) | Spend: ${spend:,}", ln=True)
+            else:
+                pdf.cell(0, 10, f"- {comp}", ln=True)
     else:
         pdf.cell(0, 10, "No components found.", ln=True)
 
@@ -209,5 +215,6 @@ else:
 
     with col2:
         st.image("Market image.png", width=200)
+
 
 
