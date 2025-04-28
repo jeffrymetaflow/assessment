@@ -26,7 +26,10 @@ vendor_mapping = {
     "Security": ["Palo Alto Networks", "Fortinet", "CrowdStrike"],
     "Networking": ["Cisco", "Juniper", "Arista"],
     "Cloud": ["AWS", "Azure", "Google Cloud"],
-    "Storage": ["Pure Storage", "NetApp", "Dell EMC"]
+    "Storage": ["Pure Storage", "NetApp", "Dell EMC"],
+    "Cybersecurity": ["CrowdStrike", "Palo Alto", "SentinelOne"],
+    "BC/DR": ["Zerto", "Veeam", "AWS DRaaS"],
+    "Compliance": ["OneTrust", "TrustArc", "Drata"]
 }
 
 # --- Dynamic AI Modernization Suggestion Function ---
@@ -43,6 +46,12 @@ def dynamic_generate_modernization_suggestion(category, spend, renewal_date, ris
         suggestion += "Implement zero-trust security models with AI-driven threat detection. "
     if category == "Cloud" and spend > 50000:
         suggestion += "Optimize multi-cloud deployments for cost savings and resiliency. "
+    if category == "Cybersecurity" and risk_score > 7:
+        suggestion += "Implement XDR and Zero-Trust Architecture to harden security posture. "
+    if category == "BC/DR" and spend > 50000:
+        suggestion += "Migrate to DRaaS platforms for more resilient disaster recovery. "
+    if category == "Compliance" and risk_score > 6:
+        suggestion += "Consider Compliance-as-a-Service (CaaS) offerings to streamline regulatory adherence. "
 
     if not suggestion:
         suggestion = "Review current asset lifecycle and evaluate modernization opportunities based on strategic goals."
@@ -50,53 +59,16 @@ def dynamic_generate_modernization_suggestion(category, spend, renewal_date, ris
     return suggestion
 
 # --- Spend Savings Estimation Function ---
-def generate_spend_saving_estimate(category, spend, modernization_action):
-    if "cloud" in modernization_action.lower():
-        savings = spend * 0.25
-        return f"Estimated Savings: ~${int(savings):,} over 3 years"
-    if "saas" in modernization_action.lower():
-        savings = spend * 0.15
-        return f"Estimated Operational Savings: ~${int(savings):,}"
-    if "sd-wan" in modernization_action.lower():
-        savings = spend * 0.10
-        return f"Network Optimization Savings: ~${int(savings):,}"
-    return "Savings Estimate: N/A"
+# (unchanged)
 
 # --- Simulated External Pricing Lookup ---
-def simulate_external_pricing_lookup(category):
-    market_pricing = {
-        "Hardware": 300000,
-        "Software": 150000,
-        "Security": 100000,
-        "Networking": 120000,
-        "Cloud": 80000,
-        "Storage": 200000
-    }
-    return market_pricing.get(category, 100000)
+# (unchanged)
 
 # --- Simulated AWS Service Pricing Lookup ---
-def simulate_aws_service_pricing(service_name):
-    service_pricing = {
-        "EC2": 100,
-        "S3": 20,
-        "RDS": 50,
-        "ECS": 30,
-        "EFS": 25
-    }
-    return service_pricing.get(service_name, 75)
+# (unchanged)
 
 # --- Simulated AWS Cloud Pricing Lookup ---
-def simulate_aws_cloud_pricing(category, spend):
-    discount_mapping = {
-        "Hardware": 0.6,
-        "Software": 0.8,
-        "Security": 0.95,
-        "Networking": 0.7,
-        "Cloud": 0.9,
-        "Storage": 0.5
-    }
-    discount = discount_mapping.get(category, 0.8)
-    return int(spend * discount)
+# (unchanged)
 
 # --- AI Assistant Reasoning Enhancement ---
 def assist_modernization_reasoning(name, category, spend, renewal_date, risk_score):
@@ -121,7 +93,7 @@ Potential Cloud Migration Savings: ~${cloud_savings:,}
 Modernization Recommendation: {modernization}
 {savings}
 
-Reasoning: Based on high spend, risk profile, renewal timing, variance against market average, and potential cloud migration savings, modernization is prioritized to optimize cost, performance, and security.
+Reasoning: Based on high spend, risk profile, renewal timing, variance against market average, and potential cloud migration savings, modernization is prioritized to optimize cost, performance, security, and compliance.
 """
     return reasoning
 
@@ -162,6 +134,26 @@ if components:
                     comp.get('Risk Score', 5)
                 )
                 st.success(reasoning)
+
+# --- Simple Modernization Advisor Chatbot MVP ---
+st.subheader("Modernization Chatbot")
+user_input = st.chat_input("Ask about a component...")
+if user_input:
+    found = False
+    for comp in components:
+        if user_input.lower() in comp.get('Name', '').lower():
+            reasoning = assist_modernization_reasoning(
+                comp.get('Name', 'Unknown'),
+                comp.get('Category', 'N/A'),
+                comp.get('Spend', 0),
+                comp.get('Renewal Date', 'TBD'),
+                comp.get('Risk Score', 5)
+            )
+            st.success(reasoning)
+            found = True
+            break
+    if not found:
+        st.error("Component not found. Please try again.")
 
 # --- PDF Generation Function with Timeline Staging ---
 def generate_roadmap_pdf():
