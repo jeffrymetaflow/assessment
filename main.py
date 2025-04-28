@@ -29,6 +29,18 @@ vendor_mapping = {
     "Storage": ["Pure Storage", "NetApp", "Dell EMC"]
 }
 
+# --- AI Modernization Suggestions ---
+def generate_modernization_suggestion(category):
+    suggestions = {
+        "Hardware": "Consider virtualizing or moving to cloud-based infrastructure.",
+        "Software": "Explore SaaS alternatives to reduce maintenance overhead.",
+        "Security": "Evaluate zero-trust architecture and AI-driven threat detection.",
+        "Networking": "Modernize with SD-WAN solutions for better agility.",
+        "Cloud": "Optimize costs by implementing multi-cloud strategies.",
+        "Storage": "Transition to scalable object storage or cloud storage services."
+    }
+    return suggestions.get(category, "Explore modernization opportunities specific to this category.")
+
 # --- Project Save/Load Functions ---
 def save_project():
     if not os.path.exists("projects"):
@@ -104,6 +116,11 @@ def generate_roadmap_pdf():
                 pdf.cell(40, 10, renewal, border=1)
                 pdf.cell(50, 10, suggested_vendors, border=1)
                 pdf.ln()
+
+                # Add AI Modernization Suggestion
+                modernization = generate_modernization_suggestion(category)
+                pdf.cell(0, 10, f"   ➔ Modernization Suggestion: {modernization}", ln=True)
+                pdf.ln(2)
     else:
         pdf.cell(0, 10, "No components found.", ln=True)
 
@@ -135,6 +152,7 @@ def generate_roadmap_pdf():
     pdf.output(filepath)
 
     return filepath
+
 
 # --- Sidebar Save/Load Controls ---
 with st.sidebar:
