@@ -1,4 +1,7 @@
 import streamlit as st
+import os
+import json
+import uuid
 from controller.controller import ITRMController
 
 # Initialize the shared controller (only once)
@@ -16,8 +19,6 @@ from utils.bootstrap import page_bootstrap
 page_bootstrap(current_page="Main")
 
 # --- Client/Project Setup ---
-import uuid
-
 if "project_id" not in st.session_state:
     with st.form("new_project_form", clear_on_submit=True):
         st.subheader("🛠️ Start a New Client Assessment")
@@ -34,8 +35,52 @@ if "project_id" not in st.session_state:
             else:
                 st.error("Please enter both Client and Project names.")
 
+# --- Project Save/Load Functions ---
+def save_project():
+    if not os.path.exists("projects"):
+        os.makedirs("projects")
+    project_id = st.session_state.get("project_id", str(uuid.uuid4()))
+    data = {
+        "client_name": st.session_state.get("client_name", ""),
+        "project_name": st.session_state.get("project_name", ""),
+        "project_id": project_id,
+        "components": st.session_state.controller.get_components(),
+    }
+    filepath = f"projects/{project_id}.json"
+    with open(filepath, "w") as f:
+        json.dump(data, f, indent=4)
+    st.success(f"Project saved successfully: {filepath}")
+
+def load_project(project_file):
+    filepath = os.path.join("projects", project_file)
+    if os.path.exists(filepath):
+        with open(filepath, "r") as f:
+            data = json.load(f)
+            st.session_state["client_name"] = data.get("client_name", "")
+            st.session_state["project_name"] = data.get("project_name", "")
+            st.session_state["project_id"] = data.get("project_id", str(uuid.uuid4()))
+            st.session_state.controller.set_components(data.get("components", []))
+            st.success(f"Project {st.session_state['project_name']} loaded successfully!")
+    else:
+        st.error("Selected project file not found.")
+
+# --- Sidebar Save/Load Controls ---
+with st.sidebar:
+    st.subheader("💾 Project Management")
+    
+    if "project_id" in st.session_state:
+        if st.button("Save Current Project"):
+            save_project()
+
+    if os.path.exists("projects"):
+        project_files = os.listdir("projects")
+        if project_files:
+            selected_file = st.selectbox("Load a Saved Project", project_files)
+            if st.button("Load Selected Project"):
+                load_project(selected_file)
+
 # --- Layout with logo and client/project info ---
-col1, col2 = st.columns([6, 1])  # 6:1 ratio for left vs right
+col1, col2 = st.columns([6, 1])
 
 with col1:
     # Display active Client/Project
