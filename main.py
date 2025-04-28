@@ -62,6 +62,46 @@ def generate_spend_saving_estimate(category, spend, modernization_action):
         return f"Network Optimization Savings: ~${int(savings):,}"
     return "Savings Estimate: N/A"
 
+# --- AI Assistant Reasoning Enhancement ---
+def assist_modernization_reasoning(name, category, spend, renewal_date, risk_score):
+    modernization = dynamic_generate_modernization_suggestion(category, spend, renewal_date, risk_score)
+    savings = generate_spend_saving_estimate(category, spend, modernization)
+
+    reasoning = f"""
+Component: {name}
+Category: {category}
+Spend: ${spend:,}
+Renewal Date: {renewal_date}
+Risk Score: {risk_score}/10
+
+Modernization Recommendation: {modernization}
+{savings}
+
+Reasoning: Based on high spend, risk profile, and renewal timing, modernization is prioritized to optimize cost, performance, and security.
+"""
+    return reasoning
+
+# --- Display Components with Ask AI Why Button ---
+components = st.session_state.controller.get_components()
+if components:
+    st.header("Client Architecture Components")
+    for comp in components:
+        with st.expander(f"{comp.get('Name', 'Unnamed Component')}"):
+            st.write(f"**Category:** {comp.get('Category', 'N/A')}")
+            st.write(f"**Spend:** ${comp.get('Spend', 0):,}")
+            st.write(f"**Renewal Date:** {comp.get('Renewal Date', 'TBD')}")
+            st.write(f"**Risk Score:** {comp.get('Risk Score', 5)}/10")
+
+            if st.button(f"Ask AI Why ({comp.get('Name', 'Component')})"):
+                reasoning = assist_modernization_reasoning(
+                    comp.get('Name', 'Unknown'),
+                    comp.get('Category', 'N/A'),
+                    comp.get('Spend', 0),
+                    comp.get('Renewal Date', 'TBD'),
+                    comp.get('Risk Score', 5)
+                )
+                st.success(reasoning)
+
 # --- PDF Generation Function with Timeline Staging ---
 def generate_roadmap_pdf():
     pdf = FPDF()
