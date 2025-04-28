@@ -29,17 +29,25 @@ vendor_mapping = {
     "Storage": ["Pure Storage", "NetApp", "Dell EMC"]
 }
 
-# --- AI Modernization Suggestions ---
-def generate_modernization_suggestion(category):
-    suggestions = {
-        "Hardware": "Consider virtualizing or moving to cloud-based infrastructure.",
-        "Software": "Explore SaaS alternatives to reduce maintenance overhead.",
-        "Security": "Evaluate zero-trust architecture and AI-driven threat detection.",
-        "Networking": "Modernize with SD-WAN solutions for better agility.",
-        "Cloud": "Optimize costs by implementing multi-cloud strategies.",
-        "Storage": "Transition to scalable object storage or cloud storage services."
-    }
-    return suggestions.get(category, "Explore modernization opportunities specific to this category.")
+# --- Dynamic AI Modernization Suggestion Function ---
+def dynamic_generate_modernization_suggestion(category, spend, renewal_date, risk_score):
+    suggestion = ""
+
+    if category in ["Hardware", "Storage"] and spend > 100000:
+        suggestion += "Explore cloud migration to reduce capex and enhance scalability. "
+    if category == "Software" and risk_score > 7:
+        suggestion += "Evaluate SaaS alternatives to improve security and upgrade cycles. "
+    if category == "Networking" and renewal_date:
+        suggestion += "Modernize network with SD-WAN or next-gen architecture solutions. "
+    if category == "Security" and risk_score > 8:
+        suggestion += "Implement zero-trust security models with AI-driven threat detection. "
+    if category == "Cloud" and spend > 50000:
+        suggestion += "Optimize multi-cloud deployments for cost savings and resiliency. "
+
+    if not suggestion:
+        suggestion = "Review current asset lifecycle and evaluate modernization opportunities based on strategic goals."
+
+    return suggestion
 
 # --- PDF Generation Function with Timeline Staging ---
 def generate_roadmap_pdf():
@@ -78,9 +86,11 @@ def generate_roadmap_pdf():
             if isinstance(comp, dict):
                 name = comp.get('Name', 'Unknown')
                 category = comp.get('Category', 'N/A')
-                spend = f"${comp.get('Spend', 0):,}"
+                spend_val = comp.get('Spend', 0)
+                spend = f"${spend_val:,}"
                 renewal = comp.get('Renewal Date', 'TBD')
                 suggested_vendors = ", ".join(vendor_mapping.get(category, ["TBD"]))
+                risk_score = comp.get('Risk Score', 5)
                 pdf.cell(40, 10, name, border=1)
                 pdf.cell(30, 10, category, border=1)
                 pdf.cell(30, 10, spend, border=1)
@@ -88,7 +98,7 @@ def generate_roadmap_pdf():
                 pdf.cell(50, 10, suggested_vendors, border=1)
                 pdf.ln()
 
-                modernization = generate_modernization_suggestion(category)
+                modernization = dynamic_generate_modernization_suggestion(category, spend_val, renewal, risk_score)
                 pdf.cell(0, 10, f"   -> Modernization Suggestion: {modernization}", ln=True)
                 pdf.ln(2)
     else:
