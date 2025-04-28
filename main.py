@@ -73,14 +73,24 @@ def generate_roadmap_pdf():
 
     components = st.session_state.controller.get_components()
     if components:
+        pdf.set_fill_color(200, 220, 255)
+        pdf.cell(50, 10, "Name", border=1, fill=True)
+        pdf.cell(40, 10, "Category", border=1, fill=True)
+        pdf.cell(50, 10, "Spend", border=1, fill=True)
+        pdf.cell(50, 10, "Renewal Date", border=1, fill=True)
+        pdf.ln()
+
         for comp in components:
             if isinstance(comp, dict):
                 name = comp.get('Name', 'Unknown')
                 category = comp.get('Category', 'N/A')
-                spend = comp.get('Spend', 0)
-                pdf.cell(0, 10, f"- {name} ({category}) | Spend: ${spend:,}", ln=True)
-            else:
-                pdf.cell(0, 10, f"- {comp}", ln=True)
+                spend = f"${comp.get('Spend', 0):,}"
+                renewal = comp.get('Renewal Date', 'TBD')
+                pdf.cell(50, 10, name, border=1)
+                pdf.cell(40, 10, category, border=1)
+                pdf.cell(50, 10, spend, border=1)
+                pdf.cell(50, 10, renewal, border=1)
+                pdf.ln()
     else:
         pdf.cell(0, 10, "No components found.", ln=True)
 
@@ -96,10 +106,12 @@ def generate_roadmap_pdf():
         {"Risk": "No DR Plan", "Recommendation": "Design and implement DR/BC solution with cloud failover"},
     ]
 
+    priority_number = 1
     for item in risk_items:
-        pdf.cell(0, 10, f"Risk: {item['Risk']}", ln=True)
-        pdf.cell(0, 10, f"Action: {item['Recommendation']}", ln=True)
+        pdf.cell(0, 10, f"{priority_number}. Risk: {item['Risk']}", ln=True)
+        pdf.cell(0, 10, f"   Action: {item['Recommendation']}", ln=True)
         pdf.ln(5)
+        priority_number += 1
 
     if not os.path.exists("exports"):
         os.makedirs("exports")
