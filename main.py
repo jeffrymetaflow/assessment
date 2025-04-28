@@ -32,31 +32,31 @@ vendor_mapping = {
     "Compliance": ["OneTrust", "TrustArc", "Drata"]
 }
 
-# --- Dynamic AI Modernization Suggestion Function ---
-def dynamic_generate_modernization_suggestion(category, spend, renewal_date, risk_score):
-    suggestion = ""
+# --- Executive Summary Calculation Function ---
+def generate_executive_summary(components):
+    total_spend = 0
+    total_cloud_spend = 0
+    category_counts = {}
+    high_risk_items = []
 
-    if category in ["Hardware", "Storage"] and spend > 100000:
-        suggestion += "Explore cloud migration to reduce capex and enhance scalability. "
-    if category == "Software" and risk_score > 7:
-        suggestion += "Evaluate SaaS alternatives to improve security and upgrade cycles. "
-    if category == "Networking" and renewal_date:
-        suggestion += "Modernize network with SD-WAN or next-gen architecture solutions. "
-    if category == "Security" and risk_score > 8:
-        suggestion += "Implement zero-trust security models with AI-driven threat detection. "
-    if category == "Cloud" and spend > 50000:
-        suggestion += "Optimize multi-cloud deployments for cost savings and resiliency. "
-    if category == "Cybersecurity" and risk_score > 7:
-        suggestion += "Implement XDR and Zero-Trust Architecture to harden security posture. "
-    if category == "BC/DR" and spend > 50000:
-        suggestion += "Migrate to DRaaS platforms for more resilient disaster recovery. "
-    if category == "Compliance" and risk_score > 6:
-        suggestion += "Consider Compliance-as-a-Service (CaaS) offerings to streamline regulatory adherence. "
+    for comp in components:
+        spend = comp.get("Spend", 0)
+        risk = comp.get("Risk Score", 0)
+        category = comp.get("Category", "Other")
 
-    if not suggestion:
-        suggestion = "Review current asset lifecycle and evaluate modernization opportunities based on strategic goals."
+        total_spend += spend
+        cloud_cost = simulate_aws_cloud_pricing(category, spend)
+        total_cloud_spend += cloud_cost
 
-    return suggestion
+        if category not in category_counts:
+            category_counts[category] = 0
+        category_counts[category] += 1
+
+        high_risk_items.append((comp.get("Name", "Unnamed"), category, spend, risk))
+
+    high_risk_items.sort(key=lambda x: (-x[3], -x[2]))  # Sort by Risk descending, Spend descending
+
+    return total_spend, total_cloud_spend, category_counts, high_risk_items[:5]
 
 # --- Simulated External Pricing Lookup ---
 def simulate_external_pricing_lookup(category):
@@ -194,6 +194,45 @@ if user_input:
             break
     if not found:
         st.error("Component not found. Please try again.")
+
+# --- PDF Export with Executive Summary ---
+def generate_roadmap_pdf():
+    components = st.session_state.controller.get_components()
+    total_spend, total_cloud_spend, category_counts, top_risks = generate_executive_summary(components)
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, "ITRM Modernization Executive Summary", ln=True, align="C")
+    pdf.ln(10)
+
+    pdf.set_font("Arial", size=12)
+    pdf.cell(0, 10, f"Total Current Spend: ${total_spend:,}", ln=True)
+    pdf.cell(0, 10, f"Total Estimated Cloud Spend: ${total_cloud_spend:,}", ln=True)
+    pdf.cell(0, 10, f"Potential Cloud Migration Savings: ${total_spend - total_cloud_spend:,}", ln=True)
+    pdf.ln(5)
+
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Component Category Distribution:", ln=True)
+    pdf.set_font("Arial", size=12)
+    for cat, count in category_counts.items():
+        pdf.cell(0, 8, f"- {cat}: {count} Components", ln=True)
+
+    pdf.ln(5)
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Top 5 High-Risk / High-Spend Components:", ln=True)
+    pdf.set_font("Arial", size=12)
+    for name, cat, spend, risk in top_risks:
+        pdf.cell(0, 8, f"- {name} ({cat}) | Spend: ${spend:,} | Risk Score: {risk}", ln=True)
+
+    output_dir = "generated_pdfs"
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    filename = f"{output_dir}/ITRM_Modernization_Roadmap.pdf"
+    pdf.output(filename)
+
+    return filename
 
 # --- PDF Generation Function with Timeline Staging ---
 def generate_roadmap_pdf():
