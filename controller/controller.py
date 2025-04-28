@@ -8,6 +8,12 @@ class ITRMController:
         self.forecast_model = {}
         self.financial_summary = {}
 
+    def get_components(self):
+            return self.components
+
+    def set_components(self, components_list):
+        self.components = components_list
+    
     def add_component(self, component):
         self.components.append(component)
 
