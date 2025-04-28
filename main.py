@@ -57,19 +57,19 @@ def generate_roadmap_pdf():
     if os.path.exists(logo_path):
         pdf.image(logo_path, x=160, y=10, w=40)
 
-    pdf.set_font("Arial", 'B', 16)
+    pdf.set_font("Helvetica", 'B', 16)
     pdf.cell(0, 10, "ITRM Modernization Roadmap", ln=True, align='C')
     pdf.ln(20)
 
-    pdf.set_font("Arial", size=12)
+    pdf.set_font("Helvetica", size=12)
     pdf.cell(0, 10, f"Client: {st.session_state.get('client_name', '')}", ln=True)
     pdf.cell(0, 10, f"Project: {st.session_state.get('project_name', '')}", ln=True)
     pdf.cell(0, 10, f"Project ID: {st.session_state.get('project_id', '')}", ln=True)
     pdf.ln(10)
 
-    pdf.set_font("Arial", 'B', 14)
+    pdf.set_font("Helvetica", 'B', 14)
     pdf.cell(0, 10, "Architecture Components:", ln=True)
-    pdf.set_font("Arial", size=12)
+    pdf.set_font("Helvetica", size=12)
 
     components = st.session_state.controller.get_components()
     if components:
@@ -80,9 +80,9 @@ def generate_roadmap_pdf():
 
     pdf.ln(10)
 
-    pdf.set_font("Arial", 'B', 14)
+    pdf.set_font("Helvetica", 'B', 14)
     pdf.cell(0, 10, "Risk Summary + Recommendations:", ln=True)
-    pdf.set_font("Arial", size=12)
+    pdf.set_font("Helvetica", size=12)
 
     risk_items = [
         {"Risk": "Aging Server Infrastructure", "Recommendation": "Consider cloud migration for elasticity"},
@@ -209,7 +209,4 @@ else:
 
     with col2:
         st.image("Market image.png", width=200)
-
-
-
 
