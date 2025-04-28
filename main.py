@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import json
 import uuid
+from fpdf import FPDF
 from controller.controller import ITRMController
 
 # Initialize the shared controller (only once)
@@ -46,6 +47,45 @@ def load_project(project_file):
             st.success(f"Project {st.session_state['project_name']} loaded successfully!")
     else:
         st.error("Selected project file not found.")
+
+# --- PDF Generation Function with Optional Logo ---
+def generate_roadmap_pdf():
+    pdf = FPDF()
+    pdf.add_page()
+
+    # Add logo if exists
+    logo_path = "assets/logo.png"
+    if os.path.exists(logo_path):
+        pdf.image(logo_path, x=160, y=10, w=40)
+
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(0, 10, "ITRM Modernization Roadmap", ln=True, align='C')
+    pdf.ln(20)
+
+    pdf.set_font("Arial", size=12)
+    pdf.cell(0, 10, f"Client: {st.session_state.get('client_name', '')}", ln=True)
+    pdf.cell(0, 10, f"Project: {st.session_state.get('project_name', '')}", ln=True)
+    pdf.cell(0, 10, f"Project ID: {st.session_state.get('project_id', '')}", ln=True)
+    pdf.ln(10)
+
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, "Architecture Components:", ln=True)
+    pdf.set_font("Arial", size=12)
+
+    components = st.session_state.controller.get_components()
+    if components:
+        for comp in components:
+            pdf.cell(0, 10, f"- {comp}", ln=True)
+    else:
+        pdf.cell(0, 10, "No components found.", ln=True)
+
+    # Save the file temporarily
+    if not os.path.exists("exports"):
+        os.makedirs("exports")
+    filepath = f"exports/{st.session_state['project_id']}_roadmap.pdf"
+    pdf.output(filepath)
+
+    return filepath
 
 # --- Sidebar Save/Load Controls ---
 with st.sidebar:
@@ -127,8 +167,21 @@ else:
         This tool helps IT leaders align architecture to financial and strategic impact — all in one place.
         """)
 
+        # Generate Roadmap PDF Button
+        if st.button("📄 Generate Modernization Roadmap PDF"):
+            pdf_path = generate_roadmap_pdf()
+            with open(pdf_path, "rb") as pdf_file:
+                st.download_button(
+                    label="📥 Download Roadmap PDF",
+                    data=pdf_file,
+                    file_name=os.path.basename(pdf_path),
+                    mime="application/pdf"
+                )
+
     with col2:
         st.image("Market image.png", width=200)
+
+
 
 
 
