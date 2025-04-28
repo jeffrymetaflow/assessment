@@ -74,12 +74,27 @@ def simulate_external_pricing_lookup(category):
     }
     return market_pricing.get(category, 100000)
 
+# --- Simulated AWS Cloud Pricing Lookup ---
+def simulate_aws_cloud_pricing(category, spend):
+    discount_mapping = {
+        "Hardware": 0.6,
+        "Software": 0.8,
+        "Security": 0.95,
+        "Networking": 0.7,
+        "Cloud": 0.9,
+        "Storage": 0.5
+    }
+    discount = discount_mapping.get(category, 0.8)
+    return int(spend * discount)
+
 # --- AI Assistant Reasoning Enhancement ---
 def assist_modernization_reasoning(name, category, spend, renewal_date, risk_score):
     modernization = dynamic_generate_modernization_suggestion(category, spend, renewal_date, risk_score)
     savings = generate_spend_saving_estimate(category, spend, modernization)
     avg_market_spend = simulate_external_pricing_lookup(category)
     variance = ((spend - avg_market_spend) / avg_market_spend) * 100 if avg_market_spend else 0
+    aws_cloud_cost = simulate_aws_cloud_pricing(category, spend)
+    cloud_savings = spend - aws_cloud_cost
 
     reasoning = f"""
 Component: {name}
@@ -89,11 +104,13 @@ Renewal Date: {renewal_date}
 Risk Score: {risk_score}/10
 Industry Average Spend: ~${avg_market_spend:,}
 Variance vs Market: {variance:+.1f}%
+AWS Cloud Alternative: ~${aws_cloud_cost:,}
+Potential Cloud Migration Savings: ~${cloud_savings:,}
 
 Modernization Recommendation: {modernization}
 {savings}
 
-Reasoning: Based on high spend, risk profile, renewal timing, and variance against market average, modernization is prioritized to optimize cost, performance, and security.
+Reasoning: Based on high spend, risk profile, renewal timing, variance against market average, and potential cloud migration savings, modernization is prioritized to optimize cost, performance, and security.
 """
     return reasoning
 
@@ -115,6 +132,11 @@ if components:
             if avg_market_spend:
                 variance = ((spend_val - avg_market_spend) / avg_market_spend) * 100
                 st.write(f"**Variance:** {variance:+.1f}% vs. Market")
+
+            aws_cloud_cost = simulate_aws_cloud_pricing(category, spend_val)
+            cloud_savings = spend_val - aws_cloud_cost
+            st.write(f"**AWS Cloud Alternative:** ~${aws_cloud_cost:,}")
+            st.write(f"**Potential Cloud Migration Savings:** ~${cloud_savings:,}")
 
             if st.button(f"Ask AI Why ({comp.get('Name', 'Component')})"):
                 reasoning = assist_modernization_reasoning(
