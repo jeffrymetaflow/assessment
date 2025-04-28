@@ -31,12 +31,17 @@ if "project_id" not in st.session_state:
                 st.session_state["project_name"] = project_name
                 st.session_state["project_id"] = str(uuid.uuid4())
                 st.success(f"Started project: {client_name} - {project_name}")
-                st.experimental_rerun()
+                # 🚫 REMOVE st.experimental_rerun()
             else:
                 st.error("Please enter both Client and Project names.")
-else:
-    st.markdown(f"**Client:** {st.session_state['client_name']}  |  **Project:** {st.session_state['project_name']}  |  **Project ID:** {st.session_state['project_id']}")
 
+# Always display current project info if available
+if "project_id" in st.session_state:
+    st.info(
+        f"**Client:** {st.session_state['client_name']} | "
+        f"**Project:** {st.session_state['project_name']} | "
+        f"**ID:** {st.session_state['project_id']}"
+    )
 
 # --- Layout with logo ---
 col1, col2 = st.columns([6, 1])  # 6:1 ratio for left vs right
