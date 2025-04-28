@@ -15,9 +15,9 @@ st.set_page_config(
 from utils.bootstrap import page_bootstrap
 page_bootstrap(current_page="Main")
 
+# --- Client/Project Setup ---
 import uuid
 
-# --- Check if project metadata exists ---
 if "project_id" not in st.session_state:
     with st.form("new_project_form", clear_on_submit=True):
         st.subheader("🛠️ Start a New Client Assessment")
@@ -31,22 +31,22 @@ if "project_id" not in st.session_state:
                 st.session_state["project_name"] = project_name
                 st.session_state["project_id"] = str(uuid.uuid4())
                 st.success(f"Started project: {client_name} - {project_name}")
-                # 🚫 REMOVE st.experimental_rerun()
             else:
                 st.error("Please enter both Client and Project names.")
 
-# Always display current project info if available
-if "project_id" in st.session_state:
-    st.info(
-        f"**Client:** {st.session_state['client_name']} | "
-        f"**Project:** {st.session_state['project_name']} | "
-        f"**ID:** {st.session_state['project_id']}"
-    )
-
-# --- Layout with logo ---
+# --- Layout with logo and client/project info ---
 col1, col2 = st.columns([6, 1])  # 6:1 ratio for left vs right
 
 with col1:
+    # Display active Client/Project
+    if "project_id" in st.session_state:
+        with st.expander("📁 Active Project", expanded=True):
+            st.markdown(
+                f"**Client:** {st.session_state['client_name']}  \n"
+                f"**Project:** {st.session_state['project_name']}  \n"
+                f"**Project ID:** {st.session_state['project_id']}"
+            )
+
     st.title("💡 ITRM Unified Platform")
     st.markdown("""
     Welcome to the **IT Revenue Management (ITRM)** platform.
