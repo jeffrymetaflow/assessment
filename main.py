@@ -15,6 +15,29 @@ st.set_page_config(
 from utils.bootstrap import page_bootstrap
 page_bootstrap(current_page="Main")
 
+import uuid
+
+# --- Check if project metadata exists ---
+if "project_id" not in st.session_state:
+    with st.form("new_project_form", clear_on_submit=True):
+        st.subheader("🛠️ Start a New Client Assessment")
+        client_name = st.text_input("Client Name")
+        project_name = st.text_input("Project/Assessment Name")
+        submitted = st.form_submit_button("Start Assessment")
+
+        if submitted:
+            if client_name and project_name:
+                st.session_state["client_name"] = client_name
+                st.session_state["project_name"] = project_name
+                st.session_state["project_id"] = str(uuid.uuid4())
+                st.success(f"Started project: {client_name} - {project_name}")
+                st.experimental_rerun()
+            else:
+                st.error("Please enter both Client and Project names.")
+else:
+    st.markdown(f"**Client:** {st.session_state['client_name']}  |  **Project:** {st.session_state['project_name']}  |  **Project ID:** {st.session_state['project_id']}")
+
+
 # --- Layout with logo ---
 col1, col2 = st.columns([6, 1])  # 6:1 ratio for left vs right
 
