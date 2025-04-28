@@ -49,6 +49,19 @@ def dynamic_generate_modernization_suggestion(category, spend, renewal_date, ris
 
     return suggestion
 
+# --- Spend Savings Estimation Function ---
+def generate_spend_saving_estimate(category, spend, modernization_action):
+    if "cloud" in modernization_action.lower():
+        savings = spend * 0.25
+        return f"Estimated Savings: ~${int(savings):,} over 3 years"
+    if "saas" in modernization_action.lower():
+        savings = spend * 0.15
+        return f"Estimated Operational Savings: ~${int(savings):,}"
+    if "sd-wan" in modernization_action.lower():
+        savings = spend * 0.10
+        return f"Network Optimization Savings: ~${int(savings):,}"
+    return "Savings Estimate: N/A"
+
 # --- PDF Generation Function with Timeline Staging ---
 def generate_roadmap_pdf():
     pdf = FPDF()
@@ -99,7 +112,9 @@ def generate_roadmap_pdf():
                 pdf.ln()
 
                 modernization = dynamic_generate_modernization_suggestion(category, spend_val, renewal, risk_score)
+                savings = generate_spend_saving_estimate(category, spend_val, modernization)
                 pdf.cell(0, 10, f"   -> Modernization Suggestion: {modernization}", ln=True)
+                pdf.cell(0, 10, f"   -> {savings}", ln=True)
                 pdf.ln(2)
     else:
         pdf.cell(0, 10, "No components found.", ln=True)
