@@ -195,7 +195,7 @@ if user_input:
     if not found:
         st.error("Component not found. Please try again.")
 
-# --- PDF Export with Executive Summary ---
+# --- PDF Export with Executive Summary and Detailed Roadmap ---
 def generate_roadmap_pdf():
     components = st.session_state.controller.get_components()
     total_spend, total_cloud_spend, category_counts, top_risks = generate_executive_summary(components)
@@ -224,6 +224,34 @@ def generate_roadmap_pdf():
     pdf.set_font("Arial", size=12)
     for name, cat, spend, risk in top_risks:
         pdf.cell(0, 8, f"- {name} ({cat}) | Spend: ${spend:,} | Risk Score: {risk}", ln=True)
+
+    # --- Add Detailed Roadmap Section ---
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, "ITRM Modernization Detailed Roadmap", ln=True, align="C")
+    pdf.ln(10)
+
+    pdf.set_font("Arial", size=12)
+    for comp in components:
+        name = comp.get("Name", "Unnamed")
+        category = comp.get("Category", "Other")
+        spend_val = comp.get("Spend", 0)
+        renewal = comp.get("Renewal Date", "TBD")
+        risk_score = comp.get("Risk Score", 5)
+
+        modernization = dynamic_generate_modernization_suggestion(category, spend_val, renewal, risk_score)
+        savings = generate_spend_saving_estimate(category, spend_val, modernization)
+
+        pdf.set_font("Arial", "B", 14)
+        pdf.cell(0, 8, f"Component: {name}", ln=True)
+        pdf.set_font("Arial", size=12)
+        pdf.cell(0, 8, f"Category: {category}", ln=True)
+        pdf.cell(0, 8, f"Spend: ${spend_val:,}", ln=True)
+        pdf.cell(0, 8, f"Renewal Date: {renewal}", ln=True)
+        pdf.cell(0, 8, f"Risk Score: {risk_score}/10", ln=True)
+        pdf.multi_cell(0, 8, f"Modernization Suggestion: {modernization}")
+        pdf.cell(0, 8, savings, ln=True)
+        pdf.ln(5)
 
     output_dir = "generated_pdfs"
     if not os.path.exists(output_dir):
