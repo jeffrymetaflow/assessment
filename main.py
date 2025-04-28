@@ -53,7 +53,6 @@ def generate_roadmap_pdf():
     pdf = FPDF()
     pdf.add_page()
 
-    # Add logo if exists
     logo_path = "assets/logo.png"
     if os.path.exists(logo_path):
         pdf.image(logo_path, x=160, y=10, w=40)
@@ -68,7 +67,6 @@ def generate_roadmap_pdf():
     pdf.cell(0, 10, f"Project ID: {st.session_state.get('project_id', '')}", ln=True)
     pdf.ln(10)
 
-    # Architecture Components Section
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(0, 10, "Architecture Components:", ln=True)
     pdf.set_font("Arial", size=12)
@@ -82,7 +80,6 @@ def generate_roadmap_pdf():
 
     pdf.ln(10)
 
-    # Risk Summary + Recommendations Section
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(0, 10, "Risk Summary + Recommendations:", ln=True)
     pdf.set_font("Arial", size=12)
@@ -108,7 +105,7 @@ def generate_roadmap_pdf():
 # --- Sidebar Save/Load Controls ---
 with st.sidebar:
     st.subheader("💾 Project Management")
-    
+
     if "project_id" in st.session_state:
         if st.button("Save Current Project"):
             save_project()
@@ -175,23 +172,6 @@ else:
         st.markdown("""
         Welcome to the **IT Revenue Management (ITRM)** platform.
 
-# --- Add New Component Form ---
-st.subheader("➕ Add New Architecture Component")
-
-with st.form("add_component_form", clear_on_submit=True):
-    new_component = st.text_input("Component Name")
-    submitted = st.form_submit_button("Add Component")
-
-    if submitted:
-        if new_component:
-            # Append the new component to the controller
-            components = st.session_state.controller.get_components()
-            components.append(new_component)
-            st.session_state.controller.set_components(components)
-            st.success(f"Added component: {new_component}")
-        else:
-            st.error("Please enter a component name.")
-
         Use the sidebar to access modules like:
         - 🧩 Component Mapping
         - 🗺️ Architecture Visualization
@@ -200,6 +180,22 @@ with st.form("add_component_form", clear_on_submit=True):
 
         This tool helps IT leaders align architecture to financial and strategic impact — all in one place.
         """)
+
+        # --- Add New Component Form ---
+        st.subheader("➕ Add New Architecture Component")
+
+        with st.form("add_component_form", clear_on_submit=True):
+            new_component = st.text_input("Component Name")
+            submitted = st.form_submit_button("Add Component")
+
+            if submitted:
+                if new_component:
+                    components = st.session_state.controller.get_components()
+                    components.append(new_component)
+                    st.session_state.controller.set_components(components)
+                    st.success(f"Added component: {new_component}")
+                else:
+                    st.error("Please enter a component name.")
 
         if st.button("📄 Generate Modernization Roadmap PDF"):
             pdf_path = generate_roadmap_pdf()
@@ -213,8 +209,6 @@ with st.form("add_component_form", clear_on_submit=True):
 
     with col2:
         st.image("Market image.png", width=200)
-
-
 
 
 
