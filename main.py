@@ -19,6 +19,16 @@ st.set_page_config(
 from utils.bootstrap import page_bootstrap
 page_bootstrap(current_page="Main")
 
+# --- Vendor Mapping Template ---
+vendor_mapping = {
+    "Hardware": ["Dell", "HPE", "Lenovo"],
+    "Software": ["Microsoft", "Oracle", "SAP"],
+    "Security": ["Palo Alto Networks", "Fortinet", "CrowdStrike"],
+    "Networking": ["Cisco", "Juniper", "Arista"],
+    "Cloud": ["AWS", "Azure", "Google Cloud"],
+    "Storage": ["Pure Storage", "NetApp", "Dell EMC"]
+}
+
 # --- Project Save/Load Functions ---
 def save_project():
     if not os.path.exists("projects"):
@@ -74,10 +84,11 @@ def generate_roadmap_pdf():
     components = st.session_state.controller.get_components()
     if components:
         pdf.set_fill_color(200, 220, 255)
-        pdf.cell(50, 10, "Name", border=1, fill=True)
-        pdf.cell(40, 10, "Category", border=1, fill=True)
-        pdf.cell(40, 10, "Spend", border=1, fill=True)
+        pdf.cell(40, 10, "Name", border=1, fill=True)
+        pdf.cell(30, 10, "Category", border=1, fill=True)
+        pdf.cell(30, 10, "Spend", border=1, fill=True)
         pdf.cell(40, 10, "Renewal Date", border=1, fill=True)
+        pdf.cell(50, 10, "Suggested Vendors", border=1, fill=True)
         pdf.ln()
 
         for comp in components:
@@ -86,10 +97,12 @@ def generate_roadmap_pdf():
                 category = comp.get('Category', 'N/A')
                 spend = f"${comp.get('Spend', 0):,}"
                 renewal = comp.get('Renewal Date', 'TBD')
-                pdf.cell(50, 10, name, border=1)
-                pdf.cell(40, 10, category, border=1)
-                pdf.cell(40, 10, spend, border=1)
+                suggested_vendors = ", ".join(vendor_mapping.get(category, ["TBD"]))
+                pdf.cell(40, 10, name, border=1)
+                pdf.cell(30, 10, category, border=1)
+                pdf.cell(30, 10, spend, border=1)
                 pdf.cell(40, 10, renewal, border=1)
+                pdf.cell(50, 10, suggested_vendors, border=1)
                 pdf.ln()
     else:
         pdf.cell(0, 10, "No components found.", ln=True)
@@ -106,7 +119,6 @@ def generate_roadmap_pdf():
         {"Risk": "No DR Plan", "Recommendation": "Design and implement DR/BC solution with cloud failover", "Severity": 4, "Spend Impact": 75000},
     ]
 
-    # Sort risks by (Severity * Spend Impact) descending
     risk_items.sort(key=lambda x: x.get("Severity", 0) * x.get("Spend Impact", 0), reverse=True)
 
     priority_number = 1
