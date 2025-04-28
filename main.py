@@ -175,6 +175,25 @@ else:
         st.markdown("""
         Welcome to the **IT Revenue Management (ITRM)** platform.
 
+    # --- Add New Component Form ---
+    st.subheader("➕ Add New Architecture Component")
+    
+    with st.form("add_component_form", clear_on_submit=True):
+        new_component = st.text_input("Component Name")
+        
+        submitted = st.form_submit_button("Add Component")
+
+    if submitted:
+        if new_component:
+            # Append the new component to the controller
+            components = st.session_state.controller.get_components()
+            components.append(new_component)
+            st.session_state.controller.set_components(components)
+            st.success(f"Added component: {new_component}")
+        else:
+            st.error("Please enter a component name.")
+
+
         Use the sidebar to access modules like:
         - 🧩 Component Mapping
         - 🗺️ Architecture Visualization
