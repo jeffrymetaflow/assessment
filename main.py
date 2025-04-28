@@ -18,23 +18,6 @@ st.set_page_config(
 from utils.bootstrap import page_bootstrap
 page_bootstrap(current_page="Main")
 
-# --- Client/Project Setup ---
-if "project_id" not in st.session_state:
-    with st.form("new_project_form", clear_on_submit=True):
-        st.subheader("🛠️ Start a New Client Assessment")
-        client_name = st.text_input("Client Name")
-        project_name = st.text_input("Project/Assessment Name")
-        submitted = st.form_submit_button("Start Assessment")
-
-        if submitted:
-            if client_name and project_name:
-                st.session_state["client_name"] = client_name
-                st.session_state["project_name"] = project_name
-                st.session_state["project_id"] = str(uuid.uuid4())
-                st.success(f"Started project: {client_name} - {project_name}")
-            else:
-                st.error("Please enter both Client and Project names.")
-
 # --- Project Save/Load Functions ---
 def save_project():
     if not os.path.exists("projects"):
@@ -79,12 +62,51 @@ with st.sidebar:
             if st.button("Load Selected Project"):
                 load_project(selected_file)
 
-# --- Layout with logo and client/project info ---
-col1, col2 = st.columns([6, 1])
+# --- Landing Page: New or Existing Project ---
+if "project_id" not in st.session_state:
+    st.title("🚀 Welcome to the ITRM Platform")
+    st.subheader("Start a New Assessment or Load an Existing One")
 
-with col1:
-    # Display active Client/Project
-    if "project_id" in st.session_state:
+    option = st.radio(
+        "Choose an option:",
+        ("➕ Start New Client Assessment", "📂 Open Existing Project"),
+        horizontal=True
+    )
+
+    if option == "➕ Start New Client Assessment":
+        with st.form("new_project_form", clear_on_submit=True):
+            client_name = st.text_input("Client Name")
+            project_name = st.text_input("Project/Assessment Name")
+            submitted = st.form_submit_button("Start New Project")
+
+            if submitted:
+                if client_name and project_name:
+                    st.session_state["client_name"] = client_name
+                    st.session_state["project_name"] = project_name
+                    st.session_state["project_id"] = str(uuid.uuid4())
+                    st.success(f"Started project: {client_name} - {project_name}")
+                    st.experimental_rerun()
+                else:
+                    st.error("Please enter both Client and Project names.")
+
+    elif option == "📂 Open Existing Project":
+        if os.path.exists("projects"):
+            project_files = os.listdir("projects")
+            if project_files:
+                selected_file = st.selectbox("Select a saved project to load", project_files)
+                if st.button("Load Selected Project"):
+                    load_project(selected_file)
+                    st.experimental_rerun()
+            else:
+                st.warning("No saved projects found. Please create a new assessment first.")
+        else:
+            st.warning("Project folder does not exist yet.")
+else:
+    # --- Normal App Flow (Project Active) ---
+    col1, col2 = st.columns([6, 1])
+
+    with col1:
+        # Display active Client/Project
         with st.expander("📁 Active Project", expanded=True):
             st.markdown(
                 f"**Client:** {st.session_state['client_name']}  \n"
@@ -92,20 +114,20 @@ with col1:
                 f"**Project ID:** {st.session_state['project_id']}"
             )
 
-    st.title("💡 ITRM Unified Platform")
-    st.markdown("""
-    Welcome to the **IT Revenue Management (ITRM)** platform.
+        st.title("💡 ITRM Unified Platform")
+        st.markdown("""
+        Welcome to the **IT Revenue Management (ITRM)** platform.
 
-    Use the sidebar to access modules like:
-    - 🧩 Component Mapping
-    - 🗺️ Architecture Visualization
-    - 📊 Forecast & Risk Simulation
-    - 🤖 AI Strategy Assistant
+        Use the sidebar to access modules like:
+        - 🧩 Component Mapping
+        - 🗺️ Architecture Visualization
+        - 📊 Forecast & Risk Simulation
+        - 🤖 AI Strategy Assistant
 
-    This tool helps IT leaders align architecture to financial and strategic impact — all in one place.
-    """)
+        This tool helps IT leaders align architecture to financial and strategic impact — all in one place.
+        """)
 
-with col2:
-    st.image("Market image.png", width=200)
+    with col2:
+        st.image("Market image.png", width=200)
 
 
