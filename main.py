@@ -74,6 +74,17 @@ def simulate_external_pricing_lookup(category):
     }
     return market_pricing.get(category, 100000)
 
+# --- Simulated AWS Service Pricing Lookup ---
+def simulate_aws_service_pricing(service_name):
+    service_pricing = {
+        "EC2": 100,
+        "S3": 20,
+        "RDS": 50,
+        "ECS": 30,
+        "EFS": 25
+    }
+    return service_pricing.get(service_name, 75)
+
 # --- Simulated AWS Cloud Pricing Lookup ---
 def simulate_aws_cloud_pricing(category, spend):
     discount_mapping = {
@@ -137,6 +148,10 @@ if components:
             cloud_savings = spend_val - aws_cloud_cost
             st.write(f"**AWS Cloud Alternative:** ~${aws_cloud_cost:,}")
             st.write(f"**Potential Cloud Migration Savings:** ~${cloud_savings:,}")
+
+            if category in ["Hardware", "Storage", "Cloud"]:
+                service_pricing = simulate_aws_service_pricing("EC2" if category == "Hardware" else "S3")
+                st.write(f"**Simulated AWS Service Pricing:** ~${service_pricing}/month")
 
             if st.button(f"Ask AI Why ({comp.get('Name', 'Component')})"):
                 reasoning = assist_modernization_reasoning(
