@@ -91,8 +91,8 @@ def generate_roadmap_pdf():
     ]
 
     for item in risk_items:
-        pdf.cell(0, 10, f" Risk: {item['Risk']}", ln=True)
-        pdf.cell(0, 10, f" Action: {item['Recommendation']}", ln=True)
+        pdf.cell(0, 10, f"Risk: {item['Risk']}", ln=True)
+        pdf.cell(0, 10, f"Action: {item['Recommendation']}", ln=True)
         pdf.ln(5)
 
     if not os.path.exists("exports"):
@@ -209,4 +209,5 @@ else:
 
     with col2:
         st.image("Market image.png", width=200)
+
 
