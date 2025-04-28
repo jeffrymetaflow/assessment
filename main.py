@@ -119,7 +119,7 @@ def generate_roadmap_pdf():
 
                 # Add AI Modernization Suggestion
                 modernization = generate_modernization_suggestion(category)
-                pdf.cell(0, 10, f"   ➔ Modernization Suggestion: {modernization}", ln=True)
+                pdf.cell(0, 10, f"   -> Modernization Suggestion: {modernization}", ln=True)
                 pdf.ln(2)
     else:
         pdf.cell(0, 10, "No components found.", ln=True)
@@ -152,7 +152,6 @@ def generate_roadmap_pdf():
     pdf.output(filepath)
 
     return filepath
-
 
 # --- Sidebar Save/Load Controls ---
 with st.sidebar:
