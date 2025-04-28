@@ -48,7 +48,7 @@ def load_project(project_file):
     else:
         st.error("Selected project file not found.")
 
-# --- PDF Generation Function with Optional Logo ---
+# --- PDF Generation Function with Optional Logo and Risk Table ---
 def generate_roadmap_pdf():
     pdf = FPDF()
     pdf.add_page()
@@ -68,6 +68,7 @@ def generate_roadmap_pdf():
     pdf.cell(0, 10, f"Project ID: {st.session_state.get('project_id', '')}", ln=True)
     pdf.ln(10)
 
+    # Architecture Components Section
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(0, 10, "Architecture Components:", ln=True)
     pdf.set_font("Arial", size=12)
@@ -79,7 +80,24 @@ def generate_roadmap_pdf():
     else:
         pdf.cell(0, 10, "No components found.", ln=True)
 
-    # Save the file temporarily
+    pdf.ln(10)
+
+    # Risk Summary + Recommendations Section
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, "Risk Summary + Recommendations:", ln=True)
+    pdf.set_font("Arial", size=12)
+
+    risk_items = [
+        {"Risk": "Aging Server Infrastructure", "Recommendation": "Consider cloud migration for elasticity"},
+        {"Risk": "Legacy Firewall Rules", "Recommendation": "Conduct firewall policy modernization review"},
+        {"Risk": "No DR Plan", "Recommendation": "Design and implement DR/BC solution with cloud failover"},
+    ]
+
+    for item in risk_items:
+        pdf.cell(0, 10, f"⚠️ Risk: {item['Risk']}", ln=True)
+        pdf.cell(0, 10, f"✅ Action: {item['Recommendation']}", ln=True)
+        pdf.ln(5)
+
     if not os.path.exists("exports"):
         os.makedirs("exports")
     filepath = f"exports/{st.session_state['project_id']}_roadmap.pdf"
@@ -146,7 +164,6 @@ else:
     col1, col2 = st.columns([6, 1])
 
     with col1:
-        # Display active Client/Project
         with st.expander("📁 Active Project", expanded=True):
             st.markdown(
                 f"**Client:** {st.session_state['client_name']}  \n"
@@ -167,7 +184,6 @@ else:
         This tool helps IT leaders align architecture to financial and strategic impact — all in one place.
         """)
 
-        # Generate Roadmap PDF Button
         if st.button("📄 Generate Modernization Roadmap PDF"):
             pdf_path = generate_roadmap_pdf()
             with open(pdf_path, "rb") as pdf_file:
@@ -180,6 +196,7 @@ else:
 
     with col2:
         st.image("Market image.png", width=200)
+
 
 
 
