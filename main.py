@@ -76,8 +76,8 @@ def generate_roadmap_pdf():
         pdf.set_fill_color(200, 220, 255)
         pdf.cell(50, 10, "Name", border=1, fill=True)
         pdf.cell(40, 10, "Category", border=1, fill=True)
-        pdf.cell(50, 10, "Spend", border=1, fill=True)
-        pdf.cell(50, 10, "Renewal Date", border=1, fill=True)
+        pdf.cell(40, 10, "Spend", border=1, fill=True)
+        pdf.cell(40, 10, "Renewal Date", border=1, fill=True)
         pdf.ln()
 
         for comp in components:
@@ -88,8 +88,8 @@ def generate_roadmap_pdf():
                 renewal = comp.get('Renewal Date', 'TBD')
                 pdf.cell(50, 10, name, border=1)
                 pdf.cell(40, 10, category, border=1)
-                pdf.cell(50, 10, spend, border=1)
-                pdf.cell(50, 10, renewal, border=1)
+                pdf.cell(40, 10, spend, border=1)
+                pdf.cell(40, 10, renewal, border=1)
                 pdf.ln()
     else:
         pdf.cell(0, 10, "No components found.", ln=True)
@@ -101,15 +101,19 @@ def generate_roadmap_pdf():
     pdf.set_font("Helvetica", size=12)
 
     risk_items = [
-        {"Risk": "Aging Server Infrastructure", "Recommendation": "Consider cloud migration for elasticity"},
-        {"Risk": "Legacy Firewall Rules", "Recommendation": "Conduct firewall policy modernization review"},
-        {"Risk": "No DR Plan", "Recommendation": "Design and implement DR/BC solution with cloud failover"},
+        {"Risk": "Aging Server Infrastructure", "Recommendation": "Consider cloud migration for elasticity", "Severity": 5, "Spend Impact": 100000},
+        {"Risk": "Legacy Firewall Rules", "Recommendation": "Conduct firewall policy modernization review", "Severity": 3, "Spend Impact": 50000},
+        {"Risk": "No DR Plan", "Recommendation": "Design and implement DR/BC solution with cloud failover", "Severity": 4, "Spend Impact": 75000},
     ]
+
+    # Sort risks by (Severity * Spend Impact) descending
+    risk_items.sort(key=lambda x: x.get("Severity", 0) * x.get("Spend Impact", 0), reverse=True)
 
     priority_number = 1
     for item in risk_items:
         pdf.cell(0, 10, f"{priority_number}. Risk: {item['Risk']}", ln=True)
         pdf.cell(0, 10, f"   Action: {item['Recommendation']}", ln=True)
+        pdf.cell(0, 10, f"   Severity: {item['Severity']} | Spend Impact: ${item['Spend Impact']:,}", ln=True)
         pdf.ln(5)
         priority_number += 1
 
