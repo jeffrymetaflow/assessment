@@ -207,6 +207,22 @@ with st.expander("💵 Project Revenue", expanded=True):
 st.header("📥 Upload Architecture Document")
 uploaded_file = st.file_uploader("Upload Visio (.vsdx), PDF, CSV, or JSON", type=["vsdx", "pdf", "csv", "json"])
 
+# --- CSV Upload Protection ---
+if "csv_loaded" not in st.session_state:
+    st.session_state["csv_loaded"] = False
+
+uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
+if uploaded_file and not st.session_state["csv_loaded"]:
+    if st.button("📥 Load CSV into Project"):
+        df = pd.read_csv(uploaded_file)
+        st.session_state.controller.set_components(df.to_dict(orient="records"))
+        st.session_state["csv_loaded"] = True
+        st.success("✅ Components loaded successfully.")
+
+if st.button("Start New Project"):
+    st.session_state.controller.clear_components()
+    st.session_state["csv_loaded"] = False
+
 # Dynamic CSV Template Generator
 template_df = pd.DataFrame({
     "Name": ["Example Component"],
