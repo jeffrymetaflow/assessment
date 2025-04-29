@@ -362,8 +362,8 @@ if st.session_state.controller.get_components():
 
                     with st.expander(f"{name} | Risk Score: {risk_score}"):
                         # Add your code here for displaying the component's details
-            else:
-                st.info("✅ No contracts expiring soon.") 
+                    else:
+                        st.info("✅ No contracts expiring soon.") 
 
         with tab2:
             if not high_risk.empty:
