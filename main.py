@@ -234,13 +234,19 @@ if uploaded_file:
     st.success(f"Uploaded: {uploaded_file.name}")
     file_extension = uploaded_file.name.split(".")[-1]
 
+def safe_int(val, default=0):
+    try:
+        return int(float(val))
+    except (ValueError, TypeError):
+        return default
+    
     if file_extension == "csv":
         df = pd.read_csv(uploaded_file)
         for _, row in df.iterrows():
             comp = {
                 "Name": row.get("Name", "Unnamed Component"),
                 "Category": row.get("Category", "Unknown"),
-                "Spend": int(row.get("Spend", 0)),
+                "Spend": safe_int(row.get("Spend", 0)),
                 "Renewal Date": row.get("Renewal Date", "TBD"),
                 "Risk Score": int(row.get("Risk Score", 5))
             }
