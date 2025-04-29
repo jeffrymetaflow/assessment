@@ -58,6 +58,99 @@ def dynamic_generate_modernization_suggestion(category, spend, renewal_date, ris
         suggestion = "Review current asset lifecycle and evaluate modernization opportunities based on strategic goals."
     return suggestion
 
+# --- Landing Page: New or Existing Project ---
+if "project_id" not in st.session_state:
+    st.title("🚀 Welcome to the ITRM Platform")
+    st.subheader("Start a New Assessment or Load an Existing One")
+
+    option = st.radio(
+        "Choose an option:",
+        ("➕ Start New Client Assessment", "📂 Open Existing Project"),
+        horizontal=True
+    )
+
+    if option == "➕ Start New Client Assessment":
+        with st.form("new_project_form", clear_on_submit=True):
+            client_name = st.text_input("Client Name")
+            project_name = st.text_input("Project/Assessment Name")
+            submitted = st.form_submit_button("Start New Project")
+
+            if submitted:
+                if client_name and project_name:
+                    st.session_state["client_name"] = client_name
+                    st.session_state["project_name"] = project_name
+                    st.session_state["project_id"] = str(uuid.uuid4())
+                    st.success(f"Started project: {client_name} - {project_name}")
+                    st.stop()
+                else:
+                    st.error("Please enter both Client and Project names.")
+
+    elif option == "📂 Open Existing Project":
+        if os.path.exists("projects"):
+            project_files = os.listdir("projects")
+            if project_files:
+                selected_file = st.selectbox("Select a saved project to load", project_files)
+                if st.button("Load Selected Project"):
+                    load_project(selected_file)
+                    st.stop()
+            else:
+                st.warning("No saved projects found. Please create a new assessment first.")
+        else:
+            st.warning("Project folder does not exist yet.")
+else:
+    # --- Normal App Flow (Project Active) ---
+    col1, col2 = st.columns([6, 1])
+
+    with col1:
+        with st.expander("📁 Active Project", expanded=True):
+            st.markdown(
+                f"**Client:** {st.session_state['client_name']}  \n"
+                f"**Project:** {st.session_state['project_name']}  \n"
+                f"**Project ID:** {st.session_state['project_id']}"
+            )
+
+        st.title("💡 ITRM Unified Platform")
+        st.markdown("""
+        Welcome to the **IT Revenue Management (ITRM)** platform.
+
+        Use the sidebar to access modules like:
+        - 🧩 Component Mapping
+        - 🗺️ Architecture Visualization
+        - 📊 Forecast & Risk Simulation
+        - 🤖 AI Strategy Assistant
+
+        This tool helps IT leaders align architecture to financial and strategic impact — all in one place.
+        """)
+
+        # --- Add New Component Form ---
+        st.subheader("➕ Add New Architecture Component")
+
+        with st.form("add_component_form", clear_on_submit=True):
+            new_component = st.text_input("Component Name")
+            submitted = st.form_submit_button("Add Component")
+
+            if submitted:
+                if new_component:
+                    components = st.session_state.controller.get_components()
+                    components.append(new_component)
+                    st.session_state.controller.set_components(components)
+                    st.success(f"Added component: {new_component}")
+                else:
+                    st.error("Please enter a component name.")
+
+        if st.button("📄 Generate Modernization Roadmap PDF"):
+            pdf_path = generate_roadmap_pdf()
+            with open(pdf_path, "rb") as pdf_file:
+                st.download_button(
+                    label="📥 Download Roadmap PDF",
+                    data=pdf_file,
+                    file_name=os.path.basename(pdf_path),
+                    mime="application/pdf"
+                )
+
+    with col2:
+        st.image("Market image.png", width=200)
+
 # --- Architecture Importer v2 (Visio, PDF, CSV, JSON) ---
 st.header("📥 Upload Architecture Document")
 uploaded_file = st.file_uploader("Upload Visio (.vsdx), PDF, CSV, or JSON", type=["vsdx", "pdf", "csv", "json"])
@@ -566,98 +659,7 @@ with st.sidebar:
             if st.button("Load Selected Project"):
                 load_project(selected_file)
 
-# --- Landing Page: New or Existing Project ---
-if "project_id" not in st.session_state:
-    st.title("🚀 Welcome to the ITRM Platform")
-    st.subheader("Start a New Assessment or Load an Existing One")
 
-    option = st.radio(
-        "Choose an option:",
-        ("➕ Start New Client Assessment", "📂 Open Existing Project"),
-        horizontal=True
-    )
-
-    if option == "➕ Start New Client Assessment":
-        with st.form("new_project_form", clear_on_submit=True):
-            client_name = st.text_input("Client Name")
-            project_name = st.text_input("Project/Assessment Name")
-            submitted = st.form_submit_button("Start New Project")
-
-            if submitted:
-                if client_name and project_name:
-                    st.session_state["client_name"] = client_name
-                    st.session_state["project_name"] = project_name
-                    st.session_state["project_id"] = str(uuid.uuid4())
-                    st.success(f"Started project: {client_name} - {project_name}")
-                    st.stop()
-                else:
-                    st.error("Please enter both Client and Project names.")
-
-    elif option == "📂 Open Existing Project":
-        if os.path.exists("projects"):
-            project_files = os.listdir("projects")
-            if project_files:
-                selected_file = st.selectbox("Select a saved project to load", project_files)
-                if st.button("Load Selected Project"):
-                    load_project(selected_file)
-                    st.stop()
-            else:
-                st.warning("No saved projects found. Please create a new assessment first.")
-        else:
-            st.warning("Project folder does not exist yet.")
-else:
-    # --- Normal App Flow (Project Active) ---
-    col1, col2 = st.columns([6, 1])
-
-    with col1:
-        with st.expander("📁 Active Project", expanded=True):
-            st.markdown(
-                f"**Client:** {st.session_state['client_name']}  \n"
-                f"**Project:** {st.session_state['project_name']}  \n"
-                f"**Project ID:** {st.session_state['project_id']}"
-            )
-
-        st.title("💡 ITRM Unified Platform")
-        st.markdown("""
-        Welcome to the **IT Revenue Management (ITRM)** platform.
-
-        Use the sidebar to access modules like:
-        - 🧩 Component Mapping
-        - 🗺️ Architecture Visualization
-        - 📊 Forecast & Risk Simulation
-        - 🤖 AI Strategy Assistant
-
-        This tool helps IT leaders align architecture to financial and strategic impact — all in one place.
-        """)
-
-        # --- Add New Component Form ---
-        st.subheader("➕ Add New Architecture Component")
-
-        with st.form("add_component_form", clear_on_submit=True):
-            new_component = st.text_input("Component Name")
-            submitted = st.form_submit_button("Add Component")
-
-            if submitted:
-                if new_component:
-                    components = st.session_state.controller.get_components()
-                    components.append(new_component)
-                    st.session_state.controller.set_components(components)
-                    st.success(f"Added component: {new_component}")
-                else:
-                    st.error("Please enter a component name.")
-
-        if st.button("📄 Generate Modernization Roadmap PDF"):
-            pdf_path = generate_roadmap_pdf()
-            with open(pdf_path, "rb") as pdf_file:
-                st.download_button(
-                    label="📥 Download Roadmap PDF",
-                    data=pdf_file,
-                    file_name=os.path.basename(pdf_path),
-                    mime="application/pdf"
-                )
-
-    with col2:
-        st.image("Market image.png", width=200)
 
 
 
