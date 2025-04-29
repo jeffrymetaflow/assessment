@@ -287,15 +287,7 @@ if st.button("Start New Project"):
     st.session_state["json_loaded"] = False
     st.session_state["pdf_loaded"] = False
     st.session_state["visio_loaded"] = False
-
-# Undo Last Import Option
-if imported_batch:
-    if st.button("↩️ Undo Last Import"):
-        for comp in imported_batch:
-            st.session_state.controller.remove_component_by_name(comp["Name"])
-        imported_batch.clear()
-        st.success("Last imported components removed!")
-            
+          
 # --- AIOps / CMDB Mock Connector ---
 st.header("🔌 Connect to AIOps / CMDB System")
 
