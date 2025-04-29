@@ -296,7 +296,8 @@ if uploaded_visio and not st.session_state["visio_loaded"]:
 
 # --- Reset Project State ---
 if st.button("Start New Project"):
-    st.session_state.controller.clear_components()
+    if "controller" in st.session_state:
+        st.session_state.controller.clear_components()
     st.session_state["csv_loaded"] = False
     st.session_state["json_loaded"] = False
     st.session_state["pdf_loaded"] = False
