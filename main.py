@@ -288,6 +288,18 @@ def generate_roadmap_pdf():
 
     return filename
 
+# --- Streamlit Button to Generate Modernization PDF ---
+if st.button("🚀 Generate Full Modernization Roadmap PDF"):
+    pdf_path = generate_roadmap_pdf()
+    if pdf_path:
+        with open(pdf_path, "rb") as f:
+            st.download_button(
+                label="📥 Download Modernization Roadmap PDF",
+                data=f,
+                file_name="Modernization_Roadmap.pdf",
+                mime="application/pdf"
+            )
+
 # --- PDF Generation Function with Timeline Staging ---
 def generate_roadmap_pdf():
     pdf = FPDF()
@@ -490,17 +502,7 @@ else:
     with col2:
         st.image("Market image.png", width=200)
 
-# --- Streamlit Button to Generate Modernization PDF ---
-if st.button("🚀 Generate Full Modernization Roadmap PDF"):
-    pdf_path = generate_roadmap_pdf()
-    if pdf_path:
-        with open(pdf_path, "rb") as f:
-            st.download_button(
-                label="📥 Download Modernization Roadmap PDF",
-                data=f,
-                file_name="Modernization_Roadmap.pdf",
-                mime="application/pdf"
-            )
+
 
 
 
