@@ -644,15 +644,15 @@ if components:
             with st.expander(f"{comp.get('Name', 'Unnamed Component')}"):
                 # Other code displaying component details...
             
-            if st.button(f"Ask AI Why ({comp.get('Name', 'Component')}) - {i}"):
-                reasoning = assist_modernization_reasoning(
-                    comp.get('Name', 'Unknown'),
-                    comp.get('Category', 'N/A'),
-                    comp.get('Spend', 0),
-                    comp.get('Renewal Date', 'TBD'),
-                    comp.get('Risk Score', 5)
-                )
-                st.success(reasoning)
+                if st.button(f"Ask AI Why ({comp.get('Name', 'Component')}) - {i}"):
+                    reasoning = assist_modernization_reasoning(
+                        comp.get('Name', 'Unknown'),
+                        comp.get('Category', 'N/A'),
+                        comp.get('Spend', 0),
+                        comp.get('Renewal Date', 'TBD'),
+                        comp.get('Risk Score', 5)
+                    )
+                    st.success(reasoning)
 
 # --- Simple Modernization Advisor Chatbot MVP ---
 st.subheader("Modernization Chatbot")
