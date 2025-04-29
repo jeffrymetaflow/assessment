@@ -181,7 +181,7 @@ with st.expander("💵 Project Revenue", expanded=True):
             from bs4 import BeautifulSoup
 
             client_name = st.session_state.get ("client_name", "")
-            if not client name: 
+            if not client_name: 
             st.warning ("Client name is not set. Please enter a client name first.")
             st.stop ()
             
