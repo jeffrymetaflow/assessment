@@ -35,19 +35,6 @@ vendor_mapping = {
     "Compliance": ["OneTrust", "TrustArc", "Drata"]
 }
 
-# --- Vendor Mapping Template ---
-vendor_mapping = {
-    "Hardware": ["Dell", "HPE", "Lenovo"],
-    "Software": ["Microsoft", "Oracle", "SAP"],
-    "Security": ["Palo Alto Networks", "Fortinet", "CrowdStrike"],
-    "Networking": ["Cisco", "Juniper", "Arista"],
-    "Cloud": ["AWS", "Azure", "Google Cloud"],
-    "Storage": ["Pure Storage", "NetApp", "Dell EMC"],
-    "Cybersecurity": ["CrowdStrike", "Palo Alto", "SentinelOne"],
-    "BC/DR": ["Zerto", "Veeam", "AWS DRaaS"],
-    "Compliance": ["OneTrust", "TrustArc", "Drata"]
-}
-
 # --- Dynamic AI Modernization Suggestion Function ---
 def dynamic_generate_modernization_suggestion(category, spend, renewal_date, risk_score):
     suggestion = ""
