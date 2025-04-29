@@ -300,6 +300,51 @@ if 'aiops_components' in st.session_state:
 if st.session_state.controller.get_components():
     revenue_display = st.session_state.get("project_revenue", "Not set")
     st.subheader(f"🚨 AIOps Risk Insights Dashboard  |  💰 Revenue: {revenue_display}")
+
+    # --- Generate KPI PDF ---
+    if st.button("📄 Export Financial KPI Summary PDF"):
+        from fpdf import FPDF
+        import re
+
+        class RoadmapPDF(FPDF):
+            def header(self):
+                self.set_font("Arial", "B", 14)
+                self.cell(0, 10, "ITRM Modernization Roadmap", 0, 1, "C")
+                self.ln(5)
+
+            def section_title(self, title):
+                self.set_font("Arial", "B", 12)
+                self.cell(0, 10, title, 0, 1)
+                self.ln(2)
+
+            def section_body(self, body):
+                self.set_font("Arial", "", 11)
+                self.multi_cell(0, 8, body)
+                self.ln(3)
+
+        # Prepare data
+        components = st.session_state.controller.get_components()
+        total_spend = sum(c.get("Spend", 0) for c in components)
+        match = re.search(r"\$([\d,]+)", revenue_display)
+        revenue_val = int(match.group(1).replace(",", "")) if match else 0
+        itrm_ratio = round((total_spend / revenue_val) * 100, 2) if revenue_val else 0
+
+        # Generate PDF
+        pdf = RoadmapPDF()
+        pdf.add_page()
+        pdf.section_title("Financial Overview")
+        pdf.section_body(f"Total Project Revenue: {revenue_display}")
+        pdf.section_body(f"Total IT Architecture Spend: ${total_spend:,.2f}")
+        pdf.section_body(f"ITRM KPI (Spend / Revenue): {itrm_ratio}%")
+
+        pdf_path = "/mnt/data/ITRM_Mini_KPI_Summary.pdf"
+        pdf.output(pdf_path)
+        st.success("PDF Export Complete! Download below:")
+        st.download_button("📥 Download KPI Summary PDF", data=open(pdf_path, "rb"), file_name="ITRM_KPI_Summary.pdf")
+
+if st.session_state.controller.get_components():
+    revenue_display = st.session_state.get("project_revenue", "Not set")
+    st.subheader(f"🚨 AIOps Risk Insights Dashboard  |  💰 Revenue: {revenue_display}")
     
 if st.session_state.controller.get_components():
     with st.expander("🚨 View AIOps Risk Insights Dashboard", expanded=True):
