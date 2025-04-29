@@ -180,6 +180,11 @@ with st.expander("💵 Project Revenue", expanded=True):
             import requests
             from bs4 import BeautifulSoup
 
+            client name = st.session_state.get ("client_name", "")
+            if not client name: 
+            st.warning ("Client name is not set. Please enter a client name first.")
+            st.stop ()
+            
             query = f"{client_name} annual revenue site:craft.co"
             url = f"https://www.google.com/search?q={query}"
             headers = {"User-Agent": "Mozilla/5.0"}
@@ -197,7 +202,6 @@ with st.expander("💵 Project Revenue", expanded=True):
 
         except Exception as e:
             st.warning(f"Error fetching revenue: {e}")
-
     
 # --- Architecture Importer v2 (Visio, PDF, CSV, JSON) ---
 st.header("📥 Upload Architecture Document")
