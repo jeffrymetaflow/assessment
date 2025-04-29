@@ -507,7 +507,7 @@ if components:
                 comp.get('Renewal Date', 'TBD'),
                 comp.get('Risk Score', 5)
             )
-            st.success(reasoning)
+                    st.success(reasoning)
 
 # --- Simple Modernization Advisor Chatbot MVP ---
 st.subheader("Modernization Chatbot")
