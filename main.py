@@ -22,6 +22,12 @@ st.set_page_config(
 # Inject AI Assistant with full context
 page_bootstrap(current_page="Main")
 
+# --- Display Revenue on Sidebar ---
+with st.sidebar:
+    st.markdown("### 💰 Revenue")
+    revenue_sidebar = st.session_state.get("project_revenue", "Not set")
+    st.info(f"Current Project Revenue: {revenue_sidebar}")
+
 # --- Revenue Input Capture Block ---
 with st.expander("💵 Project Revenue", expanded=True):
     if "project_revenue" not in st.session_state:
@@ -56,6 +62,19 @@ with st.expander("💵 Project Revenue", expanded=True):
             st.warning(f"Error fetching revenue: {e}")
 
     st.session_state["project_revenue"] = revenue_input
+
+# --- Vendor Mapping Template ---
+vendor_mapping = {
+    "Hardware": ["Dell", "HPE", "Lenovo"],
+    "Software": ["Microsoft", "Oracle", "SAP"],
+    "Security": ["Palo Alto Networks", "Fortinet", "CrowdStrike"],
+    "Networking": ["Cisco", "Juniper", "Arista"],
+    "Cloud": ["AWS", "Azure", "Google Cloud"],
+    "Storage": ["Pure Storage", "NetApp", "Dell EMC"],
+    "Cybersecurity": ["CrowdStrike", "Palo Alto", "SentinelOne"],
+    "BC/DR": ["Zerto", "Veeam", "AWS DRaaS"],
+    "Compliance": ["OneTrust", "TrustArc", "Drata"]
+}
 
 # --- Vendor Mapping Template ---
 vendor_mapping = {
