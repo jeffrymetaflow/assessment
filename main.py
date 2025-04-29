@@ -355,9 +355,12 @@ if st.session_state.controller.get_components():
 
         with tab1:
             if not expiring_soon.empty:
-                st.dataframe(expiring_soon[['Name', 'Category', 'Spend', 'Renewal Date', 'Risk Score']])
+                for comp in expiring_soon.to_dict(orient="records"):
+                    with st.expander(f"{comp.get('Name', 'Component')} | Risk Score: {comp.get('Risk Score', 'N/A')}"):
+                        st.markdown(f"**Category:** {comp.get('Category', 'Unknown')}")
+                        st.markdown(f"**Spend:** ${comp.get('Spend', 0):,}")
             else:
-                st.info("✅ No contracts expiring soon.")
+                st.info("✅ No contracts expiring soon.") 
 
         with tab2:
             if not high_risk.empty:
