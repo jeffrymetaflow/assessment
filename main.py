@@ -239,30 +239,37 @@ def safe_int(val, default=0):
         return int(float(val))
     except (ValueError, TypeError):
         return default
-    
-    if file_extension == "csv":
-        df = pd.read_csv(uploaded_file)
-        for _, row in df.iterrows():
-            comp = {
-                "Name": row.get("Name", "Unnamed Component"),
-                "Category": row.get("Category", "Unknown"),
-                "Spend": safe_int(row.get("Spend", 0)),
-                "Renewal Date": row.get("Renewal Date", "TBD"),
-                "Risk Score": int(row.get("Risk Score", 5))
-            }
-            simulated_components.append(comp)
-    else:
-        simulated_components = [
-            {"Name": "Core Router", "Category": "Networking", "Spend": 120000, "Renewal Date": "2025-12-31", "Risk Score": 7},
-            {"Name": "Application Server", "Category": "Hardware", "Spend": 250000, "Renewal Date": "2026-06-30", "Risk Score": 5},
-            {"Name": "Corporate Firewall", "Category": "Security", "Spend": 95000, "Renewal Date": "2025-04-15", "Risk Score": 8}
-        ]
 
+if uploaded_file:  # Ensure file is uploaded
+    st.success(f"Uploaded: {uploaded_file.name}")
+    file_extension = uploaded_file.name.split(".")[-1].lower()  # Get file extension in lowercase
+
+    if file_extension == "csv":
+        try:
+            # Read the CSV file
+            df = pd.read_csv(uploaded_file)
+            for _, row in df.iterrows():
+                comp = {
+                    "Name": row.get("Name", "Unnamed Component"),
+                    "Category": row.get("Category", "Unknown"),
+                    "Spend": safe_int(row.get("Spend", 0)),
+                    "Renewal Date": row.get("Renewal Date", "TBD"),
+                    "Risk Score": safe_int(row.get("Risk Score", 5))
+                }
+                simulated_components.append(comp)
+        except Exception as e:
+            st.error(f"Error processing CSV file: {e}")
+            st.stop()
+    else:
+        st.warning(f"Unsupported file type: {file_extension}")
+
+    # Display parsed components
     if simulated_components:
         st.subheader("🔎 Parsed Components Preview")
         for comp in simulated_components:
-            st.write(f"- {comp['Name']} ({comp['Category']}) | Spend: ${comp['Spend']:,} | Risk: {comp['Risk Score']}")
+            st.write(f"- {comp['Name']} ({comp['Category']}) | Spend: ${comp['Spend']:,} | Risk: {comp['Risk Score']}/10")
 
+        # Button to import components
         if st.button("➕ Import Parsed Components into Architecture"):
             for comp in simulated_components:
                 st.session_state.controller.add_component(comp)
