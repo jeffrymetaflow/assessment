@@ -334,7 +334,15 @@ if st.session_state.controller.get_components():
 
         with tab2:
             if not high_risk.empty:
-                st.dataframe(high_risk[['Name', 'Category', 'Spend', 'Renewal Date', 'Risk Score']])
+                for i, comp in enumerate(high_risk.to_dict(orient='records')):
+                    with st.expander(f"{comp['Name']} | Risk Score: {comp['Risk Score']}"):
+                        st.markdown(f"**Category:** {comp['Category']}")
+                        st.markdown(f"**Spend:** ${comp['Spend']:,}")
+                        st.markdown(f"**Renewal Date:** {comp['Renewal Date'].date() if pd.notnull(comp['Renewal Date']) else 'N/A'}")
+
+                        # Place the button inside the expander
+                        if st.button(f"Ask AI Why ({comp['Name']})", key=f"ai_why_{i}"):
+                            st.info("🧠 AI Reasoning for this component will appear here...")
             else:
                 st.info("✅ No high-risk components identified.")
 
@@ -370,18 +378,10 @@ if st.session_state.controller.get_components():
         st.subheader("📈 Risk Score Comparison Across Components")
         fig, ax = plt.subplots(figsize=(10, 5))
         components_df_sorted = pd.DataFrame(st.session_state.controller.get_components()).sort_values(by="Risk Score", ascending=False)
-        if components_df_sorted.empty:
-            st.warning("No data available to plot the bar chart.")
-        else:
-            # Ensure 'Name' column contains valid strings
-            components_df_sorted['Name'] = components_df_sorted['Name'].fillna("Unnamed Component").astype(str)
-            
-            # Plot the horizontal bar chart
-            fig, ax = plt.subplots(figsize=(10, 5))
-            ax.barh(components_df_sorted['Name'], components_df_sorted['Risk Score'])
-            ax.set_xlabel('Risk Score')
-            ax.set_title('Component Risk Scores After Simulation')
-            st.pyplot(fig)
+        ax.barh(components_df_sorted['Name'], components_df_sorted['Risk Score'])
+        ax.set_xlabel('Risk Score')
+        ax.set_title('Component Risk Scores After Simulation')
+        st.pyplot(fig)
 
 # --- Executive Summary Calculation Function ---
 def generate_executive_summary(components):
