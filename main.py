@@ -171,7 +171,7 @@ with st.expander("💵 Project Revenue", expanded=True):
         revenue_button_label = f"🔍 Try Auto-Fetch for “{st.session_state['client_name']}”"
     else:
         revenue_button_label = "🔍 Try Auto-Fetch (Enter company name first)"
-    st.button(revenue_button_label, key="revenue_fetch_button")
+    fetch_button = st.button(revenue_button_label, key="revenue_fetch_button")
     
     st.caption("Hint: Use a publicly traded company name (e.g., 'Cisco', 'Salesforce') for best results.")
    
