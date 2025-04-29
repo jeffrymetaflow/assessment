@@ -198,8 +198,7 @@ with st.expander("💵 Project Revenue", expanded=True):
         except Exception as e:
             st.warning(f"Error fetching revenue: {e}")
 
-    st.session_state["project_revenue"] = revenue_input
-
+    
 # --- Architecture Importer v2 (Visio, PDF, CSV, JSON) ---
 st.header("📥 Upload Architecture Document")
 uploaded_file = st.file_uploader("Upload Visio (.vsdx), PDF, CSV, or JSON", type=["vsdx", "pdf", "csv", "json"])
