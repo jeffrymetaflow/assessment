@@ -148,25 +148,33 @@ if 'aiops_components' in st.session_state:
         st.success("AIOps components successfully imported into architecture!")
         del st.session_state.aiops_components
 
-# --- AIOps-Specific Risk Insights ---
+# --- Polished AIOps-Specific Risk Insights Dashboard ---
 if st.session_state.controller.get_components():
-    st.header("🚨 AIOps Risk Insights Dashboard")
-    components_df = pd.DataFrame(st.session_state.controller.get_components())
+    with st.expander("🚨 View AIOps Risk Insights Dashboard", expanded=True):
+        components_df = pd.DataFrame(st.session_state.controller.get_components())
 
-    expiring_soon = components_df[components_df['Renewal Date'] <= '2026-06-30']
-    high_risk = components_df[components_df['Risk Score'] >= 7]
+        expiring_soon = components_df[pd.to_datetime(components_df['Renewal Date'], errors='coerce') <= pd.to_datetime('2026-06-30')]
+        high_risk = components_df[components_df['Risk Score'] >= 7]
 
-    st.metric("Total Components", len(components_df))
-    st.metric("Contracts Expiring by Mid-2026", len(expiring_soon))
-    st.metric("High Risk Components", len(high_risk))
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Total Components", len(components_df))
+        col2.metric("Contracts Expiring by Mid-2026", len(expiring_soon))
+        col3.metric("High Risk Components", len(high_risk))
 
-    if not expiring_soon.empty:
-        st.subheader("🛑 Contracts Expiring Soon")
-        st.dataframe(expiring_soon[['Name', 'Category', 'Spend', 'Renewal Date', 'Risk Score']])
+        st.markdown("---")
+        tab1, tab2 = st.tabs(["🛑 Expiring Contracts", "🔥 High Risk Components"])
 
-    if not high_risk.empty:
-        st.subheader("🔥 High Risk Components")
-        st.dataframe(high_risk[['Name', 'Category', 'Spend', 'Renewal Date', 'Risk Score']])
+        with tab1:
+            if not expiring_soon.empty:
+                st.dataframe(expiring_soon[['Name', 'Category', 'Spend', 'Renewal Date', 'Risk Score']])
+            else:
+                st.info("✅ No contracts expiring soon.")
+
+        with tab2:
+            if not high_risk.empty:
+                st.dataframe(high_risk[['Name', 'Category', 'Spend', 'Renewal Date', 'Risk Score']])
+            else:
+                st.info("✅ No high-risk components identified.")
 
 # --- Executive Summary Calculation Function ---
 def generate_executive_summary(components):
