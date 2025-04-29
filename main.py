@@ -125,16 +125,15 @@ if imported_batch:
         imported_batch.clear()
         st.success("Last imported components removed!")
             
+# --- AIOps / CMDB Mock Connector ---
 st.header("🔌 Connect to AIOps / CMDB System")
 
 if st.button("🌐 Fetch Architecture from AIOps API"):
-    # Simulated API response
     simulated_api_response = [
         {"Name": "Web Load Balancer", "Category": "Networking", "Spend": 80000, "Renewal Date": "2025-11-01", "Risk Score": 6},
         {"Name": "Customer Database", "Category": "Storage", "Spend": 200000, "Renewal Date": "2026-03-15", "Risk Score": 8},
         {"Name": "Authentication Server", "Category": "Security", "Spend": 70000, "Renewal Date": "2025-08-30", "Risk Score": 7}
     ]
-    
     st.session_state.aiops_components = simulated_api_response
     st.success("Successfully fetched architecture components from AIOps!")
 
@@ -149,6 +148,25 @@ if 'aiops_components' in st.session_state:
         st.success("AIOps components successfully imported into architecture!")
         del st.session_state.aiops_components
 
+# --- AIOps-Specific Risk Insights ---
+if st.session_state.controller.get_components():
+    st.header("🚨 AIOps Risk Insights Dashboard")
+    components_df = pd.DataFrame(st.session_state.controller.get_components())
+
+    expiring_soon = components_df[components_df['Renewal Date'] <= '2026-06-30']
+    high_risk = components_df[components_df['Risk Score'] >= 7]
+
+    st.metric("Total Components", len(components_df))
+    st.metric("Contracts Expiring by Mid-2026", len(expiring_soon))
+    st.metric("High Risk Components", len(high_risk))
+
+    if not expiring_soon.empty:
+        st.subheader("🛑 Contracts Expiring Soon")
+        st.dataframe(expiring_soon[['Name', 'Category', 'Spend', 'Renewal Date', 'Risk Score']])
+
+    if not high_risk.empty:
+        st.subheader("🔥 High Risk Components")
+        st.dataframe(high_risk[['Name', 'Category', 'Spend', 'Renewal Date', 'Risk Score']])
 
 # --- Executive Summary Calculation Function ---
 def generate_executive_summary(components):
