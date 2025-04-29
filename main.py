@@ -495,20 +495,19 @@ if components:
                 service_pricing = simulate_aws_service_pricing("EC2" if category == "Hardware" else "S3")
                 st.write(f"**Simulated AWS Service Pricing:** ~${service_pricing}/month")
 
-        for i, comp in enumerate(components):  # Add an index to ensure unique button labels
+        for i, comp in enumerate(components):  # Add an index for uniqueness
             with st.expander(f"{comp.get('Name', 'Unnamed Component')}"):
-                # Other code displaying component details...
-            
-                unique_button_label = f"Ask AI Why ({comp.get('Name', 'Component')}) - {i}"  # Ensure unique labels
+        # Ensure unique button label using UUID or memory address of the component
+                unique_button_label = f"Ask AI Why ({comp.get('Name', 'Component')}) - {i} - {uuid.uuid4()}"
                 if st.button(unique_button_label):
-                    reasoning = assist_modernization_reasoning(
-                        comp.get('Name', 'Unknown'),
-                        comp.get('Category', 'N/A'),
-                        comp.get('Spend', 0),
-                        comp.get('Renewal Date', 'TBD'),
-                        comp.get('Risk Score', 5)
-                    )
-                    st.success(reasoning)
+            reasoning = assist_modernization_reasoning(
+                comp.get('Name', 'Unknown'),
+                comp.get('Category', 'N/A'),
+                comp.get('Spend', 0),
+                comp.get('Renewal Date', 'TBD'),
+                comp.get('Risk Score', 5)
+            )
+            st.success(reasoning)
 
 # --- Simple Modernization Advisor Chatbot MVP ---
 st.subheader("Modernization Chatbot")
