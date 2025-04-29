@@ -22,47 +22,6 @@ st.set_page_config(
 # Inject AI Assistant with full context
 page_bootstrap(current_page="Main")
 
-# --- Display Revenue on Sidebar ---
-with st.sidebar:
-    st.markdown("### 💰 Revenue")
-    revenue_sidebar = st.session_state.get("project_revenue", "Not set")
-    st.info(f"Current Project Revenue: {revenue_sidebar}")
-
-# --- Revenue Input Capture Block ---
-with st.expander("💵 Project Revenue", expanded=True):
-    if "project_revenue" not in st.session_state:
-        st.session_state["project_revenue"] = ""
-
-    st.markdown("Enter the annual revenue this IT architecture supports. You can type it manually or click auto-fetch:")
-    client_name = st.session_state.get("client_name", "")
-    revenue_input = st.text_input("Annual Revenue (USD)", value=st.session_state["project_revenue"])
-    fetch_button = st.button(f"🔍 Try Auto-Fetch for '{client_name}'")
-
-    if fetch_button:
-        try:
-            import requests
-            from bs4 import BeautifulSoup
-
-            query = f"{client_name} annual revenue site:craft.co"
-            url = f"https://www.google.com/search?q={query}"
-            headers = {"User-Agent": "Mozilla/5.0"}
-            response = requests.get(url, headers=headers)
-            soup = BeautifulSoup(response.text, "html.parser")
-            text = soup.get_text()
-
-            import re
-            match = re.search(r"\$[\d,]+[MBT]?", text)
-            if match:
-                st.session_state["project_revenue"] = match.group(0)
-                st.success(f"Auto-fetched estimated revenue: {match.group(0)}")
-            else:
-                st.warning("Could not extract revenue. Please enter it manually.")
-
-        except Exception as e:
-            st.warning(f"Error fetching revenue: {e}")
-
-    st.session_state["project_revenue"] = revenue_input
-
 # --- Vendor Mapping Template ---
 vendor_mapping = {
     "Hardware": ["Dell", "HPE", "Lenovo"],
@@ -204,6 +163,47 @@ else:
 
     with col2:
         st.image("Market image.png", width=200)
+
+# --- Display Revenue on Sidebar ---
+with st.sidebar:
+    st.markdown("### 💰 Revenue")
+    revenue_sidebar = st.session_state.get("project_revenue", "Not set")
+    st.info(f"Current Project Revenue: {revenue_sidebar}")
+
+# --- Revenue Input Capture Block ---
+with st.expander("💵 Project Revenue", expanded=True):
+    if "project_revenue" not in st.session_state:
+        st.session_state["project_revenue"] = ""
+
+    st.markdown("Enter the annual revenue this IT architecture supports. You can type it manually or click auto-fetch:")
+    client_name = st.session_state.get("client_name", "")
+    revenue_input = st.text_input("Annual Revenue (USD)", value=st.session_state["project_revenue"])
+    fetch_button = st.button(f"🔍 Try Auto-Fetch for '{client_name}'")
+
+    if fetch_button:
+        try:
+            import requests
+            from bs4 import BeautifulSoup
+
+            query = f"{client_name} annual revenue site:craft.co"
+            url = f"https://www.google.com/search?q={query}"
+            headers = {"User-Agent": "Mozilla/5.0"}
+            response = requests.get(url, headers=headers)
+            soup = BeautifulSoup(response.text, "html.parser")
+            text = soup.get_text()
+
+            import re
+            match = re.search(r"\$[\d,]+[MBT]?", text)
+            if match:
+                st.session_state["project_revenue"] = match.group(0)
+                st.success(f"Auto-fetched estimated revenue: {match.group(0)}")
+            else:
+                st.warning("Could not extract revenue. Please enter it manually.")
+
+        except Exception as e:
+            st.warning(f"Error fetching revenue: {e}")
+
+    st.session_state["project_revenue"] = revenue_input
 
 # --- Architecture Importer v2 (Visio, PDF, CSV, JSON) ---
 st.header("📥 Upload Architecture Document")
