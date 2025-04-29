@@ -640,7 +640,11 @@ if components:
                 service_pricing = simulate_aws_service_pricing("EC2" if category == "Hardware" else "S3")
                 st.write(f"**Simulated AWS Service Pricing:** ~${service_pricing}/month")
 
-            if st.button(f"Ask AI Why ({comp.get('Name', 'Component')})"):
+        for i, comp in enumerate(components):  # Add an index to ensure unique button labels
+            with st.expander(f"{comp.get('Name', 'Unnamed Component')}"):
+                # Other code displaying component details...
+            
+            if st.button(f"Ask AI Why ({comp.get('Name', 'Component')})") - {i}"):
                 reasoning = assist_modernization_reasoning(
                     comp.get('Name', 'Unknown'),
                     comp.get('Category', 'N/A'),
