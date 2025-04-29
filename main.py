@@ -162,10 +162,18 @@ with st.expander("💵 Project Revenue", expanded=True):
     if "project_revenue" not in st.session_state:
         st.session_state["project_revenue"] = ""
 
-    st.markdown("Enter the annual revenue this IT architecture supports. You can type it manually or click auto-fetch:")
-    client_name = st.session_state.get("client_name", "")
-    revenue_input = st.text_input("Annual Revenue (USD)", value=st.session_state["project_revenue"])
-    fetch_button = st.button(f"🔍 Try Auto-Fetch for '{client_name}'")
+    st.markdown("## 💵 Project Revenue")
+    st.caption("Enter the annual revenue this IT architecture supports. You can type it manually or click auto-fetch:")
+    
+    st.text_input("Annual Revenue (USD)", key="project_revenue")
+    
+    if st.session_state.get("client_name"):
+        revenue_button_label = f"🔍 Try Auto-Fetch for “{st.session_state['client_name']}”"
+    else:
+        revenue_button_label = "🔍 Try Auto-Fetch (Enter company name first)"
+    st.button(revenue_button_label, key="revenue_fetch_button")
+    
+    st.caption("Hint: Use a publicly traded company name (e.g., 'Cisco', 'Salesforce') for best results.")
    
     if fetch_button:
         try:
