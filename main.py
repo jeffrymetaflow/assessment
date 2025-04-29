@@ -500,7 +500,7 @@ if components:
         # Ensure unique button label using UUID or memory address of the component
                 unique_button_label = f"Ask AI Why ({comp.get('Name', 'Component')}) - {i} - {uuid.uuid4()}"
                 if st.button(unique_button_label):
-            reasoning = assist_modernization_reasoning(
+                    reasoning = assist_modernization_reasoning(
                 comp.get('Name', 'Unknown'),
                 comp.get('Category', 'N/A'),
                 comp.get('Spend', 0),
