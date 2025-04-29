@@ -567,6 +567,13 @@ if user_input:
 def generate_roadmap_pdf():
     import re
 
+    # Optional fallback if bs4 isn't available
+    try:
+        from bs4 import BeautifulSoup
+        bs4_available = True
+    except ImportError:
+        bs4_available = False
+
     pdf = FPDF()
     pdf.add_page()
 
@@ -594,7 +601,7 @@ def generate_roadmap_pdf():
 
     pdf.ln(10)
     pdf.set_font("Helvetica", 'B', 14)
-    pdf.cell(0, 10, "📊 Financial Overview", ln=True)
+    pdf.cell(0, 10, "Financial Overview", ln=True)
     pdf.set_font("Helvetica", size=12)
     pdf.cell(0, 10, f"Total Project Revenue: {revenue_str}", ln=True)
     pdf.cell(0, 10, f"Total IT Architecture Spend: ${total_spend:,.2f}", ln=True)
@@ -672,22 +679,6 @@ def generate_roadmap_pdf():
     pdf.output(filepath)
 
     return filepath
-    
-# --- Sidebar Save/Load Controls ---
-with st.sidebar:
-    st.subheader("💾 Project Management")
-
-    if "project_id" in st.session_state:
-        if st.button("Save Current Project"):
-            save_project()
-
-    if os.path.exists("projects"):
-        project_files = os.listdir("projects")
-        if project_files:
-            selected_file = st.selectbox("Load a Saved Project", project_files)
-            if st.button("Load Selected Project"):
-                load_project(selected_file)
-
 
 
 
