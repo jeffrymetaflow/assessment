@@ -376,14 +376,16 @@ if st.session_state.controller.get_components():
         with tab2:
             if not high_risk.empty:
                 for i, comp in enumerate(high_risk.to_dict(orient='records')):
-                    with st.container(f"{comp['Name']} | Risk Score: {comp['Risk Score']}"):
+                    with st.container():  # Use st.container instead of st.expander
+                        st.markdown(f"### {comp['Name']} | Risk Score: {comp['Risk Score']}")  # Display the title
                         st.markdown(f"**Category:** {comp['Category']}")
                         st.markdown(f"**Spend:** ${comp['Spend']:,}")
                         st.markdown(f"**Renewal Date:** {comp['Renewal Date'].date() if pd.notnull(comp['Renewal Date']) else 'N/A'}")
-
-                        # Place the button inside the expander
+                    
+                        # Add the button inside the container
                         if st.button(f"Ask AI Why ({comp['Name']})", key=f"ai_why_{i}"):
                             st.info("🧠 AI Reasoning for this component will appear here...")
+
             else:
                 st.info("✅ No high-risk components identified.")
 
