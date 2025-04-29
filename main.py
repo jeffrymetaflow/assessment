@@ -55,29 +55,45 @@ def dynamic_generate_modernization_suggestion(category, spend, renewal_date, ris
         suggestion = "Review current asset lifecycle and evaluate modernization opportunities based on strategic goals."
     return suggestion
 
-# --- Architecture Importer v1 (Visio, PDF, CSV, JSON) ---
+# --- Architecture Importer v2 (Visio, PDF, CSV, JSON) ---
 st.header("📥 Upload Architecture Document")
 uploaded_file = st.file_uploader("Upload Visio (.vsdx), PDF, CSV, or JSON", type=["vsdx", "pdf", "csv", "json"])
 
+simulated_components = []
+
 if uploaded_file:
     st.success(f"Uploaded: {uploaded_file.name}")
+    file_extension = uploaded_file.name.split(".")[-1]
 
-    # Fake parse result
-    simulated_components = [
-        {"Name": "Core Router", "Category": "Networking", "Spend": 120000, "Renewal Date": "2025-12-31", "Risk Score": 7},
-        {"Name": "Application Server", "Category": "Hardware", "Spend": 250000, "Renewal Date": "2026-06-30", "Risk Score": 5},
-        {"Name": "Corporate Firewall", "Category": "Security", "Spend": 95000, "Renewal Date": "2025-04-15", "Risk Score": 8}
-    ]
+    if file_extension == "csv":
+        df = pd.read_csv(uploaded_file)
+        for _, row in df.iterrows():
+            comp = {
+                "Name": row.get("Name", "Unnamed Component"),
+                "Category": row.get("Category", "Unknown"),
+                "Spend": int(row.get("Spend", 0)),
+                "Renewal Date": row.get("Renewal Date", "TBD"),
+                "Risk Score": int(row.get("Risk Score", 5))
+            }
+            simulated_components.append(comp)
+    else:
+        # Default simulated parse for non-CSV
+        simulated_components = [
+            {"Name": "Core Router", "Category": "Networking", "Spend": 120000, "Renewal Date": "2025-12-31", "Risk Score": 7},
+            {"Name": "Application Server", "Category": "Hardware", "Spend": 250000, "Renewal Date": "2026-06-30", "Risk Score": 5},
+            {"Name": "Corporate Firewall", "Category": "Security", "Spend": 95000, "Renewal Date": "2025-04-15", "Risk Score": 8}
+        ]
 
-    st.subheader("🔎 Parsed Components Preview")
-    for comp in simulated_components:
-        st.write(f"- {comp['Name']} ({comp['Category']}) | Spend: ${comp['Spend']:,} | Risk: {comp['Risk Score']}")
-
-    if st.button("➕ Import Parsed Components into Architecture"):
+    if simulated_components:
+        st.subheader("🔎 Parsed Components Preview")
         for comp in simulated_components:
-            st.session_state.controller.add_component(comp)
-        st.success("Components successfully imported into current architecture!")
+            st.write(f"- {comp['Name']} ({comp['Category']}) | Spend: ${comp['Spend']:,} | Risk: {comp['Risk Score']}")
 
+        if st.button("➕ Import Parsed Components into Architecture"):
+            for comp in simulated_components:
+                st.session_state.controller.add_component(comp)
+            st.success("Components successfully imported into current architecture!")
+            
 # --- Executive Summary Calculation Function ---
 def generate_executive_summary(components):
     total_spend = 0
