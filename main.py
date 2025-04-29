@@ -644,7 +644,7 @@ if components:
             with st.expander(f"{comp.get('Name', 'Unnamed Component')}"):
                 # Other code displaying component details...
             
-            if st.button(f"Ask AI Why ({comp.get('Name', 'Component')})") - {i}"):
+            if st.button(f"Ask AI Why ({comp.get('Name', 'Component')})" - {i}"):
                 reasoning = assist_modernization_reasoning(
                     comp.get('Name', 'Unknown'),
                     comp.get('Category', 'N/A'),
