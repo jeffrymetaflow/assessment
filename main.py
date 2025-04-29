@@ -298,6 +298,10 @@ if 'aiops_components' in st.session_state:
 
 # --- Polished AIOps-Specific Risk Insights Dashboard ---
 if st.session_state.controller.get_components():
+    revenue_display = st.session_state.get("project_revenue", "Not set")
+    st.subheader(f"🚨 AIOps Risk Insights Dashboard  |  💰 Revenue: {revenue_display}")
+    
+if st.session_state.controller.get_components():
     with st.expander("🚨 View AIOps Risk Insights Dashboard", expanded=True):
         components_df = pd.DataFrame(st.session_state.controller.get_components())
 
