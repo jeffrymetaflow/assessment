@@ -58,7 +58,7 @@ if section == "⚙️ Inputs Setup":
     controller = st.session_state.get("controller", None)
     if controller and hasattr(controller, "components"):
         st.write("📊 Pulled from Component Mapping:")
-        st.dataframe(pd.DataFrame(controller.components))
+        st.dataframe(pd.DataFrame(controller.get_components()))
     if controller and hasattr(controller, "components"):
         df = pd.DataFrame(controller.components)
         default_revenue = st.session_state.get("revenue", 5_000_000)
