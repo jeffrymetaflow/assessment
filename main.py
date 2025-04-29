@@ -561,90 +561,16 @@ if user_input:
     if not found:
         st.error("Component not found. Please try again.")
 
-# --- PDF Export with Executive Summary and Detailed Roadmap ---
+# Updated generate_roadmap_pdf with revenue + KPI injection
+# (Replacing both previous definitions)
+
 def generate_roadmap_pdf():
-    components = st.session_state.controller.get_components()
-    total_spend, total_cloud_spend, category_counts, top_risks = generate_executive_summary(components)
+    import re
 
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", "B", 16)
-    pdf.cell(0, 10, "ITRM Modernization Executive Summary", ln=True, align="C")
-    pdf.ln(10)
 
-    pdf.set_font("Arial", size=12)
-    pdf.cell(0, 10, f"Total Current Spend: ${total_spend:,}", ln=True)
-    pdf.cell(0, 10, f"Total Estimated Cloud Spend: ${total_cloud_spend:,}", ln=True)
-    pdf.cell(0, 10, f"Potential Cloud Migration Savings: ${total_spend - total_cloud_spend:,}", ln=True)
-    pdf.ln(5)
-
-    pdf.set_font("Arial", "B", 14)
-    pdf.cell(0, 10, "Component Category Distribution:", ln=True)
-    pdf.set_font("Arial", size=12)
-    for cat, count in category_counts.items():
-        pdf.cell(0, 8, f"- {cat}: {count} Components", ln=True)
-
-    pdf.ln(5)
-    pdf.set_font("Arial", "B", 14)
-    pdf.cell(0, 10, "Top 5 High-Risk / High-Spend Components:", ln=True)
-    pdf.set_font("Arial", size=12)
-    for name, cat, spend, risk in top_risks:
-        pdf.cell(0, 8, f"- {name} ({cat}) | Spend: ${spend:,} | Risk Score: {risk}", ln=True)
-
-    # --- Add Detailed Roadmap Section ---
-    pdf.add_page()
-    pdf.set_font("Arial", "B", 16)
-    pdf.cell(0, 10, "ITRM Modernization Detailed Roadmap", ln=True, align="C")
-    pdf.ln(10)
-
-    pdf.set_font("Arial", size=12)
-    for comp in components:
-        name = comp.get("Name", "Unnamed")
-        category = comp.get("Category", "Other")
-        spend_val = comp.get("Spend", 0)
-        renewal = comp.get("Renewal Date", "TBD")
-        risk_score = comp.get("Risk Score", 5)
-
-        modernization = dynamic_generate_modernization_suggestion(category, spend_val, renewal, risk_score)
-        savings = generate_spend_saving_estimate(category, spend_val, modernization)
-
-        pdf.set_font("Arial", "B", 14)
-        pdf.cell(0, 8, f"Component: {name}", ln=True)
-        pdf.set_font("Arial", size=12)
-        pdf.cell(0, 8, f"Category: {category}", ln=True)
-        pdf.cell(0, 8, f"Spend: ${spend_val:,}", ln=True)
-        pdf.cell(0, 8, f"Renewal Date: {renewal}", ln=True)
-        pdf.cell(0, 8, f"Risk Score: {risk_score}/10", ln=True)
-        pdf.multi_cell(0, 8, f"Modernization Suggestion: {modernization}")
-        pdf.cell(0, 8, savings, ln=True)
-        pdf.ln(5)
-
-    output_dir = "generated_pdfs"
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    filename = f"{output_dir}/ITRM_Modernization_Roadmap.pdf"
-    pdf.output(filename)
-
-    return filename
-
-# --- Streamlit Button to Generate Modernization PDF ---
-if st.button("🚀 Generate Full Modernization Roadmap PDF"):
-    pdf_path = generate_roadmap_pdf()
-    if pdf_path:
-        with open(pdf_path, "rb") as f:
-            st.download_button(
-                label="📥 Download Modernization Roadmap PDF",
-                data=f,
-                file_name="Modernization_Roadmap.pdf",
-                mime="application/pdf"
-            )
-
-# --- PDF Generation Function with Timeline Staging ---
-def generate_roadmap_pdf():
-    pdf = FPDF()
-    pdf.add_page()
-
+    # --- Header and Meta ---
     logo_path = "assets/logo.png"
     if os.path.exists(logo_path):
         pdf.image(logo_path, x=160, y=10, w=40)
@@ -657,13 +583,28 @@ def generate_roadmap_pdf():
     pdf.cell(0, 10, f"Client: {st.session_state.get('client_name', '')}", ln=True)
     pdf.cell(0, 10, f"Project: {st.session_state.get('project_name', '')}", ln=True)
     pdf.cell(0, 10, f"Project ID: {st.session_state.get('project_id', '')}", ln=True)
-    pdf.ln(10)
 
+    # --- Revenue Section ---
+    revenue_str = st.session_state.get("project_revenue", "$0")
+    match = re.search(r"\$([\d,]+)", revenue_str)
+    revenue_val = int(match.group(1).replace(",", "")) if match else 0
+    components = st.session_state.controller.get_components()
+    total_spend = sum(c.get("Spend", 0) for c in components)
+    itrm_ratio = round((total_spend / revenue_val) * 100, 2) if revenue_val else 0
+
+    pdf.ln(10)
+    pdf.set_font("Helvetica", 'B', 14)
+    pdf.cell(0, 10, "📊 Financial Overview", ln=True)
+    pdf.set_font("Helvetica", size=12)
+    pdf.cell(0, 10, f"Total Project Revenue: {revenue_str}", ln=True)
+    pdf.cell(0, 10, f"Total IT Architecture Spend: ${total_spend:,.2f}", ln=True)
+    pdf.cell(0, 10, f"ITRM KPI (Spend / Revenue): {itrm_ratio}%", ln=True)
+
+    pdf.ln(10)
     pdf.set_font("Helvetica", 'B', 14)
     pdf.cell(0, 10, "Architecture Components:", ln=True)
     pdf.set_font("Helvetica", size=12)
 
-    components = st.session_state.controller.get_components()
     if components:
         pdf.set_fill_color(200, 220, 255)
         pdf.cell(40, 10, "Name", border=1, fill=True)
@@ -698,7 +639,6 @@ def generate_roadmap_pdf():
         pdf.cell(0, 10, "No components found.", ln=True)
 
     pdf.ln(10)
-
     pdf.set_font("Helvetica", 'B', 14)
     pdf.cell(0, 10, "Modernization Timeline:", ln=True)
     pdf.set_font("Helvetica", size=12)
@@ -710,7 +650,6 @@ def generate_roadmap_pdf():
     ]
 
     risk_items.sort(key=lambda x: (x.get("Target Year", 2025), -(x.get("Severity", 0) * x.get("Spend Impact", 0))))
-
     current_year = None
     priority_number = 1
     for item in risk_items:
@@ -733,7 +672,7 @@ def generate_roadmap_pdf():
     pdf.output(filepath)
 
     return filepath
-
+    
 # --- Sidebar Save/Load Controls ---
 with st.sidebar:
     st.subheader("💾 Project Management")
