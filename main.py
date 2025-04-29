@@ -59,7 +59,28 @@ def dynamic_generate_modernization_suggestion(category, spend, renewal_date, ris
 st.header("📥 Upload Architecture Document")
 uploaded_file = st.file_uploader("Upload Visio (.vsdx), PDF, CSV, or JSON", type=["vsdx", "pdf", "csv", "json"])
 
+# Dynamic CSV Template Generator
+template_df = pd.DataFrame({
+    "Name": ["Example Component"],
+    "Category": ["Hardware"],
+    "Spend": [100000],
+    "Renewal Date": ["2026-12-31"],
+    "Risk Score": [5]
+})
+
+template_buffer = BytesIO()
+template_df.to_csv(template_buffer, index=False)
+template_buffer.seek(0)
+
+st.download_button(
+    label="📄 Download CSV Template",
+    data=template_buffer,
+    file_name="architecture_template.csv",
+    mime="text/csv"
+)
+
 simulated_components = []
+imported_batch = []
 
 if uploaded_file:
     st.success(f"Uploaded: {uploaded_file.name}")
@@ -77,7 +98,6 @@ if uploaded_file:
             }
             simulated_components.append(comp)
     else:
-        # Default simulated parse for non-CSV
         simulated_components = [
             {"Name": "Core Router", "Category": "Networking", "Spend": 120000, "Renewal Date": "2025-12-31", "Risk Score": 7},
             {"Name": "Application Server", "Category": "Hardware", "Spend": 250000, "Renewal Date": "2026-06-30", "Risk Score": 5},
@@ -92,7 +112,16 @@ if uploaded_file:
         if st.button("➕ Import Parsed Components into Architecture"):
             for comp in simulated_components:
                 st.session_state.controller.add_component(comp)
+                imported_batch.append(comp)
             st.success("Components successfully imported into current architecture!")
+
+# Undo Last Import Option
+if imported_batch:
+    if st.button("↩️ Undo Last Import"):
+        for comp in imported_batch:
+            st.session_state.controller.remove_component_by_name(comp["Name"])
+        imported_batch.clear()
+        st.success("Last imported components removed!")
             
 # --- Executive Summary Calculation Function ---
 def generate_executive_summary(components):
