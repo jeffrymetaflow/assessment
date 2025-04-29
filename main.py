@@ -125,6 +125,31 @@ if imported_batch:
         imported_batch.clear()
         st.success("Last imported components removed!")
             
+st.header("🔌 Connect to AIOps / CMDB System")
+
+if st.button("🌐 Fetch Architecture from AIOps API"):
+    # Simulated API response
+    simulated_api_response = [
+        {"Name": "Web Load Balancer", "Category": "Networking", "Spend": 80000, "Renewal Date": "2025-11-01", "Risk Score": 6},
+        {"Name": "Customer Database", "Category": "Storage", "Spend": 200000, "Renewal Date": "2026-03-15", "Risk Score": 8},
+        {"Name": "Authentication Server", "Category": "Security", "Spend": 70000, "Renewal Date": "2025-08-30", "Risk Score": 7}
+    ]
+    
+    st.session_state.aiops_components = simulated_api_response
+    st.success("Successfully fetched architecture components from AIOps!")
+
+if 'aiops_components' in st.session_state:
+    st.subheader("🔎 AIOps Components Preview")
+    for comp in st.session_state.aiops_components:
+        st.write(f"- {comp['Name']} ({comp['Category']}) | Spend: ${comp['Spend']:,} | Risk: {comp['Risk Score']}")
+
+    if st.button("➕ Import AIOps Components into Architecture"):
+        for comp in st.session_state.aiops_components:
+            st.session_state.controller.add_component(comp)
+        st.success("AIOps components successfully imported into architecture!")
+        del st.session_state.aiops_components
+
+
 # --- Executive Summary Calculation Function ---
 def generate_executive_summary(components):
     total_spend = 0
