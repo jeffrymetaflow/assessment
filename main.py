@@ -162,7 +162,7 @@ if st.session_state.controller.get_components():
         col3.metric("High Risk Components", len(high_risk))
 
         st.markdown("---")
-        tab1, tab2 = st.tabs(["🛑 Expiring Contracts", "🔥 High Risk Components"])
+        tab1, tab2, tab3 = st.tabs(["🛑 Expiring Contracts", "🔥 High Risk Components", "🛠️ Risk Delta Simulation"])
 
         with tab1:
             if not expiring_soon.empty:
@@ -175,6 +175,19 @@ if st.session_state.controller.get_components():
                 st.dataframe(high_risk[['Name', 'Category', 'Spend', 'Renewal Date', 'Risk Score']])
             else:
                 st.info("✅ No high-risk components identified.")
+
+        with tab3:
+            st.subheader("🔧 Simulate Risk Score After Modernization")
+            selected_component = st.selectbox("Select a component to simulate: ", components_df['Name'].unique())
+
+            if selected_component:
+                original_score = components_df.loc[components_df['Name'] == selected_component, 'Risk Score'].values[0]
+                st.write(f"Original Risk Score: {original_score}")
+
+                simulated_delta = st.slider("Simulated Risk Improvement (%)", min_value=0, max_value=100, value=20, step=5)
+                simulated_new_score = max(0, original_score * (1 - simulated_delta/100))
+
+                st.metric("Projected New Risk Score", round(simulated_new_score, 1))
 
 # --- Executive Summary Calculation Function ---
 def generate_executive_summary(components):
