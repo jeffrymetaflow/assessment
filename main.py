@@ -2,6 +2,8 @@ import streamlit as st
 import os
 import json
 import uuid
+import pandas as pd
+from io import BytesIO
 from fpdf import FPDF
 from controller.controller import ITRMController
 
