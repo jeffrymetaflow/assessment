@@ -336,9 +336,107 @@ if st.session_state.controller.get_components():
         pdf.section_body(f"ITRM KPI (Spend / Revenue): {itrm_ratio}%")
 
         pdf_path = "/mnt/data/ITRM_Mini_KPI_Summary.pdf"
-        pdf.output(pdf_path)
-        st.success("PDF Export Complete! Download below:")
-        st.download_button("📥 Download KPI Summary PDF", data=open(pdf_path, "rb"), file_name="ITRM_KPI_Summary.pdf")
+        
+        try:
+            if not os.path.exists(os.path.dirname(pdf_path)):
+                os.makedirs(os.path.dirname(pdf_path))
+            pdf.output(pdf_path)
+        
+            with open(pdf_path, "rb") as pdf_file:
+                st.success("PDF Export Complete! Download below:")
+                st.download_button(
+                    "📥 Download KPI Summary PDF",
+                    data=pdf_file,
+                    file_name=os.path.basename(pdf_path),
+                    mime="application/pdf"
+                )
+        except Exception as e:
+            st.error(f"An error occurred while generating or downloading the PDF: {e}")
+        
+        components = st.session_state.controller.get_components()
+        
+        if components:
+            revenue_display = st.session_state.get("project_revenue", "Not set")
+            st.subheader(f"🚨 AIOps Risk Insights Dashboard  |  💰 Revenue: {revenue_display}")
+        
+            with st.expander("🚨 View AIOps Risk Insights Dashboard", expanded=True):
+                components_df = pd.DataFrame(components)
+        
+                if 'Renewal Date' in components_df.columns:
+                    components_df['Renewal Date'] = pd.to_datetime(components_df['Renewal Date'], errors='coerce')
+                    expiring_soon = components_df[components_df['Renewal Date'] <= pd.to_datetime('2026-06-30')]
+                else:
+                    expiring_soon = pd.DataFrame()
+        
+                high_risk = components_df[components_df['Risk Score'] >= 7]
+        
+                col1, col2, col3 = st.columns(3)
+                col1.metric("Total Components", len(components_df))
+                col2.metric("Contracts Expiring by Mid-2026", len(expiring_soon))
+                col3.metric("High Risk Components", len(high_risk))
+        
+                st.markdown("---")
+                tab1, tab2, tab3 = st.tabs(["🛑 Expiring Contracts", "🔥 High Risk Components", "🛠️ Risk Delta Simulation"])
+        
+                with tab1:
+                    if not expiring_soon.empty:
+                        st.dataframe(expiring_soon[['Name', 'Category', 'Spend', 'Renewal Date', 'Risk Score']])
+                    else:
+                        st.info("✅ No contracts expiring soon.")
+        
+                with tab2:
+                    if not high_risk.empty:
+                        st.dataframe(high_risk[['Name', 'Category', 'Spend', 'Renewal Date', 'Risk Score']])
+                    else:
+                        st.info("✅ No high-risk components identified.")
+        
+                with tab3:
+                    st.subheader("🔧 Simulate Risk Score After Modernization")
+                    selected_component = st.selectbox("Select a component to simulate:", components_df['Name'].unique())
+        
+                    if selected_component:
+                        original_score = components_df.loc[components_df['Name'] == selected_component, 'Risk Score'].values[0]
+                        st.write(f"Original Risk Score: {original_score}")
+        
+                        simulated_delta = st.slider("Simulated Risk Improvement (%)", min_value=0, max_value=100, value=20, step=5)
+                        simulated_new_score = max(0, original_score * (1 - simulated_delta / 100))
+        
+                        st.metric("Projected New Risk Score", round(simulated_new_score, 1))
+        
+                        if st.button("💾 Save Simulated New Risk Score"):
+                            for i, comp in enumerate(components):
+                                if comp['Name'] == selected_component:
+                                    st.session_state.controller.components[i]['Risk Score'] = round(simulated_new_score, 1)
+                                    break
+                            st.success(f"Updated {selected_component}'s risk score to {round(simulated_new_score, 1)}.")
+                            
+# AIOps Risk Insights Dashboard
+if st.session_state.controller.get_components():
+    revenue_display = st.session_state.get("project_revenue", "Not set")
+    st.subheader(f"🚨 AIOps Risk Insights Dashboard  |  💰 Revenue: {revenue_display}")
+
+    with st.expander("🚨 View AIOps Risk Insights Dashboard", expanded=True):
+        components_df = pd.DataFrame(st.session_state.controller.get_components())
+        components_df['Renewal Date'] = pd.to_datetime(components_df['Renewal Date'], errors='coerce')
+        expiring_soon = components_df[components_df['Renewal Date'] <= pd.to_datetime('2026-06-30')]
+        high_risk = components_df[components_df['Risk Score'] >= 7]
+
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Total Components", len(components_df))
+        col2.metric("Contracts Expiring by Mid-2026", len(expiring_soon))
+        col3.metric("High Risk Components", len(high_risk))
+
+# Risk Insights Dashboard
+if st.session_state.controller.get_components():
+    revenue_display = st.session_state.get("project_revenue", "Not set")
+    st.subheader(f"🚨 AIOps Risk Insights Dashboard  |  💰 Revenue: {revenue_display}")
+
+if st.session_state.controller.get_components():
+    with st.expander("🚨 View AIOps Risk Insights Dashboard", expanded=True):
+        components_df = pd.DataFrame(st.session_state.controller.get_components())
+        components_df['Renewal Date'] = pd.to_datetime(components_df['Renewal Date'], errors='coerce')
+        expiring_soon = components_df[components_df['Renewal Date'] <= pd.to_datetime('2026-06-30')]
+        high_risk = components_df[components_df['Risk Score'] >= 7]
 
 if st.session_state.controller.get_components():
     revenue_display = st.session_state.get("project_revenue", "Not set")
