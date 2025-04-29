@@ -35,7 +35,6 @@ vendor_mapping = {
 # --- Dynamic AI Modernization Suggestion Function ---
 def dynamic_generate_modernization_suggestion(category, spend, renewal_date, risk_score):
     suggestion = ""
-
     if category in ["Hardware", "Storage"] and spend > 100000:
         suggestion += "Explore cloud migration to reduce capex and enhance scalability. "
     if category == "Software" and risk_score > 7:
@@ -52,11 +51,32 @@ def dynamic_generate_modernization_suggestion(category, spend, renewal_date, ris
         suggestion += "Migrate to DRaaS platforms for more resilient disaster recovery. "
     if category == "Compliance" and risk_score > 6:
         suggestion += "Consider Compliance-as-a-Service (CaaS) offerings to streamline regulatory adherence. "
-
     if not suggestion:
         suggestion = "Review current asset lifecycle and evaluate modernization opportunities based on strategic goals."
-
     return suggestion
+
+# --- Architecture Importer v1 (Visio, PDF, CSV, JSON) ---
+st.header("📥 Upload Architecture Document")
+uploaded_file = st.file_uploader("Upload Visio (.vsdx), PDF, CSV, or JSON", type=["vsdx", "pdf", "csv", "json"])
+
+if uploaded_file:
+    st.success(f"Uploaded: {uploaded_file.name}")
+
+    # Fake parse result
+    simulated_components = [
+        {"Name": "Core Router", "Category": "Networking", "Spend": 120000, "Renewal Date": "2025-12-31", "Risk Score": 7},
+        {"Name": "Application Server", "Category": "Hardware", "Spend": 250000, "Renewal Date": "2026-06-30", "Risk Score": 5},
+        {"Name": "Corporate Firewall", "Category": "Security", "Spend": 95000, "Renewal Date": "2025-04-15", "Risk Score": 8}
+    ]
+
+    st.subheader("🔎 Parsed Components Preview")
+    for comp in simulated_components:
+        st.write(f"- {comp['Name']} ({comp['Category']}) | Spend: ${comp['Spend']:,} | Risk: {comp['Risk Score']}")
+
+    if st.button("➕ Import Parsed Components into Architecture"):
+        for comp in simulated_components:
+            st.session_state.controller.add_component(comp)
+        st.success("Components successfully imported into current architecture!")
 
 # --- Executive Summary Calculation Function ---
 def generate_executive_summary(components):
