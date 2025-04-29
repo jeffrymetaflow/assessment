@@ -203,94 +203,90 @@ with st.expander("💵 Project Revenue", expanded=True):
         except Exception as e:
             st.warning(f"Error fetching revenue: {e}")
     
-# --- Architecture Importer v2 (Visio, PDF, CSV, JSON) ---
-st.header("📥 Upload Architecture Document")
-uploaded_file = st.file_uploader("Upload Visio (.vsdx), PDF, CSV, or JSON", type=["vsdx", "pdf", "csv", "json"])
+# --- Upload Architecture Document ---
+st.header("📂 Upload Architecture Document")
+st.write("Upload Visio (.vsdx), PDF, CSV, or JSON")
 
 # --- CSV Upload Protection ---
 if "csv_loaded" not in st.session_state:
     st.session_state["csv_loaded"] = False
 
-uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
-if uploaded_file and not st.session_state["csv_loaded"]:
+uploaded_csv = st.file_uploader("Upload CSV", type=["csv"])
+if uploaded_csv and not st.session_state["csv_loaded"]:
     if st.button("📥 Load CSV into Project"):
-        df = pd.read_csv(uploaded_file)
+        df = pd.read_csv(uploaded_csv)
         st.session_state.controller.set_components(df.to_dict(orient="records"))
         st.session_state["csv_loaded"] = True
-        st.success("✅ Components loaded successfully.")
+        st.success("✅ CSV components loaded successfully.")
 
+# --- JSON Upload Protection ---
+if "json_loaded" not in st.session_state:
+    st.session_state["json_loaded"] = False
+
+uploaded_json = st.file_uploader("Upload JSON", type=["json"])
+if uploaded_json and not st.session_state["json_loaded"]:
+    if st.button("📥 Load JSON into Project"):
+        import json
+        data = json.load(uploaded_json)
+        if isinstance(data, list):
+            st.session_state.controller.set_components(data)
+            st.session_state["json_loaded"] = True
+            st.success("✅ JSON components loaded successfully.")
+
+# --- PDF Upload Parsing ---
+if "pdf_loaded" not in st.session_state:
+    st.session_state["pdf_loaded"] = False
+
+uploaded_pdf = st.file_uploader("Upload PDF (basic table parse)", type=["pdf"])
+if uploaded_pdf and not st.session_state["pdf_loaded"]:
+    if st.button("📥 Extract Table from PDF"):
+        import pdfplumber
+        with pdfplumber.open(uploaded_pdf) as pdf:
+            extracted_rows = []
+            for page in pdf.pages:
+                tables = page.extract_tables()
+                for table in tables:
+                    for row in table:
+                        if row and any(row):
+                            extracted_rows.append(row)
+        if extracted_rows:
+            # Assume columns: Name, Category, Spend, Renewal Date, Risk Score
+            columns = ["Name", "Category", "Spend", "Renewal Date", "Risk Score"]
+            extracted_df = pd.DataFrame(extracted_rows, columns=columns)
+            st.session_state.controller.set_components(extracted_df.to_dict(orient="records"))
+            st.session_state["pdf_loaded"] = True
+            st.success("✅ PDF tables extracted and loaded.")
+        else:
+            st.warning("⚠️ No tables found in PDF.")
+
+# --- Visio Upload Parsing ---
+if "visio_loaded" not in st.session_state:
+    st.session_state["visio_loaded"] = False
+
+uploaded_visio = st.file_uploader("Upload Visio Diagram (simple metadata parse)", type=["vsdx"])
+if uploaded_visio and not st.session_state["visio_loaded"]:
+    if st.button("📥 Parse Visio"):
+        from vsdx import VisioFile
+        vis = VisioFile(uploaded_visio)
+        extracted_shapes = []
+        for page in vis.pages:
+            for shape in page.shapes:
+                shape_text = shape.text if shape.text else "Unnamed"
+                extracted_shapes.append({"Name": shape_text, "Category": "Unknown", "Spend": 0, "Renewal Date": "", "Risk Score": 5})
+        if extracted_shapes:
+            st.session_state.controller.set_components(extracted_shapes)
+            st.session_state["visio_loaded"] = True
+            st.success("✅ Visio diagram shapes parsed and loaded.")
+        else:
+            st.warning("⚠️ No shapes found in Visio file.")
+
+# --- Reset Project State ---
 if st.button("Start New Project"):
     st.session_state.controller.clear_components()
     st.session_state["csv_loaded"] = False
-
-# Dynamic CSV Template Generator
-template_df = pd.DataFrame({
-    "Name": ["Example Component"],
-    "Category": ["Hardware"],
-    "Spend": [100000],
-    "Renewal Date": ["2026-12-31"],
-    "Risk Score": [5]
-})
-
-template_buffer = BytesIO()
-template_df.to_csv(template_buffer, index=False)
-template_buffer.seek(0)
-
-st.download_button(
-    label="📄 Download CSV Template",
-    data=template_buffer,
-    file_name="architecture_template.csv",
-    mime="text/csv"
-)
-
-simulated_components = []
-imported_batch = []
-
-if uploaded_file:
-    st.success(f"Uploaded: {uploaded_file.name}")
-    file_extension = uploaded_file.name.split(".")[-1]
-
-def safe_int(val, default=0):
-    try:
-        return int(float(val))
-    except (ValueError, TypeError):
-        return default
-
-if uploaded_file:  # Ensure file is uploaded
-    st.success(f"Uploaded: {uploaded_file.name}")
-    file_extension = uploaded_file.name.split(".")[-1].lower()  # Get file extension in lowercase
-
-    if file_extension == "csv":
-        try:
-            # Read the CSV file
-            df = pd.read_csv(uploaded_file)
-            for _, row in df.iterrows():
-                comp = {
-                    "Name": row.get("Name", "Unnamed Component"),
-                    "Category": row.get("Category", "Unknown"),
-                    "Spend": safe_int(row.get("Spend", 0)),
-                    "Renewal Date": row.get("Renewal Date", "TBD"),
-                    "Risk Score": safe_int(row.get("Risk Score", 5))
-                }
-                simulated_components.append(comp)
-        except Exception as e:
-            st.error(f"Error processing CSV file: {e}")
-            st.stop()
-    else:
-        st.warning(f"Unsupported file type: {file_extension}")
-
-    # Display parsed components
-    if simulated_components:
-        st.subheader("🔎 Parsed Components Preview")
-        for comp in simulated_components:
-            st.write(f"- {comp['Name']} ({comp['Category']}) | Spend: ${comp['Spend']:,} | Risk: {comp['Risk Score']}/10")
-
-        # Button to import components
-        if st.button("➕ Import Parsed Components into Architecture"):
-            for comp in simulated_components:
-                st.session_state.controller.add_component(comp)
-                imported_batch.append(comp)
-            st.success("Components successfully imported into current architecture!")
+    st.session_state["json_loaded"] = False
+    st.session_state["pdf_loaded"] = False
+    st.session_state["visio_loaded"] = False
 
 # Undo Last Import Option
 if imported_batch:
