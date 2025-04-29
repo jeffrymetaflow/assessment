@@ -182,8 +182,8 @@ with st.expander("💵 Project Revenue", expanded=True):
 
             client_name = st.session_state.get ("client_name", "")
             if not client_name: 
-            st.warning ("Client name is not set. Please enter a client name first.")
-            st.stop ()
+                st.warning ("Client name is not set. Please enter a client name first.")
+                st.stop ()
             
             query = f"{client_name} annual revenue site:craft.co"
             url = f"https://www.google.com/search?q={query}"
