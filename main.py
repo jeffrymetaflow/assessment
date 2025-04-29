@@ -306,7 +306,10 @@ if st.session_state.get("controller") and st.session_state.controller.get_compon
 
 # --- Reset Project State ---
 if st.button("Start New Project"):
+    if "controller" in st.session_state and hasattr(st.session_state.controller, "clear_components"):
     st.session_state.controller.clear_components()
+    else:
+        st.error("Controller is not initialized or does not have the 'clear_components' method.")
     st.session_state["csv_loaded"] = False
     st.session_state["json_loaded"] = False
     st.session_state["pdf_loaded"] = False
