@@ -207,6 +207,15 @@ with st.expander("💵 Project Revenue", expanded=True):
 st.header("📂 Upload Architecture Document")
 st.write("Upload Visio (.vsdx), PDF, CSV, or JSON")
 
+REQUIRED_COLUMNS = ["Name", "Category", "Spend", "Renewal Date", "Risk Score"]
+
+def validate_table(df):
+    missing_cols = [col for col in REQUIRED_COLUMNS if col not in df.columns]
+    if missing_cols:
+        st.error(f"❌ Missing required columns: {', '.join(missing_cols)}")
+        return False
+    return True
+
 # --- CSV Upload Protection ---
 if "csv_loaded" not in st.session_state:
     st.session_state["csv_loaded"] = False
@@ -215,9 +224,10 @@ uploaded_csv = st.file_uploader("Upload CSV", type=["csv"])
 if uploaded_csv and not st.session_state["csv_loaded"]:
     if st.button("📥 Load CSV into Project"):
         df = pd.read_csv(uploaded_csv)
-        st.session_state.controller.set_components(df.to_dict(orient="records"))
-        st.session_state["csv_loaded"] = True
-        st.success("✅ CSV components loaded successfully.")
+        if validate_table(df):
+            st.session_state.controller.set_components(df.to_dict(orient="records"))
+            st.session_state["csv_loaded"] = True
+            st.success("✅ CSV components loaded successfully.")
 
 # --- JSON Upload Protection ---
 if "json_loaded" not in st.session_state:
@@ -229,9 +239,11 @@ if uploaded_json and not st.session_state["json_loaded"]:
         import json
         data = json.load(uploaded_json)
         if isinstance(data, list):
-            st.session_state.controller.set_components(data)
-            st.session_state["json_loaded"] = True
-            st.success("✅ JSON components loaded successfully.")
+            df = pd.DataFrame(data)
+            if validate_table(df):
+                st.session_state.controller.set_components(df.to_dict(orient="records"))
+                st.session_state["json_loaded"] = True
+                st.success("✅ JSON components loaded successfully.")
 
 # --- PDF Upload Parsing ---
 if "pdf_loaded" not in st.session_state:
@@ -250,12 +262,12 @@ if uploaded_pdf and not st.session_state["pdf_loaded"]:
                         if row and any(row):
                             extracted_rows.append(row)
         if extracted_rows:
-            # Assume columns: Name, Category, Spend, Renewal Date, Risk Score
-            columns = ["Name", "Category", "Spend", "Renewal Date", "Risk Score"]
-            extracted_df = pd.DataFrame(extracted_rows, columns=columns)
-            st.session_state.controller.set_components(extracted_df.to_dict(orient="records"))
-            st.session_state["pdf_loaded"] = True
-            st.success("✅ PDF tables extracted and loaded.")
+            extracted_df = pd.DataFrame(extracted_rows)
+            if validate_table(extracted_df):
+                extracted_df.columns = REQUIRED_COLUMNS
+                st.session_state.controller.set_components(extracted_df.to_dict(orient="records"))
+                st.session_state["pdf_loaded"] = True
+                st.success("✅ PDF tables extracted and loaded.")
         else:
             st.warning("⚠️ No tables found in PDF.")
 
@@ -274,9 +286,11 @@ if uploaded_visio and not st.session_state["visio_loaded"]:
                 shape_text = shape.text if shape.text else "Unnamed"
                 extracted_shapes.append({"Name": shape_text, "Category": "Unknown", "Spend": 0, "Renewal Date": "", "Risk Score": 5})
         if extracted_shapes:
-            st.session_state.controller.set_components(extracted_shapes)
-            st.session_state["visio_loaded"] = True
-            st.success("✅ Visio diagram shapes parsed and loaded.")
+            df = pd.DataFrame(extracted_shapes)
+            if validate_table(df):
+                st.session_state.controller.set_components(df.to_dict(orient="records"))
+                st.session_state["visio_loaded"] = True
+                st.success("✅ Visio diagram shapes parsed and loaded.")
         else:
             st.warning("⚠️ No shapes found in Visio file.")
 
