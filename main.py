@@ -357,11 +357,13 @@ if st.session_state.controller.get_components():
         with tab1:
             if not expiring_soon.empty:
                 for comp in expiring_soon.to_dict(orient="records"):
-                    with st.expander(f"{comp.get('Name', 'Component')} | Risk Score: {comp.get('Risk Score', 'N/A')}"):
-                        st.markdown(f"**Category:** {comp.get('Category', 'Unknown')}")
-                        st.markdown(f"**Spend:** ${comp.get('Spend', 0):,}")
-            else:
-                st.info("✅ No contracts expiring soon.") 
+                    name = comp.get('Name', 'Unnamed Component')  # Ensure valid fallback for 'Name'
+                    risk_score = comp.get('Risk Score', 'N/A')   # Ensure valid fallback for 'Risk Score'
+
+                    with st.expander(f"{name} | Risk Score: {risk_score}"):
+                        # Add your code here for displaying the component's details
+                                else:
+                                    st.info("✅ No contracts expiring soon.") 
 
         with tab2:
             if not high_risk.empty:
