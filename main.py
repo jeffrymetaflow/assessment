@@ -360,7 +360,9 @@ if st.session_state.controller.get_components():
                     name = comp.get('Name', 'Unnamed Component')  # Ensure valid fallback for 'Name'
                     risk_score = comp.get('Risk Score', 'N/A')   # Ensure valid fallback for 'Risk Score'
                     with st.expander(f"{name} | Risk Score: {risk_score}"):
-                        # Add your code here for displaying the component's details
+                        st.markdown(f"**Category:** {comp.get('Category', 'Unknown')}")
+                        st.markdown(f"**Spend:** ${comp.get('Spend', 0):,}")
+                        st.markdown(f"**Renewal Date:** {comp.get('Renewal Date', 'TBD')}")
             else:
                 st.info("✅ No contracts expiring soon.") 
 
