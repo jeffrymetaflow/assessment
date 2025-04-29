@@ -297,11 +297,12 @@ if uploaded_visio and not st.session_state["visio_loaded"]:
 # --- Display Parsed Components Safely ---
 if st.session_state.get("controller") and st.session_state.controller.get_components():
     st.subheader("📋 Uploaded Components Overview")
-    for i, comp in enumerate(st.session_state.controller.get_components()):
-        with st.expander(f"{comp.get('Name', f'Component-{i+1}')} | Risk Score: {comp.get('Risk Score', 'N/A')}"):
-            st.markdown(f"**Category:** {comp.get('Category', 'Unknown')}")
-            st.markdown(f"**Spend:** ${comp.get('Spend', 0):,}")
-            st.markdown(f"**Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
+    with st.container():
+        for i, comp in enumerate(st.session_state.controller.get_components()):
+            with st.expander(f"{comp.get('Name', f'Component-{i+1}')} | Risk Score: {comp.get('Risk Score', 'N/A')}"):
+                st.markdown(f"**Category:** {comp.get('Category', 'Unknown')}")
+                st.markdown(f"**Spend:** ${comp.get('Spend', 0):,}")
+                st.markdown(f"**Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
 
 # --- Reset Project State ---
 if st.button("Start New Project"):
