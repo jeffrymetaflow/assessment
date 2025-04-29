@@ -3,6 +3,7 @@ import os
 import json
 import uuid
 import pandas as pd
+import matplotlib.pyplot as plt
 from io import BytesIO
 from fpdf import FPDF
 from controller.controller import ITRMController
@@ -188,6 +189,22 @@ if st.session_state.controller.get_components():
                 simulated_new_score = max(0, original_score * (1 - simulated_delta/100))
 
                 st.metric("Projected New Risk Score", round(simulated_new_score, 1))
+
+                if st.button("💾 Save Simulated New Risk Score"):
+                    for i, comp in enumerate(st.session_state.controller.get_components()):
+                        if comp['Name'] == selected_component:
+                            st.session_state.controller.components[i]['Risk Score'] = round(simulated_new_score, 1)
+                            break
+                    st.success(f"Updated {selected_component}'s risk score to {round(simulated_new_score, 1)}.")
+
+        st.markdown("---")
+        st.subheader("📈 Risk Score Comparison Across Components")
+        fig, ax = plt.subplots(figsize=(10, 5))
+        components_df_sorted = components_df.sort_values(by="Risk Score", ascending=False)
+        ax.barh(components_df_sorted['Name'], components_df_sorted['Risk Score'])
+        ax.set_xlabel('Risk Score')
+        ax.set_title('Component Risk Scores After Simulation')
+        st.pyplot(fig)
 
 # --- Executive Summary Calculation Function ---
 def generate_executive_summary(components):
