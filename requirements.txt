@@ -16,3 +16,4 @@ tavily-python
 langchain_community
 pytesseract
 pillow
+beautifulsoup4
