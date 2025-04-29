@@ -197,10 +197,19 @@ if st.session_state.controller.get_components():
                             break
                     st.success(f"Updated {selected_component}'s risk score to {round(simulated_new_score, 1)}.")
 
+            if st.button("♻️ Reset All Simulated Risk Scores"):
+                # Assume we reset all components back to original baseline score of 8 for demo purposes
+                for i, comp in enumerate(st.session_state.controller.get_components()):
+                    if 'Original Risk Score' in comp:
+                        st.session_state.controller.components[i]['Risk Score'] = comp['Original Risk Score']
+                    else:
+                        st.session_state.controller.components[i]['Risk Score'] = 8
+                st.success("All risk scores reset to default values!")
+
         st.markdown("---")
         st.subheader("📈 Risk Score Comparison Across Components")
         fig, ax = plt.subplots(figsize=(10, 5))
-        components_df_sorted = components_df.sort_values(by="Risk Score", ascending=False)
+        components_df_sorted = pd.DataFrame(st.session_state.controller.get_components()).sort_values(by="Risk Score", ascending=False)
         ax.barh(components_df_sorted['Name'], components_df_sorted['Risk Score'])
         ax.set_xlabel('Risk Score')
         ax.set_title('Component Risk Scores After Simulation')
