@@ -370,10 +370,18 @@ if st.session_state.controller.get_components():
         st.subheader("📈 Risk Score Comparison Across Components")
         fig, ax = plt.subplots(figsize=(10, 5))
         components_df_sorted = pd.DataFrame(st.session_state.controller.get_components()).sort_values(by="Risk Score", ascending=False)
-        ax.barh(components_df_sorted['Name'], components_df_sorted['Risk Score'])
-        ax.set_xlabel('Risk Score')
-        ax.set_title('Component Risk Scores After Simulation')
-        st.pyplot(fig)
+        if components_df_sorted.empty:
+            st.warning("No data available to plot the bar chart.")
+        else:
+            # Ensure 'Name' column contains valid strings
+            components_df_sorted['Name'] = components_df_sorted['Name'].fillna("Unnamed Component").astype(str)
+            
+            # Plot the horizontal bar chart
+            fig, ax = plt.subplots(figsize=(10, 5))
+            ax.barh(components_df_sorted['Name'], components_df_sorted['Risk Score'])
+            ax.set_xlabel('Risk Score')
+            ax.set_title('Component Risk Scores After Simulation')
+            st.pyplot(fig)
 
 # --- Executive Summary Calculation Function ---
 def generate_executive_summary(components):
