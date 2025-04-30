@@ -8,6 +8,25 @@ try:
     if "controller" not in st.session_state:
         st.session_state.controller = ITRMController()
     controller = st.session_state.controller
+
+    # Patch: Dynamically calculate revenue impact % from components if missing
+    if not hasattr(controller, "get_category_impact_percentages"):
+        def get_category_impact_percentages():
+            impact_totals = {}
+            counts = {}
+            for c in controller.components:
+                cat = c.get("Category", "None")
+                impact = c.get("Revenue Impact %", 0)
+                if isinstance(impact, (int, float)):
+                    impact_totals[cat] = impact_totals.get(cat, 0) + impact
+                    counts[cat] = counts.get(cat, 0) + 1
+            return {
+                cat: round(impact_totals[cat] / counts[cat], 2)
+                for cat in impact_totals
+                if counts[cat] > 0
+            }
+        controller.get_category_impact_percentages = get_category_impact_percentages
+
 except Exception as e:
     st.error(f"❌ Failed to initialize controller: {e}")
     st.stop()
@@ -99,5 +118,6 @@ if not sim_df.empty and "Adjusted Risk ($)" in sim_df.columns:
         }), use_container_width=True)
 else:
     st.info("No valid simulation data to display.")
+
 
 
