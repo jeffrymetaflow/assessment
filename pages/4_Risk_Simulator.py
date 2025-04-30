@@ -1,76 +1,60 @@
-import streamlit as st
 import pandas as pd
+import streamlit as st
 import plotly.graph_objects as go
-from utils.bootstrap import page_bootstrap
 
-st.set_page_config(page_title="Revenue at Risk Analysis", layout="wide")
+# Ensure controller is always initialized in session state
+if "controller" not in st.session_state:
+    from controller import ITRMController  # Adjust path if needed
+    st.session_state.controller = ITRMController()
+
+controller = st.session_state.controller
+controller.run_simulation()
+
 st.title("💸 Revenue at Risk Simulator")
 
-page_bootstrap(current_page="Revenue Risk")
+# Display Simulation Table
+st.subheader("📋 Component-Level Revenue at Risk")
+st.dataframe(controller.simulation_results.style.format({"Revenue at Risk (%)": "{:.2f}%"}), use_container_width=True)
 
-# --------------------------
-# Shared Revenue Input
-# --------------------------
-revenue = st.session_state.get("revenue", 5_000_000)
-st.sidebar.header("📊 Base Revenue")
-st.sidebar.info(f"Using Baseline Revenue: ${revenue:,.0f}")
+# Get and display category summary
+category_risk = controller.get_category_risk_summary()
+category_summary = pd.DataFrame([
+    {
+        "Category": cat,
+        "Total Revenue at Risk (%)": round(data["total_risk"], 2),
+        "# of Components": len(data["components"])
+    }
+    for cat, data in category_risk.items()
+])
 
-# --------------------------
-# Pull Component-Based Aggregates
-# --------------------------
-categories = ["Hardware", "Software", "Personnel", "Maintenance", "Telecom", "Cybersecurity", "BC/DR"]
-controller = st.session_state.get("controller", None)
+st.subheader("📊 Risk Summary by Category")
+st.dataframe(category_summary.set_index("Category"), use_container_width=True)
 
-if controller:
-    try:
-        category_data = controller.get_category_aggregates()
-    except Exception as e:
-        st.warning(f"Failed to aggregate component data: {e}")
-        category_data = {}
-else:
-    st.warning("No controller found in session state.")
-    category_data = {}
-
-# --------------------------
-# Display Revenue Risk Table
-# --------------------------
-st.subheader("📋 Revenue Impact by IT Category")
-risk_table = []
-for cat in categories:
-    spend = category_data.get(cat, {}).get("spend", 0)
-    impact_pct = category_data.get(cat, {}).get("revenue_impact", 0) / 100
-    revenue_risk = revenue * impact_pct
-    risk_table.append((cat, spend, impact_pct * 100, revenue_risk))
-
-risk_df = pd.DataFrame(risk_table, columns=["Category", "IT Spend", "% Revenue at Risk", "Revenue at Risk"])
-st.dataframe(risk_df.style.format({
-    "IT Spend": "${:,.0f}",
-    "% Revenue at Risk": "{:.1f}%",
-    "Revenue at Risk": "${:,.0f}"
-}), use_container_width=True)
-
-# --------------------------
-# Visualize Revenue at Risk
-# --------------------------
-st.subheader("📉 Revenue at Risk by Category")
+# Chart visualization
 fig = go.Figure()
 fig.add_trace(go.Bar(
-    x=risk_df["Category"],
-    y=risk_df["Revenue at Risk"],
-    text=risk_df["Revenue at Risk"].apply(lambda x: f"${x:,.0f}"),
+    x=category_summary["Category"],
+    y=category_summary["Total Revenue at Risk (%)"],
+    text=category_summary["Total Revenue at Risk (%)"].apply(lambda x: f"{x:.1f}%"),
     textposition="outside",
-    marker_color="indianred"
+    marker_color="crimson"
 ))
 fig.update_layout(
+    title="Total Revenue at Risk by IT Category",
     xaxis_title="Category",
-    yaxis_title="Revenue at Risk ($)",
-    title="Projected Revenue Exposure by IT Category",
-    height=500
+    yaxis_title="Revenue at Risk (%)",
+    height=450
 )
 st.plotly_chart(fig, use_container_width=True)
 
-# --------------------------
-# Summary
-# --------------------------
-total_risk = risk_df["Revenue at Risk"].sum()
-st.metric(label="💰 Total Revenue at Risk", value=f"${total_risk:,.0f}")
+# Show per-category components
+st.subheader("🔍 Drill-Down: High-Risk Components by Category")
+for cat, data in category_risk.items():
+    with st.expander(f"{cat} - Total Risk: {round(data['total_risk'], 2)}%"):
+        comp_df = pd.DataFrame(data["components"])
+        st.dataframe(comp_df.style.format({
+            "Revenue Impact %": "{:.1f}%",
+            "Risk Score": "{:.0f}",
+            "Revenue at Risk (%)": "{:.2f}%"
+        }), use_container_width=True)
+
