@@ -47,15 +47,51 @@ if "project_id" in st.session_state:
     st.success(f"📁 Active Project: {st.session_state['client_name']} | {st.session_state['project_name']}")
 
     # --- REVENUE SETUP ---
-    st.markdown("### 💵 Project Revenue")
-    revenue_input = st.text_input("Enter Revenue ($)", key="project_revenue")
-    if revenue_input:
-        cleaned = revenue_input.replace("$", "").replace(",", "")
-        try:
-            st.session_state.baseline_revenue = float(cleaned)
-        except:
-            st.warning("Invalid revenue format.")
-
+    with st.expander("💵 Project Revenue", expanded=True):
+        if "project_revenue" not in st.session_state:
+            st.session_state["project_revenue"] = ""
+    
+        st.markdown("## 💵 Project Revenue")
+        st.caption("Enter the annual revenue this IT architecture supports. You can type it manually or click auto-fetch:")
+        
+        st.text_input("Annual Revenue (USD)", key="project_revenue")
+        
+        if st.session_state.get("client_name"):
+            revenue_button_label = f"🔍 Try Auto-Fetch for “{st.session_state['client_name']}”"
+        else:
+            revenue_button_label = "🔍 Try Auto-Fetch (Enter company name first)"
+        fetch_button = st.button(revenue_button_label, key="revenue_fetch_button")
+        
+        st.caption("Hint: Use a publicly traded company name (e.g., 'Cisco', 'Salesforce') for best results.")
+       
+        if fetch_button:
+            try:
+                import requests
+                from bs4 import BeautifulSoup
+    
+                client_name = st.session_state.get ("client_name", "")
+                if not client_name: 
+                    st.warning ("Client name is not set. Please enter a client name first.")
+                    st.stop ()
+                
+                query = f"{client_name} annual revenue site:craft.co"
+                url = f"https://www.google.com/search?q={query}"
+                headers = {"User-Agent": "Mozilla/5.0"}
+                response = requests.get(url, headers=headers)
+                soup = BeautifulSoup(response.text, "html.parser")
+                text = soup.get_text()
+    
+                import re
+                match = re.search(r"\$[\d,]+[MBT]?", text)
+                if match:
+                    st.session_state["project_revenue"] = match.group(0)
+                    st.success(f"Auto-fetched estimated revenue: {match.group(0)}")
+                else:
+                    st.warning("Could not extract revenue. Please enter it manually.")
+    
+            except Exception as e:
+                st.warning(f"Error fetching revenue: {e}")
+    
     # --- COMPONENT UPLOAD ---
     st.markdown("### 📥 Upload Components")
     file = st.file_uploader("Upload .csv with: Name, Category, Spend, Renewal Date, Risk Score")
