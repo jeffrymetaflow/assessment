@@ -9,11 +9,8 @@ from fpdf import FPDF
 from controller.controller import ITRMController
 from utils.bootstrap import page_bootstrap
 
-# Configure the app
-st.set_page_config(
-    page_title="ITRM Unified App",
-    layout="wide"
-)
+# ✅ MUST BE FIRST STREAMLIT COMMAND
+st.set_page_config(page_title="ITRM Main Dashboard", layout="wide")
 
 # Initialize the shared controller (only once)
 if "controller" not in st.session_state:
@@ -52,7 +49,7 @@ def is_component_valid(comp):
 
 # --- Patch to override Add Component to store dictionary ---
 if "project_id" in st.session_state:
-    with st.form("add_component_form", clear_on_submit=True):
+    with st.form(f"add_component_form_{st.session_state.project_id}", clear_on_submit=True):
         new_component = st.text_input("Component Name")
         submitted = st.form_submit_button("Add Component")
 
@@ -71,7 +68,7 @@ if "project_id" in st.session_state:
                 st.success(f"Added component: {new_component}")
             else:
                 st.error("Please enter a component name.")
-
+                
 # Inject AI Assistant with full context
 page_bootstrap(current_page="Main")
 
