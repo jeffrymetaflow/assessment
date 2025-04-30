@@ -13,6 +13,58 @@ from utils.bootstrap import page_bootstrap
 if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
 
+# --- Patch for Baseline Revenue Retrieval ---
+def get_project_revenue():
+    revenue_str = st.session_state.get("project_revenue", "0").replace("$", "").replace(",", "")
+    try:
+        return float(revenue_str)
+    except:
+        return 0
+
+st.session_state.baseline_revenue = get_project_revenue()
+
+# --- Patch for Revenue Impact per Category ---
+def get_default_impact():
+    return {
+        "Hardware": 10,
+        "Software": 10,
+        "Personnel": 10,
+        "Maintenance": 10,
+        "Telecom": 10,
+        "Cybersecurity": 10,
+        "BC/DR": 10,
+        "Compliance": 10,
+        "Networking": 10,
+    }
+
+if "revenue_impact_by_category" not in st.session_state:
+    st.session_state.revenue_impact_by_category = get_default_impact()
+
+# --- Patch to make sure component objects are used ---
+def is_component_valid(comp):
+    return isinstance(comp, dict) and "Name" in comp and "Category" in comp
+
+# --- Patch to override Add Component to store dictionary ---
+if "project_id" in st.session_state:
+    with st.form("add_component_form", clear_on_submit=True):
+        new_component = st.text_input("Component Name")
+        submitted = st.form_submit_button("Add Component")
+
+        if submitted:
+            if new_component:
+                comp_obj = {
+                    "Name": new_component,
+                    "Category": "Hardware",
+                    "Spend": 0,
+                    "Renewal Date": "",
+                    "Risk Score": 5
+                }
+                components = st.session_state.controller.get_components()
+                components.append(comp_obj)
+                st.session_state.controller.set_components(components)
+                st.success(f"Added component: {new_component}")
+            else:
+                st.error("Please enter a component name.")
 # Configure the app
 st.set_page_config(
     page_title="ITRM Unified App",
