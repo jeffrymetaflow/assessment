@@ -112,6 +112,7 @@ if category_baseline_risk:  # Check if the dictionary is not empty
                 "Adjusted Risk ($)": simulated
             })
             adjustment_map[cat] = adj
+      
         # Update DataFrame with simulated risks
         sim_df = pd.DataFrame(simulated_risks)
     
