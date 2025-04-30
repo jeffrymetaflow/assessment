@@ -12,395 +12,269 @@ from utils.bootstrap import page_bootstrap
 # ✅ MUST BE FIRST STREAMLIT COMMAND
 st.set_page_config(page_title="ITRM Main Dashboard", layout="wide")
 
-# Initialize the shared controller (only once)
+# --- INIT CONTROLLER ---
 if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
 
-# --- Patch for Baseline Revenue Retrieval ---
-def get_project_revenue():
-    revenue_str = st.session_state.get("project_revenue", "0").replace("$", "").replace(",", "")
-    try:
-        return float(revenue_str)
-    except:
-        return 0
+controller = st.session_state.controller
 
-st.session_state.baseline_revenue = get_project_revenue()
+# --- USER JOURNEY ---
+st.title("🚀 Welcome to the ITRM Platform")
+st.subheader("Start a New Assessment or Load an Existing One")
 
-# --- Patch for Revenue Impact per Category ---
-def get_default_impact():
-    return {
-        "Hardware": 10,
-        "Software": 10,
-        "Personnel": 10,
-        "Maintenance": 10,
-        "Telecom": 10,
-        "Cybersecurity": 10,
-        "BC/DR": 10,
-        "Compliance": 10,
-        "Networking": 10,
-    }
+step = st.radio("Select Option:", ["➕ Start New Client Assessment", "📂 Open Existing Project"], horizontal=True)
 
-if "revenue_impact_by_category" not in st.session_state:
-    st.session_state.revenue_impact_by_category = get_default_impact()
+if step == "➕ Start New Client Assessment":
+    with st.form("new_project_form", clear_on_submit=True):
+        client_name = st.text_input("Client Name")
+        project_name = st.text_input("Project / Assessment Name")
+        submitted = st.form_submit_button("Start New Project")
 
-# --- Patch to make sure component objects are used ---
-def is_component_valid(comp):
-    return isinstance(comp, dict) and "Name" in comp and "Category" in comp
+        if submitted:
+            if client_name and project_name:
+                st.session_state["client_name"] = client_name
+                st.session_state["project_name"] = project_name
+                st.session_state["project_id"] = str(uuid.uuid4())
+                st.rerun()
+            else:
+                st.error("Please fill in both fields.")
 
-# --- Patch to override Add Component to store dictionary ---
+elif step == "📂 Open Existing Project":
+    st.warning("Project loader functionality coming soon.")
+
+# --- PROJECT ACTIVE FLOW ---
 if "project_id" in st.session_state:
-    with st.form(f"add_component_form_{st.session_state.project_id}", clear_on_submit=True):
+    st.success(f"📁 Active Project: {st.session_state['client_name']} | {st.session_state['project_name']}")
+
+    # --- REVENUE SETUP ---
+    with st.expander("💵 Project Revenue", expanded=True):
+        if "project_revenue" not in st.session_state:
+            st.session_state["project_revenue"] = ""
+    
+        st.markdown("## 💵 Project Revenue")
+        st.caption("Enter the annual revenue this IT architecture supports. You can type it manually or click auto-fetch:")
+        
+        st.text_input("Annual Revenue (USD)", key="project_revenue")
+        
+        if st.session_state.get("client_name"):
+            revenue_button_label = f"🔍 Try Auto-Fetch for “{st.session_state['client_name']}”"
+        else:
+            revenue_button_label = "🔍 Try Auto-Fetch (Enter company name first)"
+        fetch_button = st.button(revenue_button_label, key="revenue_fetch_button")
+        
+        st.caption("Hint: Use a publicly traded company name (e.g., 'Cisco', 'Salesforce') for best results.")
+       
+        if fetch_button:
+            try:
+                import requests
+                from bs4 import BeautifulSoup
+    
+                client_name = st.session_state.get ("client_name", "")
+                if not client_name: 
+                    st.warning ("Client name is not set. Please enter a client name first.")
+                    st.stop ()
+                
+                query = f"{client_name} annual revenue site:craft.co"
+                url = f"https://www.google.com/search?q={query}"
+                headers = {"User-Agent": "Mozilla/5.0"}
+                response = requests.get(url, headers=headers)
+                soup = BeautifulSoup(response.text, "html.parser")
+                text = soup.get_text()
+    
+                import re
+                match = re.search(r"\$[\d,]+[MBT]?", text)
+                if match:
+                    st.session_state["project_revenue"] = match.group(0)
+                    st.success(f"Auto-fetched estimated revenue: {match.group(0)}")
+                else:
+                    st.warning("Could not extract revenue. Please enter it manually.")
+    
+            except Exception as e:
+                st.warning(f"Error fetching revenue: {e}")
+    
+    # --- COMPONENT UPLOAD ---
+    st.markdown("### 📥 Upload Components")
+    file = st.file_uploader("Upload .csv with: Name, Category, Spend, Renewal Date, Risk Score")
+    if file:
+        df = pd.read_csv(file)
+        required_cols = {"Name", "Category", "Spend", "Renewal Date", "Risk Score"}
+        if required_cols.issubset(set(df.columns)):
+            controller.set_components(df.to_dict(orient="records"))
+            st.success("✅ Components loaded.")
+        else:
+            st.error(f"Missing columns: {required_cols - set(df.columns)}")
+
+    # --- COMPONENT PREVIEW ---
+    comps = controller.get_components()
+    if comps:
+        st.markdown("### 🧩 Components Overview")
+        st.dataframe(pd.DataFrame(comps))
+
+    # --- SESSION REVENUE IMPACTS ---
+    if "revenue_impact_by_category" not in st.session_state:
+        st.session_state.revenue_impact_by_category = {
+            "Hardware": 10, "Software": 10, "Personnel": 10, "Maintenance": 10,
+            "Telecom": 10, "Cybersecurity": 10, "BC/DR": 10, "Compliance": 10, "Networking": 10
+        }
+
+    # --- AI Assistant Setup ---
+    page_bootstrap(current_page="Main")
+
+    # --- Add New Component Form ---
+    st.subheader("➕ Add New Architecture Component")
+
+    with st.form("add_component_form", clear_on_submit=True):
         new_component = st.text_input("Component Name")
         submitted = st.form_submit_button("Add Component")
 
         if submitted:
             if new_component:
-                comp_obj = {
-                    "Name": new_component,
-                    "Category": "Hardware",
-                    "Spend": 0,
-                    "Renewal Date": "",
-                    "Risk Score": 5
-                }
                 components = st.session_state.controller.get_components()
-                components.append(comp_obj)
+                components.append(new_component)
                 st.session_state.controller.set_components(components)
                 st.success(f"Added component: {new_component}")
             else:
                 st.error("Please enter a component name.")
-                
-# Inject AI Assistant with full context
-page_bootstrap(current_page="Main")
 
-# --- Vendor Mapping Template ---
-vendor_mapping = {
-    "Hardware": ["Dell", "HPE", "Lenovo"],
-    "Software": ["Microsoft", "Oracle", "SAP"],
-    "Security": ["Palo Alto Networks", "Fortinet", "CrowdStrike"],
-    "Networking": ["Cisco", "Juniper", "Arista"],
-    "Cloud": ["AWS", "Azure", "Google Cloud"],
-    "Storage": ["Pure Storage", "NetApp", "Dell EMC"],
-    "Cybersecurity": ["CrowdStrike", "Palo Alto", "SentinelOne"],
-    "BC/DR": ["Zerto", "Veeam", "AWS DRaaS"],
-    "Compliance": ["OneTrust", "TrustArc", "Drata"]
-}
-
-# --- Dynamic AI Modernization Suggestion Function ---
-def dynamic_generate_modernization_suggestion(category, spend, renewal_date, risk_score):
-    suggestion = ""
-    if category in ["Hardware", "Storage"] and spend > 100000:
-        suggestion += "Explore cloud migration to reduce capex and enhance scalability. "
-    if category == "Software" and risk_score > 7:
-        suggestion += "Evaluate SaaS alternatives to improve security and upgrade cycles. "
-    if category == "Networking" and renewal_date:
-        suggestion += "Modernize network with SD-WAN or next-gen architecture solutions. "
-    if category == "Security" and risk_score > 8:
-        suggestion += "Implement zero-trust security models with AI-driven threat detection. "
-    if category == "Cloud" and spend > 50000:
-        suggestion += "Optimize multi-cloud deployments for cost savings and resiliency. "
-    if category == "Cybersecurity" and risk_score > 7:
-        suggestion += "Implement XDR and Zero-Trust Architecture to harden security posture. "
-    if category == "BC/DR" and spend > 50000:
-        suggestion += "Migrate to DRaaS platforms for more resilient disaster recovery. "
-    if category == "Compliance" and risk_score > 6:
-        suggestion += "Consider Compliance-as-a-Service (CaaS) offerings to streamline regulatory adherence. "
-    if not suggestion:
-        suggestion = "Review current asset lifecycle and evaluate modernization opportunities based on strategic goals."
-    return suggestion
-
-# --- Landing Page: New or Existing Project ---
-if "project_id" not in st.session_state:
-    st.title("🚀 Welcome to the ITRM Platform")
-    st.subheader("Start a New Assessment or Load an Existing One")
-
-    option = st.radio(
-        "Choose an option:",
-        ("➕ Start New Client Assessment", "📂 Open Existing Project"),
-        horizontal=True
-    )
-
-    if option == "➕ Start New Client Assessment":
-        with st.form("new_project_form", clear_on_submit=True):
-            client_name = st.text_input("Client Name")
-            project_name = st.text_input("Project/Assessment Name")
-            submitted = st.form_submit_button("Start New Project")
-
-            if submitted:
-                if client_name and project_name:
-                    st.session_state["client_name"] = client_name
-                    st.session_state["project_name"] = project_name
-                    st.session_state["project_id"] = str(uuid.uuid4())
-                    st.success(f"Started project: {client_name} - {project_name}")
-                    st.stop()
-                else:
-                    st.error("Please enter both Client and Project names.")
-
-    elif option == "📂 Open Existing Project":
-        if os.path.exists("projects"):
-            project_files = os.listdir("projects")
-            if project_files:
-                selected_file = st.selectbox("Select a saved project to load", project_files)
-                if st.button("Load Selected Project"):
-                    load_project(selected_file)
-                    st.stop()
-            else:
-                st.warning("No saved projects found. Please create a new assessment first.")
-        else:
-            st.warning("Project folder does not exist yet.")
-else:
-    # --- Normal App Flow (Project Active) ---
-    col1, col2 = st.columns([6, 1])
-
-    with col1:
-        with st.expander("📁 Active Project", expanded=True):
-            st.markdown(
-                f"**Client:** {st.session_state['client_name']}  \n"
-                f"**Project:** {st.session_state['project_name']}  \n"
-                f"**Project ID:** {st.session_state['project_id']}"
+    if st.button("📄 Generate Modernization Roadmap PDF"):
+        pdf_path = generate_roadmap_pdf()
+        with open(pdf_path, "rb") as pdf_file:
+            st.download_button(
+                label="📥 Download Roadmap PDF",
+                data=pdf_file,
+                file_name=os.path.basename(pdf_path),
+                mime="application/pdf"
             )
 
-        st.title("💡 ITRM Unified Platform")
-        st.markdown("""
-        Welcome to the **IT Revenue Management (ITRM)** platform.
-
-        Use the sidebar to access modules like:
-        - 🧩 Component Mapping
-        - 🗺️ Architecture Visualization
-        - 📊 Forecast & Risk Simulation
-        - 🤖 AI Strategy Assistant
-
-        This tool helps IT leaders align architecture to financial and strategic impact — all in one place.
-        """)
-
-        # --- Add New Component Form ---
-        st.subheader("➕ Add New Architecture Component")
-
-        with st.form("add_component_form", clear_on_submit=True):
-            new_component = st.text_input("Component Name")
-            submitted = st.form_submit_button("Add Component")
-
-            if submitted:
-                if new_component:
-                    components = st.session_state.controller.get_components()
-                    components.append(new_component)
-                    st.session_state.controller.set_components(components)
-                    st.success(f"Added component: {new_component}")
-                else:
-                    st.error("Please enter a component name.")
-
-        if st.button("📄 Generate Modernization Roadmap PDF"):
-            pdf_path = generate_roadmap_pdf()
-            with open(pdf_path, "rb") as pdf_file:
-                st.download_button(
-                    label="📥 Download Roadmap PDF",
-                    data=pdf_file,
-                    file_name=os.path.basename(pdf_path),
-                    mime="application/pdf"
-                )
-
-    with col2:
-        st.image("Market image.png", width=200)
-
-# --- Display Revenue on Sidebar ---
+# --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("### 💰 Revenue")
-    revenue_sidebar = st.session_state.get("project_revenue", "Not set")
-    st.info(f"Current Project Revenue: {revenue_sidebar}")
+    st.markdown("### 📊 Session Info")
+    st.write(f"Client: {st.session_state.get('client_name', '-')}")
+    st.write(f"Project: {st.session_state.get('project_name', '-')}")
+    st.write(f"Revenue: {st.session_state.get('project_revenue', '-')}")
 
-# --- Revenue Input Capture Block ---
-with st.expander("💵 Project Revenue", expanded=True):
-    if "project_revenue" not in st.session_state:
-        st.session_state["project_revenue"] = ""
-
-    st.markdown("## 💵 Project Revenue")
-    st.caption("Enter the annual revenue this IT architecture supports. You can type it manually or click auto-fetch:")
-    
-    st.text_input("Annual Revenue (USD)", key="project_revenue")
-    
-    if st.session_state.get("client_name"):
-        revenue_button_label = f"🔍 Try Auto-Fetch for “{st.session_state['client_name']}”"
-    else:
-        revenue_button_label = "🔍 Try Auto-Fetch (Enter company name first)"
-    fetch_button = st.button(revenue_button_label, key="revenue_fetch_button")
-    
-    st.caption("Hint: Use a publicly traded company name (e.g., 'Cisco', 'Salesforce') for best results.")
-   
-    if fetch_button:
-        try:
-            import requests
-            from bs4 import BeautifulSoup
-
-            client_name = st.session_state.get ("client_name", "")
-            if not client_name: 
-                st.warning ("Client name is not set. Please enter a client name first.")
-                st.stop ()
-            
-            query = f"{client_name} annual revenue site:craft.co"
-            url = f"https://www.google.com/search?q={query}"
-            headers = {"User-Agent": "Mozilla/5.0"}
-            response = requests.get(url, headers=headers)
-            soup = BeautifulSoup(response.text, "html.parser")
-            text = soup.get_text()
-
-            import re
-            match = re.search(r"\$[\d,]+[MBT]?", text)
-            if match:
-                st.session_state["project_revenue"] = match.group(0)
-                st.success(f"Auto-fetched estimated revenue: {match.group(0)}")
-            else:
-                st.warning("Could not extract revenue. Please enter it manually.")
-
-        except Exception as e:
-            st.warning(f"Error fetching revenue: {e}")
-    
-# --- Upload Architecture Document ---
-st.header("📂 Upload Architecture Document")
-st.write("Upload Visio (.vsdx), PDF, CSV, or JSON")
-
-REQUIRED_COLUMNS = ["Name", "Category", "Spend", "Renewal Date", "Risk Score"]
-
-def validate_table(df):
-    missing_cols = [col for col in REQUIRED_COLUMNS if col not in df.columns]
-    if missing_cols:
-        st.error(f"❌ Missing required columns: {', '.join(missing_cols)}")
-        return False
-    return True
-
-# --- CSV Upload Protection ---
-if "csv_loaded" not in st.session_state:
-    st.session_state["csv_loaded"] = False
-
-uploaded_csv = st.file_uploader("Upload CSV", type=["csv"])
-if uploaded_csv and not st.session_state["csv_loaded"]:
-    if st.button("📥 Load CSV into Project"):
-        df = pd.read_csv(uploaded_csv)
-        if validate_table(df):
-            st.session_state.controller.set_components(df.to_dict(orient="records"))
-            st.session_state["csv_loaded"] = True
-            st.success("✅ CSV components loaded successfully.")
-
-# --- JSON Upload Protection ---
-if "json_loaded" not in st.session_state:
-    st.session_state["json_loaded"] = False
-
-uploaded_json = st.file_uploader("Upload JSON", type=["json"])
-if uploaded_json and not st.session_state["json_loaded"]:
-    if st.button("📥 Load JSON into Project"):
-        import json
-        data = json.load(uploaded_json)
-        if isinstance(data, list):
-            df = pd.DataFrame(data)
-            if validate_table(df):
-                st.session_state.controller.set_components(df.to_dict(orient="records"))
-                st.session_state["json_loaded"] = True
-                st.success("✅ JSON components loaded successfully.")
-
-# --- PDF Upload Parsing ---
-if "pdf_loaded" not in st.session_state:
-    st.session_state["pdf_loaded"] = False
-
-uploaded_pdf = st.file_uploader("Upload PDF (basic table parse)", type=["pdf"])
-if uploaded_pdf and not st.session_state["pdf_loaded"]:
-    if st.button("📥 Extract Table from PDF"):
-        import pdfplumber
-        with pdfplumber.open(uploaded_pdf) as pdf:
-            extracted_rows = []
-            for page in pdf.pages:
-                tables = page.extract_tables()
-                for table in tables:
-                    for row in table:
-                        if row and any(row):
-                            extracted_rows.append(row)
-        if extracted_rows:
-            extracted_df = pd.DataFrame(extracted_rows)
-            if validate_table(extracted_df):
-                extracted_df.columns = REQUIRED_COLUMNS
-                st.session_state.controller.set_components(extracted_df.to_dict(orient="records"))
-                st.session_state["pdf_loaded"] = True
-                st.success("✅ PDF tables extracted and loaded.")
-
-                # Display PDF-parsed components in safe layout
-                st.subheader("📄 Parsed PDF Component Preview")
-                with st.container():
-                    for i, comp in enumerate(st.session_state.controller.get_components()):
-                        st.markdown(f"**Component {i+1}**")
-                        st.markdown(f"- **Name:** {comp.get('Name', 'Unknown')}")
-                        st.markdown(f"- **Risk Score:** {comp.get('Risk Score', 'N/A')}")
-                        st.markdown(f"- **Category:** {comp.get('Category', 'Unknown')}")
-                        st.markdown(f"- **Spend:** ${comp.get('Spend', 0):,}")
-                        st.markdown(f"- **Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
-                        st.markdown("---")
-        else:
-            st.warning("⚠️ No tables found in PDF.")
-
-# --- Visio Upload Parsing ---
-if "visio_loaded" not in st.session_state:
-    st.session_state["visio_loaded"] = False
-
-uploaded_visio = st.file_uploader("Upload Visio Diagram (simple metadata parse)", type=["vsdx"])
-if uploaded_visio and not st.session_state["visio_loaded"]:
-    if st.button("📥 Parse Visio"):
-        from vsdx import VisioFile
-        vis = VisioFile(uploaded_visio)
-        extracted_shapes = []
-        for page in vis.pages:
-            for shape in page.shapes:
-                shape_text = shape.text if shape.text else "Unnamed"
-                extracted_shapes.append({"Name": shape_text, "Category": "Unknown", "Spend": 0, "Renewal Date": "", "Risk Score": 5})
-        if extracted_shapes:
-            df = pd.DataFrame(extracted_shapes)
-            if validate_table(df):
-                st.session_state.controller.set_components(df.to_dict(orient="records"))
-                st.session_state["visio_loaded"] = True
-                st.success("✅ Visio diagram shapes parsed and loaded.")
-        else:
-            st.warning("⚠️ No shapes found in Visio file.")
-
-# --- Display Parsed Components Safely ---
-if st.session_state.get("controller") and st.session_state.controller.get_components():
-    with st.expander("📋 View Uploaded Components Overview", expanded=False):
-        for i, comp in enumerate(st.session_state.controller.get_components()):
-            st.markdown(f"**Component {i+1}**")
-            st.markdown(f"- **Name:** {comp.get('Name', 'Unknown')}")
-            st.markdown(f"- **Risk Score:** {comp.get('Risk Score', 'N/A')}")
-            st.markdown(f"- **Category:** {comp.get('Category', 'Unknown')}")
-            st.markdown(f"- **Spend:** ${comp.get('Spend', 0):,}")
-            st.markdown(f"- **Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
-            st.markdown("---")
-
-# --- Reset Project State ---
-if st.button("Start New Project"):
-    if "controller" in st.session_state and hasattr(st.session_state.controller, "clear_components"):
-        st.session_state.controller.clear_components()
-    else:
-        st.error("Controller is not initialized or does not have the 'clear_components' method.")
-        st.session_state["csv_loaded"] = False
+    # --- JSON Upload Protection ---
+    if "json_loaded" not in st.session_state:
         st.session_state["json_loaded"] = False
+    
+    uploaded_json = st.file_uploader("Upload JSON", type=["json"])
+    if uploaded_json and not st.session_state["json_loaded"]:
+        if st.button("📥 Load JSON into Project"):
+            import json
+            data = json.load(uploaded_json)
+            if isinstance(data, list):
+                df = pd.DataFrame(data)
+                if validate_table(df):
+                    st.session_state.controller.set_components(df.to_dict(orient="records"))
+                    st.session_state["json_loaded"] = True
+                    st.success("✅ JSON components loaded successfully.")
+    
+    # --- PDF Upload Parsing ---
+    if "pdf_loaded" not in st.session_state:
         st.session_state["pdf_loaded"] = False
+    
+    uploaded_pdf = st.file_uploader("Upload PDF (basic table parse)", type=["pdf"])
+    if uploaded_pdf and not st.session_state["pdf_loaded"]:
+        if st.button("📥 Extract Table from PDF"):
+            import pdfplumber
+            with pdfplumber.open(uploaded_pdf) as pdf:
+                extracted_rows = []
+                for page in pdf.pages:
+                    tables = page.extract_tables()
+                    for table in tables:
+                        for row in table:
+                            if row and any(row):
+                                extracted_rows.append(row)
+            if extracted_rows:
+                extracted_df = pd.DataFrame(extracted_rows)
+                if validate_table(extracted_df):
+                    extracted_df.columns = REQUIRED_COLUMNS
+                    st.session_state.controller.set_components(extracted_df.to_dict(orient="records"))
+                    st.session_state["pdf_loaded"] = True
+                    st.success("✅ PDF tables extracted and loaded.")
+    
+                    # Display PDF-parsed components in safe layout
+                    st.subheader("📄 Parsed PDF Component Preview")
+                    with st.container():
+                        for i, comp in enumerate(st.session_state.controller.get_components()):
+                            st.markdown(f"**Component {i+1}**")
+                            st.markdown(f"- **Name:** {comp.get('Name', 'Unknown')}")
+                            st.markdown(f"- **Risk Score:** {comp.get('Risk Score', 'N/A')}")
+                            st.markdown(f"- **Category:** {comp.get('Category', 'Unknown')}")
+                            st.markdown(f"- **Spend:** ${comp.get('Spend', 0):,}")
+                            st.markdown(f"- **Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
+                            st.markdown("---")
+            else:
+                st.warning("⚠️ No tables found in PDF.")
+    
+    # --- Visio Upload Parsing ---
+    if "visio_loaded" not in st.session_state:
         st.session_state["visio_loaded"] = False
-          
-# --- AIOps / CMDB Mock Connector ---
-st.header("🔌 Connect to AIOps / CMDB System")
-
-if st.button("🌐 Fetch Architecture from AIOps API"):
-    simulated_api_response = [
-        {"Name": "Web Load Balancer", "Category": "Networking", "Spend": 80000, "Renewal Date": "2025-11-01", "Risk Score": 6},
-        {"Name": "Customer Database", "Category": "Storage", "Spend": 200000, "Renewal Date": "2026-03-15", "Risk Score": 8},
-        {"Name": "Authentication Server", "Category": "Security", "Spend": 70000, "Renewal Date": "2025-08-30", "Risk Score": 7}
-    ]
-    st.session_state.aiops_components = simulated_api_response
-    st.success("Successfully fetched architecture components from AIOps!")
-
-if 'aiops_components' in st.session_state:
-    st.subheader("🔎 AIOps Components Preview")
-    for comp in st.session_state.aiops_components:
-        st.write(f"- {comp['Name']} ({comp['Category']}) | Spend: ${comp['Spend']:,} | Risk: {comp['Risk Score']}")
-
-    if st.button("➕ Import AIOps Components into Architecture"):
+    
+    uploaded_visio = st.file_uploader("Upload Visio Diagram (simple metadata parse)", type=["vsdx"])
+    if uploaded_visio and not st.session_state["visio_loaded"]:
+        if st.button("📥 Parse Visio"):
+            from vsdx import VisioFile
+            vis = VisioFile(uploaded_visio)
+            extracted_shapes = []
+            for page in vis.pages:
+                for shape in page.shapes:
+                    shape_text = shape.text if shape.text else "Unnamed"
+                    extracted_shapes.append({"Name": shape_text, "Category": "Unknown", "Spend": 0, "Renewal Date": "", "Risk Score": 5})
+            if extracted_shapes:
+                df = pd.DataFrame(extracted_shapes)
+                if validate_table(df):
+                    st.session_state.controller.set_components(df.to_dict(orient="records"))
+                    st.session_state["visio_loaded"] = True
+                    st.success("✅ Visio diagram shapes parsed and loaded.")
+            else:
+                st.warning("⚠️ No shapes found in Visio file.")
+    
+    # --- Display Parsed Components Safely ---
+    if st.session_state.get("controller") and st.session_state.controller.get_components():
+        with st.expander("📋 View Uploaded Components Overview", expanded=False):
+            for i, comp in enumerate(st.session_state.controller.get_components()):
+                st.markdown(f"**Component {i+1}**")
+                st.markdown(f"- **Name:** {comp.get('Name', 'Unknown')}")
+                st.markdown(f"- **Risk Score:** {comp.get('Risk Score', 'N/A')}")
+                st.markdown(f"- **Category:** {comp.get('Category', 'Unknown')}")
+                st.markdown(f"- **Spend:** ${comp.get('Spend', 0):,}")
+                st.markdown(f"- **Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
+                st.markdown("---")
+    
+    # --- Reset Project State ---
+    if st.button("Start New Project"):
+        if "controller" in st.session_state and hasattr(st.session_state.controller, "clear_components"):
+            st.session_state.controller.clear_components()
+        else:
+            st.error("Controller is not initialized or does not have the 'clear_components' method.")
+            st.session_state["csv_loaded"] = False
+            st.session_state["json_loaded"] = False
+            st.session_state["pdf_loaded"] = False
+            st.session_state["visio_loaded"] = False
+              
+    # --- AIOps / CMDB Mock Connector ---
+    st.header("🔌 Connect to AIOps / CMDB System")
+    
+    if st.button("🌐 Fetch Architecture from AIOps API"):
+        simulated_api_response = [
+            {"Name": "Web Load Balancer", "Category": "Networking", "Spend": 80000, "Renewal Date": "2025-11-01", "Risk Score": 6},
+            {"Name": "Customer Database", "Category": "Storage", "Spend": 200000, "Renewal Date": "2026-03-15", "Risk Score": 8},
+            {"Name": "Authentication Server", "Category": "Security", "Spend": 70000, "Renewal Date": "2025-08-30", "Risk Score": 7}
+        ]
+        st.session_state.aiops_components = simulated_api_response
+        st.success("Successfully fetched architecture components from AIOps!")
+    
+    if 'aiops_components' in st.session_state:
+        st.subheader("🔎 AIOps Components Preview")
         for comp in st.session_state.aiops_components:
-            st.session_state.controller.add_component(comp)
-        st.success("AIOps components successfully imported into architecture!")
-        del st.session_state.aiops_components
+            st.write(f"- {comp['Name']} ({comp['Category']}) | Spend: ${comp['Spend']:,} | Risk: {comp['Risk Score']}")
+    
+        if st.button("➕ Import AIOps Components into Architecture"):
+            for comp in st.session_state.aiops_components:
+                st.session_state.controller.add_component(comp)
+            st.success("AIOps components successfully imported into architecture!")
+            del st.session_state.aiops_components
 
 # --- Polished AIOps-Specific Risk Insights Dashboard ---
 if st.session_state.controller.get_components():
@@ -781,8 +655,6 @@ if not components_df.empty and "Name" in components_df and "Risk Score" in compo
     ax.set_xlabel("Risk Score")
     ax.set_title("Component Risk Overview")
     st.pyplot(fig)
-
-
 
 
 
