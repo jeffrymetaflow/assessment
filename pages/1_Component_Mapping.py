@@ -54,5 +54,13 @@ st.subheader("📋 Current Component Inventory")
 if components:
     df = pd.DataFrame(components)
     st.dataframe(df)
+
+    # 📊 Aggregate Spend by Category
+    if "Category" in df.columns and "Spend" in df.columns:
+        agg_df = df.groupby("Category")["Spend"].sum().reset_index()
+        st.session_state["category_spend_summary"] = agg_df  # persist to session state
+        st.subheader("🔎 Aggregated Spend by Category")
+        st.dataframe(agg_df)
 else:
     st.info("No components added yet. Use the form above to get started.")
+ 
