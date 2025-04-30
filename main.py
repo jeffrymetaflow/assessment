@@ -776,6 +776,17 @@ def generate_roadmap_pdf():
 
     return filepath
 
+# --- Matplotlib Component Risk Plot Fix ---
+components_df = pd.DataFrame(st.session_state.controller.get_components())
+if not components_df.empty and "Name" in components_df and "Risk Score" in components_df:
+    components_df_sorted = components_df.sort_values(by="Risk Score", ascending=True)
+    components_df_sorted["Name"] = components_df_sorted["Name"].fillna("Unnamed").astype(str)
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.barh(components_df_sorted['Name'], components_df_sorted['Risk Score'])
+    ax.set_xlabel("Risk Score")
+    ax.set_title("Component Risk Overview")
+    st.pyplot(fig)
 
 
 
