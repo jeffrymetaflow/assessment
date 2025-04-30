@@ -43,6 +43,11 @@ if name and st.button("Add IT Component", key="mapping_add_button"):
     st.success(f"Component '{name}' added.")
 
 # 🧠 Run simulation and sync session state
+# Ensure all components have Revenue Impact % before running simulation
+for c in controller.components:
+    if "Revenue Impact %" not in c:
+        cat = c.get("Category", "Unknown")
+        c["Revenue Impact %"] = st.session_state.get("category_revenue_impact", {}).get(cat, 0)
 try:
     controller.run_simulation()
     init_session_state_from_components(controller)
