@@ -153,32 +153,6 @@ with st.sidebar:
     st.write(f"Project: {st.session_state.get('project_name', '-')}")
     st.write(f"Revenue: {st.session_state.get('project_revenue', '-')}")
 
-# --- Upload Architecture Document ---
-st.header("📂 Upload Architecture Document")
-st.write("Upload Visio (.vsdx), PDF, CSV, or JSON")
-
-REQUIRED_COLUMNS = ["Name", "Category", "Spend", "Renewal Date", "Risk Score"]
-
-def validate_table(df):
-    missing_cols = [col for col in REQUIRED_COLUMNS if col not in df.columns]
-    if missing_cols:
-        st.error(f"❌ Missing required columns: {', '.join(missing_cols)}")
-        return False
-    return True
-
-# --- CSV Upload Protection ---
-if "csv_loaded" not in st.session_state:
-    st.session_state["csv_loaded"] = False
-
-uploaded_csv = st.file_uploader("Upload CSV", type=["csv"])
-if uploaded_csv and not st.session_state["csv_loaded"]:
-    if st.button("📥 Load CSV into Project"):
-        df = pd.read_csv(uploaded_csv)
-        if validate_table(df):
-            st.session_state.controller.set_components(df.to_dict(orient="records"))
-            st.session_state["csv_loaded"] = True
-            st.success("✅ CSV components loaded successfully.")
-
 # --- JSON Upload Protection ---
 if "json_loaded" not in st.session_state:
     st.session_state["json_loaded"] = False
