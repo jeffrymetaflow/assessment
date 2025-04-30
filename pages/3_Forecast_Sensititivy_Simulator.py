@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from utils.bootstrap import page_bootstrap
 
-st.set_page_config(page_title="IT Forecast & Sensitivity Simulator", layout="wide")
+st.set_page_config(page_title="IT Spend Forecast & Sensitivity Simulator", layout="wide")
 st.title("📊 IT Spend Forecast & Sensitivity Model")
 
 page_bootstrap(current_page="Forecast Simulator")  # Or "Risk Model", etc.
@@ -32,6 +32,15 @@ defaults = {
 # 🔄 Pull real component-based spend if available
 if "controller" in st.session_state:
     controller = st.session_state.controller
+    if not hasattr(controller, "get_expense_by_category"):
+        def get_expense_by_category():
+            category_totals = {}
+            for comp in controller.components:
+                category = comp.get("Category", "Unknown")
+                spend = comp.get("Spend", 0)
+                category_totals[category] = category_totals.get(category, 0) + spend
+            return category_totals
+        controller.get_expense_by_category = get_expense_by_category
     expense_by_category = controller.get_expense_by_category()
 else:
     st.warning("Controller not found in session state. Using defaults.")
