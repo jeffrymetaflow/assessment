@@ -54,6 +54,7 @@ for cat, impact_pct in category_impact_map.items():
 
 # --- Simulate Adjustment Sliders ---
 simulated_risks = []
+adjustment_map = {}
 if category_baseline_risk:
     st.subheader("⚙️ Simulate Revenue at Risk by Category")
     if isinstance(category_baseline_risk, dict):
@@ -67,6 +68,7 @@ if category_baseline_risk:
                 "Adjustment %": adj,
                 "Adjusted Risk ($)": simulated
             })
+            adjustment_map[cat] = adj
 else:
     st.info("No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
 
@@ -116,8 +118,21 @@ if not sim_df.empty and "Adjusted Risk ($)" in sim_df.columns:
             "Baseline Risk ($)": "${:,.2f}",
             "Adjusted Risk ($)": "${:,.2f}"
         }), use_container_width=True)
+
+    st.markdown("""
+    ### 🧠 Logic Flow Behind This Simulation
+
+    - **Baseline Revenue Source**: Retrieved from the Main Page setup.
+    - **Component Mapping Page**: Revenue Impact % is averaged per category.
+    - **Baseline Risk Calculation**: `Revenue × Average Revenue Impact % per Category`
+    - **Adjustment Slider**: Lets user simulate increase/decrease in risk impact per category.
+    - **Adjusted Risk Output**: `Baseline Risk × (1 + Adjustment %)`
+    - **Visualization**: Table + Bar chart reflecting category risk before/after simulation.
+    """)
+
 else:
     st.info("No valid simulation data to display.")
+
 
 
 
