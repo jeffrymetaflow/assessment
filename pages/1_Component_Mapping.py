@@ -50,15 +50,24 @@ for c in controller.components:
         c["Revenue Impact %"] = st.session_state.get("category_revenue_impact", {}).get(cat, 0)
 # Ensure expense_growth keys are initialized
 if "expense_growth" not in st.session_state:
-    st.session_state.expense_growth = {
-        1: 0.03, 2: 0.03, 3: 0.03, 4: 0.03, 5: 0.03, 6: 0.03, 7: 0.03
-    }
+    category_list = st.session_state.get("category_spend_summary", pd.DataFrame()).get("Category", pd.Series()).unique()
+    st.session_state.expense_growth = {i + 1: 0.03 for i, _ in enumerate(category_list)}
+
+# ✏️ Editable Expense Growth Rates by Category
+st.subheader("📈 Adjust Expense Growth by Category")
+category_list = st.session_state.get("category_spend_summary", pd.DataFrame()).get("Category", pd.Series()).unique()
+for i, cat in enumerate(category_list):
+    label = f"{cat} Growth Rate (%)"
+    current_val = st.session_state.expense_growth.get(i + 1, 0.03)
+    updated_val = st.number_input(label, min_value=0.0, max_value=1.0, value=current_val, step=0.01, key=f"growth_{cat}")
+    st.session_state.expense_growth[i + 1] = updated_val
 
 try:
     controller.run_simulation()
     init_session_state_from_components(controller)
 except Exception as e:
     st.error(f"Simulation or sync error: {e}")
+
     
 # 📊 Display Existing Components
 st.subheader("📋 Current Component Inventory")
