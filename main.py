@@ -268,6 +268,18 @@ if uploaded_pdf and not st.session_state["pdf_loaded"]:
                 st.session_state.controller.set_components(extracted_df.to_dict(orient="records"))
                 st.session_state["pdf_loaded"] = True
                 st.success("✅ PDF tables extracted and loaded.")
+
+                # Display PDF-parsed components in safe layout
+                st.subheader("📄 Parsed PDF Component Preview")
+                with st.container():
+                    for i, comp in enumerate(st.session_state.controller.get_components()):
+                        st.markdown(f"**Component {i+1}**")
+                        st.markdown(f"- **Name:** {comp.get('Name', 'Unknown')}")
+                        st.markdown(f"- **Risk Score:** {comp.get('Risk Score', 'N/A')}")
+                        st.markdown(f"- **Category:** {comp.get('Category', 'Unknown')}")
+                        st.markdown(f"- **Spend:** ${comp.get('Spend', 0):,}")
+                        st.markdown(f"- **Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
+                        st.markdown("---")
         else:
             st.warning("⚠️ No tables found in PDF.")
 
@@ -299,10 +311,13 @@ if st.session_state.get("controller") and st.session_state.controller.get_compon
     st.subheader("📋 Uploaded Components Overview")
     with st.container():
         for i, comp in enumerate(st.session_state.controller.get_components()):
-            with st.expander(f"{comp.get('Name', f'Component-{i+1}')} | Risk Score: {comp.get('Risk Score', 'N/A')}"):
-                st.markdown(f"**Category:** {comp.get('Category', 'Unknown')}")
-                st.markdown(f"**Spend:** ${comp.get('Spend', 0):,}")
-                st.markdown(f"**Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
+            st.markdown(f"**Component {i+1}**")
+            st.markdown(f"- **Name:** {comp.get('Name', 'Unknown')}")
+            st.markdown(f"- **Risk Score:** {comp.get('Risk Score', 'N/A')}")
+            st.markdown(f"- **Category:** {comp.get('Category', 'Unknown')}")
+            st.markdown(f"- **Spend:** ${comp.get('Spend', 0):,}")
+            st.markdown(f"- **Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
+            st.markdown("---")
 
 # --- Reset Project State ---
 if st.button("Start New Project"):
