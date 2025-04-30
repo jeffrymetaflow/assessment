@@ -110,9 +110,6 @@ if "project_id" in st.session_state:
                 mime="application/pdf"
             )
 
-        with col2:
-            st.image("Market image.png", width=200)
-
 # --- SIDEBAR ---
 with st.sidebar:
     st.markdown("### 📊 Session Info")
