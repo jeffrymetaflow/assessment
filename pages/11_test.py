@@ -39,15 +39,15 @@ if category_baseline_risk:
     st.subheader("⚙️ Simulate Revenue at Risk by Category")
     if isinstance(category_baseline_risk, dict):
         for cat in sorted(category_baseline_risk.keys()):
-        base = category_baseline_risk[cat]
-        adj = st.slider(f"{cat} Adjustment %", -100, 100, 0, key=f"risk_adj_{cat}")
-        simulated = base * (1 + adj / 100)
-        simulated_risks.append({
-            "Category": cat,
-            "Baseline Risk ($)": base,
-            "Adjustment %": adj,
-            "Adjusted Risk ($)": simulated
-        })
+            base = category_baseline_risk[cat]
+            adj = st.slider(f"{cat} Adjustment %", -100, 100, 0, key=f"risk_adj_{cat}")
+            simulated = base * (1 + adj / 100)
+            simulated_risks.append({
+                "Category": cat,
+                "Baseline Risk ($)": base,
+                "Adjustment %": adj,
+                "Adjusted Risk ($)": simulated
+            })
 else:
     st.info("No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
 
