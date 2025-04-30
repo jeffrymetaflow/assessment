@@ -146,9 +146,10 @@ if "project_id" in st.session_state:
                 mime="application/pdf"
             )
 
-
-    with col_2:
-        st.image("Market image.png", width=200)
+# Define columns before using them
+col_1, col_2 = st.columns(2)
+with col_2:
+    st.image("Market image.png", width=200)
 
 # --- SIDEBAR ---
 with st.sidebar:
