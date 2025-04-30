@@ -123,8 +123,6 @@ if category_baseline_risk:  # Check if the dictionary is not empty
             "Adjustment %": "{:+.0f}%",
             "Adjusted Risk ($)": "${:,.2f}"
         }))
-else:
-    st.info("No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
 
 else:
     st.info("No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
