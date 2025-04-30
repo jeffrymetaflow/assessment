@@ -92,7 +92,7 @@ except AttributeError:
 # --- Simulate Adjustment Sliders ---
 simulated_risks = []
 adjustment_map = {}
-if category_baseline_revenue:
+if category_baseline_risk_data:
     st.subheader("⚙️ Simulate Revenue at Risk by Category")
     if isinstance(category_baseline_risk, dict):
         for cat in sorted(category_baseline_risk.keys(), key=str):
