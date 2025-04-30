@@ -89,10 +89,16 @@ except AttributeError:
     category_impact_map = {}
     st.warning("⚠️ Revenue impact percentages not available. Please assign impact values on the Component Mapping page.")
 
-# --- Simulate Adjustment Sliders ---
+# Define category_baseline_risk
+category_baseline_risk = {
+    cat: baseline_revenue * (pct / 100)
+    for cat, pct in category_impact_map.items()
+}
+
+# Simulate Adjustment Sliders
 simulated_risks = []
 adjustment_map = {}
-if category_baseline_risk:
+if category_baseline_risk:  # Check if the dictionary is not empty
     st.subheader("⚙️ Simulate Revenue at Risk by Category")
     if isinstance(category_baseline_risk, dict):
         for cat in sorted(category_baseline_risk.keys(), key=str):
