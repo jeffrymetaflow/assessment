@@ -87,3 +87,6 @@ class ITRMController:
             })
     
         return category_risk
+
+    def get_baseline_revenue(self):
+        return getattr(self, "baseline_revenue", st.session_state.get("revenue", 0))
