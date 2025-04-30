@@ -18,10 +18,6 @@ if "controller" not in st.session_state:
 
 controller = st.session_state.controller
 
-# Define columns before using them
-col_1, col_2 = st.columns(2)
-col1, col2 = st.columns([6, 1])
-
 # --- USER JOURNEY ---
 st.title("🚀 Welcome to the ITRM Platform")
 st.subheader("Start a New Assessment or Load an Existing One")
@@ -149,9 +145,6 @@ if "project_id" in st.session_state:
                 file_name=os.path.basename(pdf_path),
                 mime="application/pdf"
             )
-
-    with col2:
-        st.image("Market image.png", width=200)
 
 # --- SIDEBAR ---
 with st.sidebar:
