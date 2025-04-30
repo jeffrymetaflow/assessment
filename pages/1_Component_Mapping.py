@@ -41,34 +41,7 @@ if name and st.button("Add IT Component", key="mapping_add_button"):
     }
     controller.add_component(component)
     st.success(f"Component '{name}' added.")
-
-# 🧠 Run simulation and sync session state
-# Ensure all components have Revenue Impact % before running simulation
-for c in controller.components:
-    if "Revenue Impact %" not in c:
-        cat = c.get("Category", "Unknown")
-        c["Revenue Impact %"] = st.session_state.get("category_revenue_impact", {}).get(cat, 0)
-
-# Ensure expense_growth keys are initialized
-if "expense_growth" not in st.session_state:
-    category_list = st.session_state.get("category_spend_summary", pd.DataFrame()).get("Category", pd.Series()).unique()
-    st.session_state.expense_growth = {cat: [0.03, 0.03, 0.03] for cat in category_list}
-
-# ✏️ Editable Expense Growth Rates by Category
-st.subheader("📈 Adjust Expense Growth by Category")
-for cat in st.session_state.expense_growth:
-    current_val = st.session_state.expense_growth[cat][0]
-    updated_val = st.number_input(f"{cat} Growth Rate (%)", min_value=0.0, max_value=1.0, value=current_val, step=0.01, key=f"growth_{cat}")
-    st.session_state.expense_growth[cat] = [updated_val] * 3
-
-try:
-    controller.run_simulation()
-    init_session_state_from_components(controller)
-except Exception as e:
-    import traceback
-    st.error(f"Simulation or sync error: {e}")
-    st.exception(traceback.format_exc())
-    
+  
 # 📊 Display Existing Components
 st.subheader("📋 Current Component Inventory")
 if components:
