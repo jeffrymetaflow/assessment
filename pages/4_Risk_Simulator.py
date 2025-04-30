@@ -21,11 +21,15 @@ st.sidebar.info(f"Using Baseline Revenue: ${revenue:,.0f}")
 categories = ["Hardware", "Software", "Personnel", "Maintenance", "Telecom", "Cybersecurity", "BC/DR"]
 controller = st.session_state.get("controller", None)
 
-if controller and hasattr(controller, "get_category_aggregates"):
-    category_data = controller.get_category_aggregates()
+if controller:
+    try:
+        category_data = controller.get_category_aggregates()
+    except Exception as e:
+        st.warning(f"Failed to aggregate component data: {e}")
+        category_data = {}
 else:
-    st.warning("Missing component aggregation logic. Defaulting to zero.")
-    category_data = {cat: {"spend": 0, "revenue_impact": 0} for cat in categories}
+    st.warning("No controller found in session state.")
+    category_data = {}
 
 # --------------------------
 # Display Revenue Risk Table
