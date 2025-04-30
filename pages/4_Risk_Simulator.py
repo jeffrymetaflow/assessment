@@ -9,6 +9,24 @@ if "controller" not in st.session_state:
 
 controller = st.session_state.controller
 
+# Assign missing Risk Score or Revenue Impact % values interactively
+with st.expander("⚙️ Fix Missing Risk Data", expanded=False):
+    needs_update = False
+    for comp in controller.components:
+        if "Revenue Impact %" not in comp or "Risk Score" not in comp:
+            st.markdown(f"**Component:** {comp.get('Name', 'Unnamed')}")
+            comp["Revenue Impact %"] = st.slider(
+                f"Revenue Impact % for {comp.get('Name', 'Unnamed')}",
+                0, 100, 20, key=f"impact_{comp.get('Name', id(comp))}"
+            )
+            comp["Risk Score"] = st.slider(
+                f"Risk Score for {comp.get('Name', 'Unnamed')}",
+                0, 10, 5, key=f"risk_{comp.get('Name', id(comp))}"
+            )
+            needs_update = True
+    if needs_update:
+        st.success("Missing values updated. Please rerun simulation.")
+
 # Patch to safely run simulation avoiding missing keys
 try:
     for c in controller.components:
@@ -98,4 +116,5 @@ if high_risk_components:
     }), use_container_width=True)
 else:
     st.info(f"No components above risk score threshold ({high_risk_threshold})")
+
 
