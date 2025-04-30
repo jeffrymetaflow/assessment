@@ -12,20 +12,23 @@ controller = st.session_state.controller
 # Assign missing Risk Score or Revenue Impact % values interactively
 with st.expander("⚙️ Fix Missing Risk Data", expanded=False):
     needs_update = False
-    for comp in controller.components:
+    for i, comp in enumerate(controller.components):
         if "Revenue Impact %" not in comp or "Risk Score" not in comp:
             st.markdown(f"**Component:** {comp.get('Name', 'Unnamed')}")
             comp["Revenue Impact %"] = st.slider(
                 f"Revenue Impact % for {comp.get('Name', 'Unnamed')}",
-                0, 100, 20, key=f"impact_{comp.get('Name', id(comp))}"
+                0, 100, 20, key=f"impact_{i}"
             )
             comp["Risk Score"] = st.slider(
                 f"Risk Score for {comp.get('Name', 'Unnamed')}",
-                0, 10, 5, key=f"risk_{comp.get('Name', id(comp))}"
+                0, 10, 5, key=f"risk_{i}"
             )
             needs_update = True
     if needs_update:
-        st.success("Missing values updated. Please rerun simulation.")
+        if st.button("🔁 Rerun Simulation Now"):
+            st.rerun()
+        else:
+            st.success("Missing values updated. Click 'Rerun Simulation Now' to refresh results.")
 
 # Patch to safely run simulation avoiding missing keys
 try:
