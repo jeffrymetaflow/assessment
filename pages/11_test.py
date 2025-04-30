@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 
 # Ensure controller is initialized and safely accessible
 try:
-    from controller import ITRMController
+    from controller.controller import ITRMController
     if "controller" not in st.session_state:
         st.session_state.controller = ITRMController()
     controller = st.session_state.controller
