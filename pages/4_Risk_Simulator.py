@@ -1,6 +1,46 @@
-import pandas as pd
 import streamlit as st
+import pandas as pd
 import plotly.graph_objects as go
+
+st.title("💸 Revenue at Risk Simulator")
+
+# --- Retrieve Required Data ---
+revenue = st.session_state.get("revenue", 0)
+category_impact = st.session_state.get("category_revenue_impact", {})
+
+if not category_impact:
+    st.warning("⚠️ No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
+    st.stop()
+
+# --- Calculate Baseline Risk by Category ---
+baseline_risk_data = []
+for cat, pct in category_impact.items():
+    baseline = revenue * (pct / 100)
+    baseline_risk_data.append({
+        "Category": cat,
+        "Baseline Risk ($)": baseline,
+        "Adjustment %": 0,
+        "Adjusted Risk ($)": baseline,
+    })
+
+sim_df = pd.DataFrame(baseline_risk_data)
+
+# --- Display Key Stats ---
+total_risk = sim_df["Adjusted Risk ($)"].sum()
+avg_risk = sim_df["Adjusted Risk ($)"].mean()
+
+st.markdown(f"""
+- 📦 **Total Components**: {len(category_impact)}  
+- 🔥 **Total Simulated Revenue at Risk**: `${total_risk:,.2f}`  
+- 📊 **Average Category Risk**: `${avg_risk:,.2f}`
+""")
+
+# --- Show Main Table ---
+st.subheader("📊 Risk Simulation by Category")
+st.dataframe(sim_df.style.format({
+    "Baseline Risk ($)": "${:,.2f}",
+    "Adjusted Risk ($)": "${:,.2f}"
+}))
 
 # Ensure controller is initialized and safely accessible
 try:
