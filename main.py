@@ -146,13 +146,6 @@ if "project_id" in st.session_state:
                 mime="application/pdf"
             )
 
-# --- SIDEBAR ---
-with st.sidebar:
-    st.markdown("### 📊 Session Info")
-    st.write(f"Client: {st.session_state.get('client_name', '-')}")
-    st.write(f"Project: {st.session_state.get('project_name', '-')}")
-    st.write(f"Revenue: {st.session_state.get('project_revenue', '-')}")
-
     # --- JSON Upload Protection ---
     if "json_loaded" not in st.session_state:
         st.session_state["json_loaded"] = False
@@ -275,6 +268,13 @@ with st.sidebar:
                 st.session_state.controller.add_component(comp)
             st.success("AIOps components successfully imported into architecture!")
             del st.session_state.aiops_components
+
+# --- SIDEBAR ---
+with st.sidebar:
+    st.markdown("### 📊 Session Info")
+    st.write(f"Client: {st.session_state.get('client_name', '-')}")
+    st.write(f"Project: {st.session_state.get('project_name', '-')}")
+    st.write(f"Revenue: {st.session_state.get('project_revenue', '-')}")
 
 # --- Polished AIOps-Specific Risk Insights Dashboard ---
 if st.session_state.controller.get_components():
