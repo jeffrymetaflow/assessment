@@ -31,8 +31,13 @@ except Exception as e:
     st.error(f"❌ Failed to initialize controller: {e}")
     st.stop()
 
+# 🔁 Fallback-safe baseline revenue from session state or controller
 try:
-    baseline_revenue = controller.get_baseline_revenue() or 0
+    baseline_revenue = st.session_state.get("revenue", 0)
+    if not baseline_revenue:
+        baseline_revenue = getattr(controller, "baseline_revenue", 0)
+    if not baseline_revenue:
+        st.warning("⚠️ Baseline revenue not found. Please enter it on the main page.")
 except Exception:
     baseline_revenue = 0
     st.warning("⚠️ Baseline revenue not found. Please enter it on the main page.")
@@ -122,7 +127,7 @@ if not sim_df.empty and "Adjusted Risk ($)" in sim_df.columns:
     st.markdown("""
     ### 🧠 Logic Flow Behind This Simulation
 
-    - **Baseline Revenue Source**: Retrieved from the Main Page setup.
+    - **Baseline Revenue Source**: Retrieved from the Main Page setup or controller fallback.
     - **Component Mapping Page**: Revenue Impact % is averaged per category.
     - **Baseline Risk Calculation**: `Revenue × Average Revenue Impact % per Category`
     - **Adjustment Slider**: Lets user simulate increase/decrease in risk impact per category.
