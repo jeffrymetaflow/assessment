@@ -775,8 +775,8 @@ if not components_df.empty and "Name" in components_df and "Risk Score" in compo
 
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.barh(
-    y=components_df_sorted['Name'].astype(str),
-    width=pd.to_numeric(components_df_sorted['Risk Score'], errors='coerce').fillna(0)
+    components_df_sorted['Name'].astype(str),
+    pd.to_numeric(components_df_sorted['Risk Score'], errors='coerce').fillna(0)
 )
     ax.set_xlabel("Risk Score")
     ax.set_title("Component Risk Overview")
