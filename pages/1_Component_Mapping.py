@@ -52,14 +52,14 @@ for c in controller.components:
 # Ensure expense_growth keys are initialized
 if "expense_growth" not in st.session_state:
     category_list = st.session_state.get("category_spend_summary", pd.DataFrame()).get("Category", pd.Series()).unique()
-    st.session_state.expense_growth = {cat: 0.03 for cat in category_list}
+    st.session_state.expense_growth = {cat: [0.03, 0.03, 0.03] for cat in category_list}
 
 # ✏️ Editable Expense Growth Rates by Category
 st.subheader("📈 Adjust Expense Growth by Category")
 for cat in st.session_state.expense_growth:
-    current_val = st.session_state.expense_growth[cat]
+    current_val = st.session_state.expense_growth[cat][0]
     updated_val = st.number_input(f"{cat} Growth Rate (%)", min_value=0.0, max_value=1.0, value=current_val, step=0.01, key=f"growth_{cat}")
-    st.session_state.expense_growth[cat] = updated_val
+    st.session_state.expense_growth[cat] = [updated_val] * 3
 
 try:
     controller.run_simulation()
