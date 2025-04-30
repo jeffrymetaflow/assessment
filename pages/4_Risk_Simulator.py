@@ -8,7 +8,14 @@ if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
 
 controller = st.session_state.controller
-controller.run_simulation()
+# Patch to safely run simulation avoiding missing keys
+try:
+    for c in controller.components:
+        revenue_at_risk = (c.get("Revenue Impact %", 0) * c.get("Risk Score", 0)) / 100
+        c["Revenue at Risk (%)"] = round(revenue_at_risk, 2)
+    controller.simulation_results = pd.DataFrame(controller.components)
+except Exception as e:
+    st.error(f"Simulation error: {e}")
 
 st.title("💸 Revenue at Risk Simulator")
 
@@ -57,4 +64,3 @@ for cat, data in category_risk.items():
             "Risk Score": "{:.0f}",
             "Revenue at Risk (%)": "{:.2f}%"
         }), use_container_width=True)
-
