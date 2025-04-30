@@ -9,6 +9,18 @@ if "controller" not in st.session_state:
 
 controller = st.session_state.controller
 
+# Use category-level sliders as fallback if component-level fields are missing
+category_impact_defaults = {
+    cat: st.session_state.get(f"impact_slider_{cat}", 10)  # Default to 10%
+    for cat in set(c.get("Category") for c in controller.components)
+}
+
+for c in controller.components:
+    if "Revenue Impact %" not in c:
+        c["Revenue Impact %"] = category_impact_defaults.get(c.get("Category"), 10)
+    if "Risk Score" not in c:
+        c["Risk Score"] = 5  # Default risk score if missing
+
 # Assign missing Risk Score or Revenue Impact % values interactively
 with st.expander("⚙️ Fix Missing Risk Data", expanded=False):
     needs_update = False
@@ -63,7 +75,7 @@ st.markdown(f"""
 """)
 
 # Component-Level Detail Behind Expander
-with st.expander("📋 View Component-Level Revenue at Risk Table", expanded=False):
+with st.expander("📜 View Component-Level Revenue at Risk Table", expanded=False):
     st.dataframe(
         controller.simulation_results.style.format({"Revenue at Risk (%)": "{:.2f}%"}),
         use_container_width=True
@@ -119,5 +131,4 @@ if high_risk_components:
     }), use_container_width=True)
 else:
     st.info(f"No components above risk score threshold ({high_risk_threshold})")
-
 
