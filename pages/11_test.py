@@ -147,7 +147,7 @@ if "project_id" in st.session_state:
             )
 
 
-    with col2:
+    with col_2:
         st.image("Market image.png", width=200)
 
 # --- SIDEBAR ---
