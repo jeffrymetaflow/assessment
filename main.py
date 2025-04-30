@@ -308,8 +308,7 @@ if uploaded_visio and not st.session_state["visio_loaded"]:
 
 # --- Display Parsed Components Safely ---
 if st.session_state.get("controller") and st.session_state.controller.get_components():
-    st.subheader("📋 Uploaded Components Overview")
-    with st.container():
+    with st.expander("📋 View Uploaded Components Overview", expanded=False):
         for i, comp in enumerate(st.session_state.controller.get_components()):
             st.markdown(f"**Component {i+1}**")
             st.markdown(f"- **Name:** {comp.get('Name', 'Unknown')}")
