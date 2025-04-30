@@ -84,34 +84,34 @@ if "project_id" in st.session_state:
     # --- AI Assistant Setup ---
     page_bootstrap(current_page="Main")
 
-        # --- Add New Component Form ---
-        st.subheader("➕ Add New Architecture Component")
+    # --- Add New Component Form ---
+    st.subheader("➕ Add New Architecture Component")
 
-        with st.form("add_component_form", clear_on_submit=True):
-            new_component = st.text_input("Component Name")
-            submitted = st.form_submit_button("Add Component")
+    with st.form("add_component_form", clear_on_submit=True):
+        new_component = st.text_input("Component Name")
+        submitted = st.form_submit_button("Add Component")
 
-            if submitted:
-                if new_component:
-                    components = st.session_state.controller.get_components()
-                    components.append(new_component)
-                    st.session_state.controller.set_components(components)
-                    st.success(f"Added component: {new_component}")
-                else:
-                    st.error("Please enter a component name.")
+        if submitted:
+            if new_component:
+                components = st.session_state.controller.get_components()
+                components.append(new_component)
+                st.session_state.controller.set_components(components)
+                st.success(f"Added component: {new_component}")
+            else:
+                st.error("Please enter a component name.")
 
-        if st.button("📄 Generate Modernization Roadmap PDF"):
-            pdf_path = generate_roadmap_pdf()
-            with open(pdf_path, "rb") as pdf_file:
-                st.download_button(
-                    label="📥 Download Roadmap PDF",
-                    data=pdf_file,
-                    file_name=os.path.basename(pdf_path),
-                    mime="application/pdf"
-                )
+    if st.button("📄 Generate Modernization Roadmap PDF"):
+        pdf_path = generate_roadmap_pdf()
+        with open(pdf_path, "rb") as pdf_file:
+            st.download_button(
+                label="📥 Download Roadmap PDF",
+                data=pdf_file,
+                file_name=os.path.basename(pdf_path),
+                mime="application/pdf"
+            )
 
-    with col2:
-        st.image("Market image.png", width=200)
+with col2:
+    st.image("Market image.png", width=200)
 
 # --- SIDEBAR ---
 with st.sidebar:
