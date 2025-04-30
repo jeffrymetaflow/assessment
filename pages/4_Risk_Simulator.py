@@ -116,7 +116,6 @@ else:
     st.info("No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
 
 # --- Render Simulation Results ---
-sim_df = pd.DataFrame(simulated_risks)
 
 if not sim_df.empty and "Adjusted Risk ($)" in sim_df.columns:
     try:
