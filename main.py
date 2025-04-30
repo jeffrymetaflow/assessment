@@ -9,6 +9,12 @@ from fpdf import FPDF
 from controller.controller import ITRMController
 from utils.bootstrap import page_bootstrap
 
+# Configure the app
+st.set_page_config(
+    page_title="ITRM Unified App",
+    layout="wide"
+)
+
 # Initialize the shared controller (only once)
 if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
@@ -65,11 +71,6 @@ if "project_id" in st.session_state:
                 st.success(f"Added component: {new_component}")
             else:
                 st.error("Please enter a component name.")
-# Configure the app
-st.set_page_config(
-    page_title="ITRM Unified App",
-    layout="wide"
-)
 
 # Inject AI Assistant with full context
 page_bootstrap(current_page="Main")
