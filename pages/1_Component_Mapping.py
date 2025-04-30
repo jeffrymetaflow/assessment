@@ -48,10 +48,17 @@ try:
 except Exception as e:
     st.error(f"Simulation or sync error: {e}")
 
+# 📥 Retrieve components from controller
+components = controller.get_components()
+
 # 📊 Display Existing Components
 st.subheader("📋 Current Component Inventory")
-if controller.components:
-    df = pd.DataFrame(controller.components)
+if components:
+    df = pd.DataFrame(components)
+    st.dataframe(df)
+else:
+    st.info("No components added yet. Use the form above to get started.")
+
     st.dataframe(df)
 else:
     st.info("No components added yet. Use the form above to get started.")
