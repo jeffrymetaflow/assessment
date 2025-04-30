@@ -18,9 +18,9 @@ if "controller" not in st.session_state:
 
 controller = st.session_state.controller
 
-    # Define columns before using them
-    col_1, col_2 = st.columns(2)
-    col1, col2 = st.columns([6, 1])
+# Define columns before using them
+col_1, col_2 = st.columns(2)
+col1, col2 = st.columns([6, 1])
 
 # --- USER JOURNEY ---
 st.title("🚀 Welcome to the ITRM Platform")
