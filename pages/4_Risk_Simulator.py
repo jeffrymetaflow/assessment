@@ -41,9 +41,12 @@ st.markdown(f"""
 **📊 Average Category Risk:** `{avg_risk:.2f}%`
 """)
 
-# Display Simulation Table
-st.subheader("📋 Component-Level Revenue at Risk")
-st.dataframe(controller.simulation_results.style.format({"Revenue at Risk (%)": "{:.2f}%"}), use_container_width=True)
+# Component-Level Detail Behind Expander
+with st.expander("📋 View Component-Level Revenue at Risk Table", expanded=False):
+    st.dataframe(
+        controller.simulation_results.style.format({"Revenue at Risk (%)": "{:.2f}%"}),
+        use_container_width=True
+    )
 
 # Risk Summary by Category
 st.subheader("📊 Risk Summary by Category")
@@ -95,3 +98,4 @@ if high_risk_components:
     }), use_container_width=True)
 else:
     st.info(f"No components above risk score threshold ({high_risk_threshold})")
+
