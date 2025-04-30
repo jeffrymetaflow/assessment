@@ -3,78 +3,70 @@ import pandas as pd
 import plotly.graph_objects as go
 from utils.bootstrap import page_bootstrap
 
-st.set_page_config(page_title="Revenue-at-Risk Model", layout="wide")
-st.title("📈 Revenue-at-Risk Simulator")
+st.set_page_config(page_title="Revenue at Risk Analysis", layout="wide")
+st.title("💸 Revenue at Risk Simulator")
 
-page_bootstrap(current_page="Risk Simulator")  # Or "Risk Model", etc.
+page_bootstrap(current_page="Revenue Risk")
 
-# --- Inputs ---
-st.sidebar.header("🔧 Model Inputs")
+# --------------------------
+# Shared Revenue Input
+# --------------------------
+revenue = st.session_state.get("revenue", 5_000_000)
+st.sidebar.header("📊 Base Revenue")
+st.sidebar.info(f"Using Baseline Revenue: ${revenue:,.0f}")
 
-# Pull from shared state or use default
-total_revenue = st.session_state.get("revenue", 100_000_000)
-cyber_investment = st.session_state.get("expense_by_category", {}).get("Cybersecurity", 1_000_000)
-bcdr_investment = st.session_state.get("expense_by_category", {}).get("BC/DR", 500_000)
+# --------------------------
+# Pull Component-Based Aggregates
+# --------------------------
+categories = ["Hardware", "Software", "Personnel", "Maintenance", "Telecom", "Cybersecurity", "BC/DR"]
+controller = st.session_state.get("controller", None)
 
-st.sidebar.info(f"Using Revenue: ${total_revenue:,.0f}")
-st.sidebar.info(f"Using Cybersecurity Investment: ${cyber_investment:,.0f}")
-st.sidebar.info(f"Using BC/DR Investment: ${bcdr_investment:,.0f}")
+if controller and hasattr(controller, "get_category_aggregates"):
+    category_data = controller.get_category_aggregates()
+else:
+    st.warning("Missing component aggregation logic. Defaulting to zero.")
+    category_data = {cat: {"spend": 0, "revenue_impact": 0} for cat in categories}
 
-# Risk Exposure Inputs
-risk_exposure_percent = st.sidebar.slider("% of Revenue at Risk without Protection", min_value=0, max_value=100, value=40)
-risk_mitigation_effectiveness = st.sidebar.slider("Effectiveness of Cyber/BC Spend in Risk Reduction (%)", 0, 100, 75)
+# --------------------------
+# Display Revenue Risk Table
+# --------------------------
+st.subheader("📋 Revenue Impact by IT Category")
+risk_table = []
+for cat in categories:
+    spend = category_data.get(cat, {}).get("spend", 0)
+    impact_pct = category_data.get(cat, {}).get("revenue_impact", 0) / 100
+    revenue_risk = revenue * impact_pct
+    risk_table.append((cat, spend, impact_pct * 100, revenue_risk))
 
-# --- Calculations ---
-total_protective_investment = cyber_investment + bcdr_investment
-revenue_at_risk = total_revenue * (risk_exposure_percent / 100)
-avoided_loss = revenue_at_risk * (risk_mitigation_effectiveness / 100)
-ropr = (avoided_loss - total_protective_investment) / total_protective_investment if total_protective_investment > 0 else 0
+risk_df = pd.DataFrame(risk_table, columns=["Category", "IT Spend", "% Revenue at Risk", "Revenue at Risk"])
+st.dataframe(risk_df.style.format({
+    "IT Spend": "${:,.0f}",
+    "% Revenue at Risk": "{:.1f}%",
+    "Revenue at Risk": "${:,.0f}"
+}), use_container_width=True)
 
-# Store in session for cross-tab use
-st.session_state.risk_model = {
-    "Revenue at Risk": revenue_at_risk,
-    "Avoided Loss": avoided_loss,
-    "ROPR": ropr,
-    "Investments": {
-        "Cybersecurity": cyber_investment,
-        "BC/DR": bcdr_investment
-    }
-}
-
-# --- Results ---
-st.subheader("📊 Results Summary")
-
-col1, col2, col3 = st.columns(3)
-col1.metric("Revenue at Risk", f"${revenue_at_risk:,.0f}")
-col2.metric("Avoided Revenue Loss", f"${avoided_loss:,.0f}")
-col3.metric("ROPR (Return on Risk Prevention)", f"{ropr:.2f}x")
-
-# --- Visualization ---
+# --------------------------
+# Visualize Revenue at Risk
+# --------------------------
+st.subheader("📉 Revenue at Risk by Category")
 fig = go.Figure()
 fig.add_trace(go.Bar(
-    name="Risk Exposure",
-    x=["Unprotected Revenue"],
-    y=[revenue_at_risk],
-    marker_color="red"
-))
-fig.add_trace(go.Bar(
-    name="Avoided Loss",
-    x=["Unprotected Revenue"],
-    y=[avoided_loss],
-    marker_color="green"
+    x=risk_df["Category"],
+    y=risk_df["Revenue at Risk"],
+    text=risk_df["Revenue at Risk"].apply(lambda x: f"${x:,.0f}"),
+    textposition="outside",
+    marker_color="indianred"
 ))
 fig.update_layout(
-    title="Impact of Cybersecurity & BC/DR Investments",
-    yaxis_title="Revenue ($)",
-    barmode="group",
+    xaxis_title="Category",
+    yaxis_title="Revenue at Risk ($)",
+    title="Projected Revenue Exposure by IT Category",
     height=500
 )
 st.plotly_chart(fig, use_container_width=True)
 
-# --- Explanation ---
-st.markdown("""
-### 🔬 How It Works
-- **Revenue at Risk** is the portion of total revenue potentially lost in the event of cyberattacks or business interruptions.
-- **Avoided Loss** is how much of that risk is mitigated by your cybersecurity and BC/DR investments.
-- **ROPR** (Return on Risk Prevention) shows the financial value of those investments.
-""")
+# --------------------------
+# Summary
+# --------------------------
+total_risk = risk_df["Revenue at Risk"].sum()
+st.metric(label="💰 Total Revenue at Risk", value=f"${total_risk:,.0f}")
