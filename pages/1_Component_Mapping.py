@@ -17,7 +17,13 @@ st.title("🧩 Component Mapping & Master Inputs")
 
 # 🏛️ Global Master Inputs (used across app)
 st.subheader("💼 Organization Financial Inputs")
-st.session_state.revenue = st.number_input("Total Revenue ($)", value=5_000_000, step=100_000)
+
+# Use existing session value or fallback
+initial_revenue = st.session_state.get("revenue", 5_000_000)
+
+# Sync with session state
+st.session_state.revenue = st.number_input("Total Revenue ($)", value=initial_revenue, step=100_000)
+
 
 # 🧱 IT Component Builder
 st.subheader("🧩 Add a New IT Component")
