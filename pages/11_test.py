@@ -38,7 +38,7 @@ simulated_risks = []
 if category_baseline_risk:
     st.subheader("⚙️ Simulate Revenue at Risk by Category")
     if isinstance(category_baseline_risk, dict):
-        for cat in sorted(category_baseline_risk.keys()):
+        for cat in sorted(list(category_baseline_risk.keys())):
             base = category_baseline_risk[cat]
             adj = st.slider(f"{cat} Adjustment %", -100, 100, 0, key=f"risk_adj_{cat}")
             simulated = base * (1 + adj / 100)
@@ -99,5 +99,4 @@ if not sim_df.empty and "Adjusted Risk ($)" in sim_df.columns:
         }), use_container_width=True)
 else:
     st.info("No valid simulation data to display.")
-
 
