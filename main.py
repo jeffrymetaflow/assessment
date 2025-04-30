@@ -49,7 +49,7 @@ if "project_id" in st.session_state:
     # --- REVENUE SETUP ---
     with st.expander("💵 Project Revenue", expanded=True):
         if "project_revenue" not in st.session_state:
-            st.session_state["project_revenue"] = ""
+            st.session_state["revenue"] = float(cleaned)
     
         st.markdown("## 💵 Project Revenue")
         st.caption("Enter the annual revenue this IT architecture supports. You can type it manually or click auto-fetch:")
