@@ -89,14 +89,6 @@ except AttributeError:
     category_impact_map = {}
     st.warning("⚠️ Revenue impact percentages not available. Please assign impact values on the Component Mapping page.")
 
-st.title("💸 Revenue at Risk Simulator")
-
-# --- Calculate Baseline Revenue at Risk Per Category ---
-category_baseline_risk = {}
-for cat, impact_pct in category_impact_map.items():
-    if isinstance(impact_pct, (int, float)):
-        category_baseline_risk[cat] = baseline_revenue * (impact_pct / 100)
-
 # --- Simulate Adjustment Sliders ---
 simulated_risks = []
 adjustment_map = {}
