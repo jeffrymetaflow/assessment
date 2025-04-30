@@ -2,152 +2,119 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 
-# Ensure controller is always initialized in session state
-if "controller" not in st.session_state:
-    from controller import ITRMController  # Adjust path if needed
-    st.session_state.controller = ITRMController()
-
-controller = st.session_state.controller
-
-# Use category-level sliders as fallback if component-level fields are missing
-category_impact_defaults = {
-    cat: st.session_state.get(f"impact_slider_{cat}", 10)  # Default to 10%
-    for cat in set(c.get("Category") for c in controller.components)
-}
-
-for c in controller.components:
-    if "Revenue Impact %" not in c:
-        c["Revenue Impact %"] = category_impact_defaults.get(c.get("Category"), 10)
-    if "Risk Score" not in c:
-        c["Risk Score"] = 5  # Default risk score if missing
-
-# Assign missing Risk Score or Revenue Impact % values interactively
-with st.expander("⚙️ Fix Missing Risk Data", expanded=False):
-    needs_update = False
-    for i, comp in enumerate(controller.components):
-        if "Revenue Impact %" not in comp or "Risk Score" not in comp:
-            st.markdown(f"**Component:** {comp.get('Name', 'Unnamed')}")
-            comp["Revenue Impact %"] = st.slider(
-                f"Revenue Impact % for {comp.get('Name', 'Unnamed')}",
-                0, 100, 20, key=f"impact_{i}"
-            )
-            comp["Risk Score"] = st.slider(
-                f"Risk Score for {comp.get('Name', 'Unnamed')}",
-                0, 10, 5, key=f"risk_{i}"
-            )
-            needs_update = True
-    if needs_update:
-        if st.button("🔁 Rerun Simulation Now"):
-            st.rerun()
-        else:
-            st.success("Missing values updated. Click 'Rerun Simulation Now' to refresh results.")
-
-# Patch to safely run simulation avoiding missing keys
+# Ensure controller is initialized and safely accessible
 try:
-    for c in controller.components:
-        revenue_at_risk = (c.get("Revenue Impact %", 0) * c.get("Risk Score", 0)) / 100
-        c["Revenue at Risk (%)"] = round(revenue_at_risk, 2)
-        c["Revenue at Risk ($)"] = round((controller.get_baseline_revenue() or 0) * revenue_at_risk / 100, 2)
-    controller.simulation_results = pd.DataFrame(controller.components)
+    from controller.controller import ITRMController
+    if "controller" not in st.session_state:
+        st.session_state.controller = ITRMController()
+    controller = st.session_state.controller
+
+    # Patch: Dynamically calculate revenue impact % from components if missing
+    if not hasattr(controller, "get_category_impact_percentages"):
+        def get_category_impact_percentages():
+            impact_totals = {}
+            counts = {}
+            for c in controller.components:
+                cat = c.get("Category", "None")
+                impact = c.get("Revenue Impact %", 0)
+                if isinstance(impact, (int, float)):
+                    impact_totals[cat] = impact_totals.get(cat, 0) + impact
+                    counts[cat] = counts.get(cat, 0) + 1
+            return {
+                cat: round(impact_totals[cat] / counts[cat], 2)
+                for cat in impact_totals
+                if counts[cat] > 0
+            }
+        controller.get_category_impact_percentages = get_category_impact_percentages
+
 except Exception as e:
-    st.error(f"Simulation error: {e}")
+    st.error(f"❌ Failed to initialize controller: {e}")
+    st.stop()
+
+try:
+    baseline_revenue = controller.get_baseline_revenue() or 0
+except Exception:
+    baseline_revenue = 0
+    st.warning("⚠️ Baseline revenue not found. Please enter it on the main page.")
+
+# Safely get category impact percentages
+try:
+    category_impact_map = controller.get_category_impact_percentages()
+except AttributeError:
+    category_impact_map = {}
+    st.warning("⚠️ Revenue impact percentages not available. Please assign impact values on the Component Mapping page.")
 
 st.title("💸 Revenue at Risk Simulator")
 
-# --- Summary Metrics ---
-category_risk = controller.get_category_risk_summary()
-category_summary = pd.DataFrame([
-    {
-        "Category": cat,
-        "Total Revenue at Risk ($)": round(sum(c.get("Revenue at Risk ($)", 0) for c in data["components"]), 2),
-        "# of Components": len(data["components"])
-    }
-    for cat, data in category_risk.items()
-])
+# --- Calculate Baseline Revenue at Risk Per Category ---
+category_baseline_risk = {}
+for cat, impact_pct in category_impact_map.items():
+    if isinstance(impact_pct, (int, float)):
+        category_baseline_risk[cat] = baseline_revenue * (impact_pct / 100)
 
-# Patch for missing column
-if category_summary.empty or "Total Revenue at Risk ($)" not in category_summary.columns:
-    st.warning("⚠️ No valid 'Revenue at Risk' data found in components. Defaulting to 0s.")
-    category_summary["Total Revenue at Risk ($)"] = 0.0
-    category_summary["# of Components"] = 0
+# --- Simulate Adjustment Sliders ---
+simulated_risks = []
+if category_baseline_risk:
+    st.subheader("⚙️ Simulate Revenue at Risk by Category")
+    if isinstance(category_baseline_risk, dict):
+        for cat in sorted(category_baseline_risk.keys(), key=str):
+            base = category_baseline_risk[cat]
+            adj = st.slider(f"{cat} Adjustment %", -100, 100, 0, key=f"risk_adj_{cat}")
+            simulated = base * (1 + adj / 100)
+            simulated_risks.append({
+                "Category": cat,
+                "Baseline Risk ($)": base,
+                "Adjustment %": adj,
+                "Adjusted Risk ($)": simulated
+            })
+else:
+    st.info("No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
 
-# Ensure correct revenue totals
-total_risk = category_summary["Total Revenue at Risk ($)"].sum()
-avg_risk = category_summary["Total Revenue at Risk ($)"].mean()
-total_components = sum(len(data["components"]) for data in category_risk.values())
+# --- Render Simulation Results ---
+sim_df = pd.DataFrame(simulated_risks)
 
-st.markdown(f"""
-**🧮 Total Components:** `{total_components}`  
-**🔥 Total Revenue at Risk:** `${total_risk:,.2f}`  
-**📊 Average Category Risk:** `${avg_risk:,.2f}`
-""")
+if not sim_df.empty and "Adjusted Risk ($)" in sim_df.columns:
+    try:
+        total_components = len(controller.components)
+    except Exception:
+        total_components = 0
 
-# Component-Level Detail Behind Expander
-with st.expander("📜 View Component-Level Revenue at Risk Table", expanded=False):
-    st.dataframe(
-        controller.simulation_results.style.format({
-            "Revenue at Risk (%)": "{:.2f}%",
-            "Revenue at Risk ($)": "${:,.2f}"
-        }),
-        use_container_width=True
+    total_risk = sim_df["Adjusted Risk ($)"].sum()
+    avg_risk = sim_df["Adjusted Risk ($)"].mean()
+
+    st.markdown(f"""
+    **🧮 Total Components:** `{total_components}`  
+    **🔥 Total Simulated Revenue at Risk:** `${total_risk:,.2f}`  
+    **📊 Average Category Risk:** `${avg_risk:,.2f}`
+    """)
+
+    st.subheader("📊 Risk Simulation by Category")
+    st.dataframe(sim_df.set_index("Category").style.format({
+        "Baseline Risk ($)": "${:,.2f}",
+        "Adjustment %": "{:+.0f}%",
+        "Adjusted Risk ($)": "${:,.2f}"
+    }), use_container_width=True)
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=sim_df["Category"],
+        y=sim_df["Adjusted Risk ($)"],
+        text=sim_df["Adjusted Risk ($)"].apply(lambda x: f"${x:,.0f}"),
+        textposition="outside",
+        marker_color="darkred"
+    ))
+    fig.update_layout(
+        title="Simulated Revenue at Risk by Category",
+        xaxis_title="Category",
+        yaxis_title="Adjusted Revenue at Risk ($)",
+        height=460
     )
+    st.plotly_chart(fig, use_container_width=True)
 
-# Risk Summary by Category
-st.subheader("📊 Risk Summary by Category")
-if "Category" in category_summary.columns:
-    st.dataframe(category_summary.set_index("Category").style.format({
-        "Total Revenue at Risk ($)": "${:,.2f}"
-    }), use_container_width=True)
-else:
-    st.dataframe(category_summary.style.format({
-        "Total Revenue at Risk ($)": "${:,.2f}"
-    }), use_container_width=True)
-
-# Chart visualization
-fig = go.Figure()
-fig.add_trace(go.Bar(
-    x=category_summary["Category"] if "Category" in category_summary.columns else category_summary.index,
-    y=category_summary["Total Revenue at Risk ($)"],
-    text=category_summary["Total Revenue at Risk ($)"].apply(lambda x: f"${x:,.0f}"),
-    textposition="outside",
-    marker_color="crimson"
-))
-fig.update_layout(
-    title="Total Revenue at Risk by IT Category",
-    xaxis_title="Category",
-    yaxis_title="Revenue at Risk ($)",
-    height=450
-)
-st.plotly_chart(fig, use_container_width=True)
-
-# Show per-category components
-st.subheader("🔍 Drill-Down: High-Risk Components by Category")
-for cat, data in category_risk.items():
-    with st.expander(f"{cat} - Total Risk: ${round(sum(c.get('Revenue at Risk ($)', 0) for c in data['components']), 2):,.0f}", expanded=False):
-        comp_df = pd.DataFrame(data["components"])
-        st.dataframe(comp_df.style.format({
-            "Revenue Impact %": "{:.1f}%",
-            "Risk Score": "{:.0f}",
-            "Revenue at Risk (%)": "{:.2f}%",
-            "Revenue at Risk ($)": "${:,.2f}"
+    with st.expander("🧾 View Category Risk Calculation Details"):
+        st.dataframe(sim_df.style.format({
+            "Baseline Risk ($)": "${:,.2f}",
+            "Adjusted Risk ($)": "${:,.2f}"
         }), use_container_width=True)
-
-# 🔎 Optional Global High-Risk List
-high_risk_threshold = 7
-high_risk_components = [
-    c for comps in category_risk.values()
-    for c in comps["components"]
-    if c.get("Risk Score", 0) >= high_risk_threshold
-]
-
-if high_risk_components:
-    st.subheader(f"🚨 High-Risk Components (Score ≥ {high_risk_threshold})")
-    high_risk_df = pd.DataFrame(high_risk_components)
-    st.dataframe(high_risk_df.style.format({
-        "Revenue Impact %": "{:.1f}%",
-        "Risk Score": "{:.0f}",
-        "Revenue at Risk (%)": "{:.2f}%",
-        "Revenue at Risk ($)": "${:,.2f}"
-    }), use_container_width=True)
 else:
-    st.info(f"No components above risk score threshold ({high_risk_threshold})")
+    st.info("No valid simulation data to display.")
