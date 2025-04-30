@@ -153,128 +153,128 @@ with st.sidebar:
     st.write(f"Project: {st.session_state.get('project_name', '-')}")
     st.write(f"Revenue: {st.session_state.get('project_revenue', '-')}")
 
-# --- JSON Upload Protection ---
-if "json_loaded" not in st.session_state:
-    st.session_state["json_loaded"] = False
-
-uploaded_json = st.file_uploader("Upload JSON", type=["json"])
-if uploaded_json and not st.session_state["json_loaded"]:
-    if st.button("📥 Load JSON into Project"):
-        import json
-        data = json.load(uploaded_json)
-        if isinstance(data, list):
-            df = pd.DataFrame(data)
-            if validate_table(df):
-                st.session_state.controller.set_components(df.to_dict(orient="records"))
-                st.session_state["json_loaded"] = True
-                st.success("✅ JSON components loaded successfully.")
-
-# --- PDF Upload Parsing ---
-if "pdf_loaded" not in st.session_state:
-    st.session_state["pdf_loaded"] = False
-
-uploaded_pdf = st.file_uploader("Upload PDF (basic table parse)", type=["pdf"])
-if uploaded_pdf and not st.session_state["pdf_loaded"]:
-    if st.button("📥 Extract Table from PDF"):
-        import pdfplumber
-        with pdfplumber.open(uploaded_pdf) as pdf:
-            extracted_rows = []
-            for page in pdf.pages:
-                tables = page.extract_tables()
-                for table in tables:
-                    for row in table:
-                        if row and any(row):
-                            extracted_rows.append(row)
-        if extracted_rows:
-            extracted_df = pd.DataFrame(extracted_rows)
-            if validate_table(extracted_df):
-                extracted_df.columns = REQUIRED_COLUMNS
-                st.session_state.controller.set_components(extracted_df.to_dict(orient="records"))
-                st.session_state["pdf_loaded"] = True
-                st.success("✅ PDF tables extracted and loaded.")
-
-                # Display PDF-parsed components in safe layout
-                st.subheader("📄 Parsed PDF Component Preview")
-                with st.container():
-                    for i, comp in enumerate(st.session_state.controller.get_components()):
-                        st.markdown(f"**Component {i+1}**")
-                        st.markdown(f"- **Name:** {comp.get('Name', 'Unknown')}")
-                        st.markdown(f"- **Risk Score:** {comp.get('Risk Score', 'N/A')}")
-                        st.markdown(f"- **Category:** {comp.get('Category', 'Unknown')}")
-                        st.markdown(f"- **Spend:** ${comp.get('Spend', 0):,}")
-                        st.markdown(f"- **Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
-                        st.markdown("---")
-        else:
-            st.warning("⚠️ No tables found in PDF.")
-
-# --- Visio Upload Parsing ---
-if "visio_loaded" not in st.session_state:
-    st.session_state["visio_loaded"] = False
-
-uploaded_visio = st.file_uploader("Upload Visio Diagram (simple metadata parse)", type=["vsdx"])
-if uploaded_visio and not st.session_state["visio_loaded"]:
-    if st.button("📥 Parse Visio"):
-        from vsdx import VisioFile
-        vis = VisioFile(uploaded_visio)
-        extracted_shapes = []
-        for page in vis.pages:
-            for shape in page.shapes:
-                shape_text = shape.text if shape.text else "Unnamed"
-                extracted_shapes.append({"Name": shape_text, "Category": "Unknown", "Spend": 0, "Renewal Date": "", "Risk Score": 5})
-        if extracted_shapes:
-            df = pd.DataFrame(extracted_shapes)
-            if validate_table(df):
-                st.session_state.controller.set_components(df.to_dict(orient="records"))
-                st.session_state["visio_loaded"] = True
-                st.success("✅ Visio diagram shapes parsed and loaded.")
-        else:
-            st.warning("⚠️ No shapes found in Visio file.")
-
-# --- Display Parsed Components Safely ---
-if st.session_state.get("controller") and st.session_state.controller.get_components():
-    with st.expander("📋 View Uploaded Components Overview", expanded=False):
-        for i, comp in enumerate(st.session_state.controller.get_components()):
-            st.markdown(f"**Component {i+1}**")
-            st.markdown(f"- **Name:** {comp.get('Name', 'Unknown')}")
-            st.markdown(f"- **Risk Score:** {comp.get('Risk Score', 'N/A')}")
-            st.markdown(f"- **Category:** {comp.get('Category', 'Unknown')}")
-            st.markdown(f"- **Spend:** ${comp.get('Spend', 0):,}")
-            st.markdown(f"- **Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
-            st.markdown("---")
-
-# --- Reset Project State ---
-if st.button("Start New Project"):
-    if "controller" in st.session_state and hasattr(st.session_state.controller, "clear_components"):
-        st.session_state.controller.clear_components()
-    else:
-        st.error("Controller is not initialized or does not have the 'clear_components' method.")
-        st.session_state["csv_loaded"] = False
+    # --- JSON Upload Protection ---
+    if "json_loaded" not in st.session_state:
         st.session_state["json_loaded"] = False
+    
+    uploaded_json = st.file_uploader("Upload JSON", type=["json"])
+    if uploaded_json and not st.session_state["json_loaded"]:
+        if st.button("📥 Load JSON into Project"):
+            import json
+            data = json.load(uploaded_json)
+            if isinstance(data, list):
+                df = pd.DataFrame(data)
+                if validate_table(df):
+                    st.session_state.controller.set_components(df.to_dict(orient="records"))
+                    st.session_state["json_loaded"] = True
+                    st.success("✅ JSON components loaded successfully.")
+    
+    # --- PDF Upload Parsing ---
+    if "pdf_loaded" not in st.session_state:
         st.session_state["pdf_loaded"] = False
+    
+    uploaded_pdf = st.file_uploader("Upload PDF (basic table parse)", type=["pdf"])
+    if uploaded_pdf and not st.session_state["pdf_loaded"]:
+        if st.button("📥 Extract Table from PDF"):
+            import pdfplumber
+            with pdfplumber.open(uploaded_pdf) as pdf:
+                extracted_rows = []
+                for page in pdf.pages:
+                    tables = page.extract_tables()
+                    for table in tables:
+                        for row in table:
+                            if row and any(row):
+                                extracted_rows.append(row)
+            if extracted_rows:
+                extracted_df = pd.DataFrame(extracted_rows)
+                if validate_table(extracted_df):
+                    extracted_df.columns = REQUIRED_COLUMNS
+                    st.session_state.controller.set_components(extracted_df.to_dict(orient="records"))
+                    st.session_state["pdf_loaded"] = True
+                    st.success("✅ PDF tables extracted and loaded.")
+    
+                    # Display PDF-parsed components in safe layout
+                    st.subheader("📄 Parsed PDF Component Preview")
+                    with st.container():
+                        for i, comp in enumerate(st.session_state.controller.get_components()):
+                            st.markdown(f"**Component {i+1}**")
+                            st.markdown(f"- **Name:** {comp.get('Name', 'Unknown')}")
+                            st.markdown(f"- **Risk Score:** {comp.get('Risk Score', 'N/A')}")
+                            st.markdown(f"- **Category:** {comp.get('Category', 'Unknown')}")
+                            st.markdown(f"- **Spend:** ${comp.get('Spend', 0):,}")
+                            st.markdown(f"- **Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
+                            st.markdown("---")
+            else:
+                st.warning("⚠️ No tables found in PDF.")
+    
+    # --- Visio Upload Parsing ---
+    if "visio_loaded" not in st.session_state:
         st.session_state["visio_loaded"] = False
-          
-# --- AIOps / CMDB Mock Connector ---
-st.header("🔌 Connect to AIOps / CMDB System")
-
-if st.button("🌐 Fetch Architecture from AIOps API"):
-    simulated_api_response = [
-        {"Name": "Web Load Balancer", "Category": "Networking", "Spend": 80000, "Renewal Date": "2025-11-01", "Risk Score": 6},
-        {"Name": "Customer Database", "Category": "Storage", "Spend": 200000, "Renewal Date": "2026-03-15", "Risk Score": 8},
-        {"Name": "Authentication Server", "Category": "Security", "Spend": 70000, "Renewal Date": "2025-08-30", "Risk Score": 7}
-    ]
-    st.session_state.aiops_components = simulated_api_response
-    st.success("Successfully fetched architecture components from AIOps!")
-
-if 'aiops_components' in st.session_state:
-    st.subheader("🔎 AIOps Components Preview")
-    for comp in st.session_state.aiops_components:
-        st.write(f"- {comp['Name']} ({comp['Category']}) | Spend: ${comp['Spend']:,} | Risk: {comp['Risk Score']}")
-
-    if st.button("➕ Import AIOps Components into Architecture"):
+    
+    uploaded_visio = st.file_uploader("Upload Visio Diagram (simple metadata parse)", type=["vsdx"])
+    if uploaded_visio and not st.session_state["visio_loaded"]:
+        if st.button("📥 Parse Visio"):
+            from vsdx import VisioFile
+            vis = VisioFile(uploaded_visio)
+            extracted_shapes = []
+            for page in vis.pages:
+                for shape in page.shapes:
+                    shape_text = shape.text if shape.text else "Unnamed"
+                    extracted_shapes.append({"Name": shape_text, "Category": "Unknown", "Spend": 0, "Renewal Date": "", "Risk Score": 5})
+            if extracted_shapes:
+                df = pd.DataFrame(extracted_shapes)
+                if validate_table(df):
+                    st.session_state.controller.set_components(df.to_dict(orient="records"))
+                    st.session_state["visio_loaded"] = True
+                    st.success("✅ Visio diagram shapes parsed and loaded.")
+            else:
+                st.warning("⚠️ No shapes found in Visio file.")
+    
+    # --- Display Parsed Components Safely ---
+    if st.session_state.get("controller") and st.session_state.controller.get_components():
+        with st.expander("📋 View Uploaded Components Overview", expanded=False):
+            for i, comp in enumerate(st.session_state.controller.get_components()):
+                st.markdown(f"**Component {i+1}**")
+                st.markdown(f"- **Name:** {comp.get('Name', 'Unknown')}")
+                st.markdown(f"- **Risk Score:** {comp.get('Risk Score', 'N/A')}")
+                st.markdown(f"- **Category:** {comp.get('Category', 'Unknown')}")
+                st.markdown(f"- **Spend:** ${comp.get('Spend', 0):,}")
+                st.markdown(f"- **Renewal Date:** {comp.get('Renewal Date', 'Unknown')}")
+                st.markdown("---")
+    
+    # --- Reset Project State ---
+    if st.button("Start New Project"):
+        if "controller" in st.session_state and hasattr(st.session_state.controller, "clear_components"):
+            st.session_state.controller.clear_components()
+        else:
+            st.error("Controller is not initialized or does not have the 'clear_components' method.")
+            st.session_state["csv_loaded"] = False
+            st.session_state["json_loaded"] = False
+            st.session_state["pdf_loaded"] = False
+            st.session_state["visio_loaded"] = False
+              
+    # --- AIOps / CMDB Mock Connector ---
+    st.header("🔌 Connect to AIOps / CMDB System")
+    
+    if st.button("🌐 Fetch Architecture from AIOps API"):
+        simulated_api_response = [
+            {"Name": "Web Load Balancer", "Category": "Networking", "Spend": 80000, "Renewal Date": "2025-11-01", "Risk Score": 6},
+            {"Name": "Customer Database", "Category": "Storage", "Spend": 200000, "Renewal Date": "2026-03-15", "Risk Score": 8},
+            {"Name": "Authentication Server", "Category": "Security", "Spend": 70000, "Renewal Date": "2025-08-30", "Risk Score": 7}
+        ]
+        st.session_state.aiops_components = simulated_api_response
+        st.success("Successfully fetched architecture components from AIOps!")
+    
+    if 'aiops_components' in st.session_state:
+        st.subheader("🔎 AIOps Components Preview")
         for comp in st.session_state.aiops_components:
-            st.session_state.controller.add_component(comp)
-        st.success("AIOps components successfully imported into architecture!")
-        del st.session_state.aiops_components
+            st.write(f"- {comp['Name']} ({comp['Category']}) | Spend: ${comp['Spend']:,} | Risk: {comp['Risk Score']}")
+    
+        if st.button("➕ Import AIOps Components into Architecture"):
+            for comp in st.session_state.aiops_components:
+                st.session_state.controller.add_component(comp)
+            st.success("AIOps components successfully imported into architecture!")
+            del st.session_state.aiops_components
 
 # --- Polished AIOps-Specific Risk Insights Dashboard ---
 if st.session_state.controller.get_components():
