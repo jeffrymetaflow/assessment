@@ -45,6 +45,20 @@ col1.metric("Total IT Spend", f"${total_spend:,.0f}")
 col2.metric("IT Spend / Revenue", f"{it_ratio:.2f}%")
 col3.metric("Revenue at Risk (Protected)", f"{sum([v['Revenue Protected %'] for v in risk_impact.values()])}%")
 
+st.subheader("💰 Financial Summary Snapshot")
+
+if "category_spend_summary" in st.session_state and "category_revenue_impact" in st.session_state:
+    cat_df = st.session_state["category_spend_summary"].copy()
+    impact_map = st.session_state["category_revenue_impact"]
+
+    cat_df["Revenue Impact %"] = cat_df["Category"].map(impact_map)
+    cat_df["Revenue at Risk ($)"] = cat_df["Spend"] * (cat_df["Revenue Impact %"] / 100)
+
+    st.dataframe(cat_df)
+    st.metric("🔻 Total Revenue at Risk", f"${int(cat_df['Revenue at Risk ($)'].sum()):,}")
+else:
+    st.warning("Missing data: Please define revenue impact in Component Mapping first.")
+
 # --- Multi-Period Line Chart with Variance Highlighting ---
 st.subheader("\U0001F4C9 IT Spend Trends by Category")
 fig_trend = go.Figure()
