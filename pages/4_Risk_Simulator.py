@@ -94,14 +94,19 @@ with st.expander("📜 View Component-Level Revenue at Risk Table", expanded=Fal
 
 # Risk Summary by Category
 st.subheader("📊 Risk Summary by Category")
-st.dataframe(category_summary.set_index("Category").style.format({
-    "Total Revenue at Risk ($)": "${:,.2f}"
-}), use_container_width=True)
+if "Category" in category_summary.columns:
+    st.dataframe(category_summary.set_index("Category").style.format({
+        "Total Revenue at Risk ($)": "${:,.2f}"
+    }), use_container_width=True)
+else:
+    st.dataframe(category_summary.style.format({
+        "Total Revenue at Risk ($)": "${:,.2f}"
+    }), use_container_width=True)
 
 # Chart visualization
 fig = go.Figure()
 fig.add_trace(go.Bar(
-    x=category_summary["Category"],
+    x=category_summary["Category"] if "Category" in category_summary.columns else category_summary.index,
     y=category_summary["Total Revenue at Risk ($)"],
     text=category_summary["Total Revenue at Risk ($)"].apply(lambda x: f"${x:,.0f}"),
     textposition="outside",
