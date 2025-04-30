@@ -66,3 +66,24 @@ class ITRMController:
             "forecast": self.forecast_model,
             "summary": self.financial_summary
         }
+
+    def get_category_risk_summary(self):
+        category_risk = {}
+        for comp in self.components:
+            cat = comp.get("Category", "Unknown")
+            risk_score = comp.get("Risk Score", 0)
+            revenue_pct = comp.get("Revenue Impact %", 0)
+            risk_val = (revenue_pct * risk_score) / 100
+    
+            if cat not in category_risk:
+                category_risk[cat] = {"total_risk": 0, "components": []}
+    
+            category_risk[cat]["total_risk"] += risk_val
+            category_risk[cat]["components"].append({
+                "Name": comp.get("Name", ""),
+                "Revenue Impact %": revenue_pct,
+                "Risk Score": risk_score,
+                "Revenue at Risk (%)": round(risk_val, 2)
+            })
+    
+        return category_risk
