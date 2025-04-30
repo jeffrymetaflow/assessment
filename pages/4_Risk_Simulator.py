@@ -24,8 +24,6 @@ for cat, pct in category_impact.items():
     })
 
 sim_df = pd.DataFrame(baseline_risk_data)
-sim_df = pd.DataFrame(simulated_risks)
-
 
 # --- Display Key Stats ---
 total_risk = sim_df["Adjusted Risk ($)"].sum()
