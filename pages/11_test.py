@@ -8,10 +8,6 @@ st.title("💸 Revenue at Risk Simulator")
 revenue = st.session_state.get("revenue", 0)
 category_impact = st.session_state.get("category_revenue_impact", {})
 
-if not category_impact:
-    st.warning("⚠️ No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
-    st.stop()
-
 # Ensure controller is initialized and safely accessible
 try:
     from controller.controller import ITRMController
@@ -36,6 +32,10 @@ try:
                 if counts[cat] > 0
             }
         controller.get_category_impact_percentages = get_category_impact_percentages
+
+    # ✅ New Patch: Force populate session state with revenue impact if missing
+    if not st.session_state.get("category_revenue_impact"):
+        st.session_state["category_revenue_impact"] = controller.get_category_impact_percentages()
 
 except Exception as e:
     st.error(f"❌ Failed to initialize controller: {e}")
@@ -83,7 +83,8 @@ if category_baseline_risk:  # Check if the dictionary is not empty
             })
             adjustment_map[cat] = adj
 else:
-    st.info("No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
+    st.warning("⚠️ No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
+    st.stop()
 
 # --- Render Simulation Results ---
 sim_df = pd.DataFrame(simulated_risks)
