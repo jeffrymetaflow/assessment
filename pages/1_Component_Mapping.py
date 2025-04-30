@@ -52,8 +52,10 @@ try:
     controller.run_simulation()
     init_session_state_from_components(controller)
 except Exception as e:
+    import traceback
     st.error(f"Simulation or sync error: {e}")
-
+    st.exception(traceback.format_exc())
+    
 # 📊 Display Existing Components
 st.subheader("📋 Current Component Inventory")
 if components:
