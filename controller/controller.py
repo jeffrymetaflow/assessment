@@ -91,3 +91,18 @@ class ITRMController:
 
     def get_baseline_revenue(self):
         return getattr(self, "baseline_revenue", st.session_state.get("revenue", 0))
+
+    def get_category_impact_percentages(self):
+        """Returns a dictionary mapping category -> assigned revenue impact %"""
+        category_map = {}
+        for comp in self.components:
+            cat = comp.get("Category")
+            impact = comp.get("Revenue Impact %")
+            if cat and isinstance(impact, (int, float)):
+                if cat in category_map:
+                    category_map[cat].append(impact)
+                else:
+                    category_map[cat] = [impact]
+    
+        # Average across components for each category
+        return {cat: sum(vals)/len(vals) for cat, vals in category_map.items()}
