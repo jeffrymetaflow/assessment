@@ -6,41 +6,6 @@ st.title("💸 Revenue at Risk Simulator")
 
 # --- Retrieve Required Data ---
 revenue = st.session_state.get("revenue", 0)
-category_impact = st.session_state.get("category_revenue_impact", {})
-
-if not category_impact:
-    st.warning("⚠️ No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
-    st.stop()
-
-# --- Calculate Baseline Risk by Category ---
-baseline_risk_data = []
-for cat, pct in category_impact.items():
-    baseline = revenue * (pct / 100)
-    baseline_risk_data.append({
-        "Category": cat,
-        "Baseline Risk ($)": baseline,
-        "Adjustment %": 0,
-        "Adjusted Risk ($)": baseline,
-    })
-
-sim_df = pd.DataFrame(baseline_risk_data)
-
-# --- Display Key Stats ---
-total_risk = sim_df["Adjusted Risk ($)"].sum()
-avg_risk = sim_df["Adjusted Risk ($)"].mean()
-
-st.markdown(f"""
-- 📦 **Total Components**: {len(category_impact)}  
-- 🔥 **Total Simulated Revenue at Risk**: `${total_risk:,.2f}`  
-- 📊 **Average Category Risk**: `${avg_risk:,.2f}`
-""")
-
-# --- Show Main Table ---
-st.subheader("📊 Risk Simulation by Category")
-st.dataframe(sim_df.style.format({
-    "Baseline Risk ($)": "${:,.2f}",
-    "Adjusted Risk ($)": "${:,.2f}"
-}))
 
 # Ensure controller is initialized and safely accessible
 try:
@@ -49,92 +14,75 @@ try:
         st.session_state.controller = ITRMController()
     controller = st.session_state.controller
 
-    # Patch: Dynamically calculate revenue impact % from components if missing
-    if not hasattr(controller, "get_category_impact_percentages"):
-        def get_category_impact_percentages():
-            impact_totals = {}
-            counts = {}
-            for c in controller.components:
-                cat = c.get("Category", "None")
-                impact = c.get("Revenue Impact %", 0)
-                if isinstance(impact, (int, float)):
-                    impact_totals[cat] = impact_totals.get(cat, 0) + impact
-                    counts[cat] = counts.get(cat, 0) + 1
-            return {
-                cat: round(impact_totals[cat] / counts[cat], 2)
-                for cat in impact_totals
-                if counts[cat] > 0
-            }
-        controller.get_category_impact_percentages = get_category_impact_percentages
+    # ✅ Always add the method to calculate category-level revenue impact %
+    def get_category_impact_percentages():
+        impact_totals = {}
+        counts = {}
+        for c in controller.components:
+            cat = c.get("Category", "None")
+            impact = c.get("Revenue Impact %", 0)
+            if isinstance(impact, (int, float)):
+                impact_totals[cat] = impact_totals.get(cat, 0) + impact
+                counts[cat] = counts.get(cat, 0) + 1
+        return {
+            cat: round(impact_totals[cat] / counts[cat], 2)
+            for cat in impact_totals
+            if counts[cat] > 0
+        }
+
+    controller.get_category_impact_percentages = get_category_impact_percentages
+
+    # ✅ Force populate session state if needed
+    if not st.session_state.get("category_revenue_impact"):
+        st.session_state["category_revenue_impact"] = controller.get_category_impact_percentages()
 
 except Exception as e:
     st.error(f"❌ Failed to initialize controller: {e}")
     st.stop()
 
-# 🔁 Fallback-safe baseline revenue from session state or controller
-try:
-    baseline_revenue = st.session_state.get("revenue", 0)
-    if not baseline_revenue:
-        baseline_revenue = getattr(controller, "baseline_revenue", 0)
+# 🔁 Baseline revenue fallback
+baseline_revenue = st.session_state.get("revenue", 0)
+if not baseline_revenue:
+    baseline_revenue = getattr(controller, "baseline_revenue", 0)
     if not baseline_revenue:
         st.warning("⚠️ Baseline revenue not found. Please enter it on the main page.")
-except Exception:
-    baseline_revenue = 0
-    st.warning("⚠️ Baseline revenue not found. Please enter it on the main page.")
 
-# Safely get category impact percentages
-try:
-    category_impact_map = controller.get_category_impact_percentages()
-except AttributeError:
-    category_impact_map = {}
-    st.warning("⚠️ Revenue impact percentages not available. Please assign impact values on the Component Mapping page.")
+# Load category impact percentages
+category_impact_map = st.session_state.get("category_revenue_impact", {})
 
-# Define category_baseline_risk
+# --- Calculate Baseline Risk Per Category ---
 category_baseline_risk = {
     cat: baseline_revenue * (pct / 100)
     for cat, pct in category_impact_map.items()
+    if isinstance(pct, (int, float))
 }
 
-# Simulate Adjustment Sliders
+# --- Simulate Adjustments ---
 simulated_risks = []
 adjustment_map = {}
-if category_baseline_risk:  # Check if the dictionary is not empty
+
+if category_baseline_risk:
     st.subheader("⚙️ Simulate Revenue at Risk by Category")
-    if isinstance(category_baseline_risk, dict):
-        for cat in sorted(category_baseline_risk.keys(), key=str):
-            base = category_baseline_risk[cat]
-            adj = st.slider(f"{cat} Adjustment %", -100, 100, 0, key=f"risk_adj_{cat}")
-            simulated = base * (1 + adj / 100)
-            simulated_risks.append({
-                "Category": cat,
-                "Baseline Risk ($)": base,
-                "Adjustment %": adj,
-                "Adjusted Risk ($)": simulated
-            })
-            adjustment_map[cat] = adj
-      
-        # Update DataFrame with simulated risks
-        sim_df = pd.DataFrame(simulated_risks)
-    
-        # Render updated table
-        st.subheader("📊 Risk Simulation by Category")
-        st.dataframe(sim_df.style.format({
-            "Baseline Risk ($)": "${:,.2f}",
-            "Adjustment %": "{:+.0f}%",
-            "Adjusted Risk ($)": "${:,.2f}"
-        }))
-
+    for cat in sorted(category_baseline_risk.keys(), key=str):
+        base = category_baseline_risk[cat]
+        adj = st.slider(f"{cat} Adjustment %", -100, 100, 0, key=f"risk_adj_{cat}")
+        simulated = base * (1 + adj / 100)
+        simulated_risks.append({
+            "Category": cat,
+            "Baseline Risk ($)": base,
+            "Adjustment %": adj,
+            "Adjusted Risk ($)": simulated
+        })
+        adjustment_map[cat] = adj
 else:
-    st.info("No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
+    st.warning("⚠️ No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
+    st.stop()
 
-# --- Render Simulation Results ---
+# --- Display Results ---
+sim_df = pd.DataFrame(simulated_risks)
 
 if not sim_df.empty and "Adjusted Risk ($)" in sim_df.columns:
-    try:
-        total_components = len(controller.components)
-    except Exception:
-        total_components = 0
-
+    total_components = len(controller.components) if hasattr(controller, "components") else 0
     total_risk = sim_df["Adjusted Risk ($)"].sum()
     avg_risk = sim_df["Adjusted Risk ($)"].mean()
 
