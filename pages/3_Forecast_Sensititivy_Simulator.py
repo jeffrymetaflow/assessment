@@ -29,7 +29,13 @@ defaults = {
     "BC/DR": (3, 120)
 }
 
-expense_by_category = st.session_state.get("expense_by_category", {})
+# 🔄 Pull real component-based spend if available
+if "controller" in st.session_state:
+    controller = st.session_state.controller
+    expense_by_category = controller.get_expense_by_category()
+else:
+    st.warning("Controller not found in session state. Using defaults.")
+    expense_by_category = {}
 
 def category_input(label, default_growth, default_spend):
     col1, col2 = st.columns([2, 1])
@@ -55,7 +61,7 @@ for cat in categories:
     # Save growth pattern across 3 years
     if "category_expense_growth" not in st.session_state:
         st.session_state.category_expense_growth = {}
-    
+
     st.session_state.category_expense_growth[cat] = [growth / 100] * 3
 
 # --------------------------
