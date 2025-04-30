@@ -1,143 +1,94 @@
-import pandas as pd
 import streamlit as st
-import plotly.graph_objects as go
+import os
+import json
+import uuid
+import pandas as pd
+import matplotlib.pyplot as plt
+from io import BytesIO
+from fpdf import FPDF
+from controller.controller import ITRMController
+from utils.bootstrap import page_bootstrap
 
-# Ensure controller is initialized and safely accessible
-try:
-    from controller.controller import ITRMController
-    if "controller" not in st.session_state:
-        st.session_state.controller = ITRMController()
-    controller = st.session_state.controller
+# ✅ MUST BE FIRST STREAMLIT COMMAND
+st.set_page_config(page_title="ITRM Main Dashboard", layout="wide")
 
-    # Patch: Dynamically calculate revenue impact % from components if missing
-    if not hasattr(controller, "get_category_impact_percentages"):
-        def get_category_impact_percentages():
-            impact_totals = {}
-            counts = {}
-            for c in controller.components:
-                cat = c.get("Category", "None")
-                impact = c.get("Revenue Impact %", 0)
-                if isinstance(impact, (int, float)):
-                    impact_totals[cat] = impact_totals.get(cat, 0) + impact
-                    counts[cat] = counts.get(cat, 0) + 1
-            return {
-                cat: round(impact_totals[cat] / counts[cat], 2)
-                for cat in impact_totals
-                if counts[cat] > 0
-            }
-        controller.get_category_impact_percentages = get_category_impact_percentages
+# --- INIT CONTROLLER ---
+if "controller" not in st.session_state:
+    st.session_state.controller = ITRMController()
 
-except Exception as e:
-    st.error(f"❌ Failed to initialize controller: {e}")
-    st.stop()
+controller = st.session_state.controller
 
-# 🔁 Fallback-safe baseline revenue from session state or controller
-try:
-    baseline_revenue = st.session_state.get("revenue", 0)
-    if not baseline_revenue:
-        baseline_revenue = getattr(controller, "baseline_revenue", 0)
-    if not baseline_revenue:
-        st.warning("⚠️ Baseline revenue not found. Please enter it on the main page.")
-except Exception:
-    baseline_revenue = 0
-    st.warning("⚠️ Baseline revenue not found. Please enter it on the main page.")
+# --- USER JOURNEY ---
+st.title("🚀 Welcome to the ITRM Platform")
+st.subheader("Start a New Assessment or Load an Existing One")
 
-# Safely get category impact percentages
-try:
-    category_impact_map = controller.get_category_impact_percentages()
-except AttributeError:
-    category_impact_map = {}
-    st.warning("⚠️ Revenue impact percentages not available. Please assign impact values on the Component Mapping page.")
+step = st.radio("Select Option:", ["➕ Start New Client Assessment", "📂 Open Existing Project"], horizontal=True)
 
-st.title("💸 Revenue at Risk Simulator")
+if step == "➕ Start New Client Assessment":
+    with st.form("new_project_form", clear_on_submit=True):
+        client_name = st.text_input("Client Name")
+        project_name = st.text_input("Project / Assessment Name")
+        submitted = st.form_submit_button("Start New Project")
 
-# --- Calculate Baseline Revenue at Risk Per Category ---
-category_baseline_risk = {}
-for cat, impact_pct in category_impact_map.items():
-    if isinstance(impact_pct, (int, float)):
-        category_baseline_risk[cat] = baseline_revenue * (impact_pct / 100)
+        if submitted:
+            if client_name and project_name:
+                st.session_state["client_name"] = client_name
+                st.session_state["project_name"] = project_name
+                st.session_state["project_id"] = str(uuid.uuid4())
+                st.rerun()
+            else:
+                st.error("Please fill in both fields.")
 
-# --- Simulate Adjustment Sliders ---
-simulated_risks = []
-adjustment_map = {}
-if category_baseline_risk:
-    st.subheader("⚙️ Simulate Revenue at Risk by Category")
-    if isinstance(category_baseline_risk, dict):
-        for cat in sorted(category_baseline_risk.keys(), key=str):
-            base = category_baseline_risk[cat]
-            adj = st.slider(f"{cat} Adjustment %", -100, 100, 0, key=f"risk_adj_{cat}")
-            simulated = base * (1 + adj / 100)
-            simulated_risks.append({
-                "Category": cat,
-                "Baseline Risk ($)": base,
-                "Adjustment %": adj,
-                "Adjusted Risk ($)": simulated
-            })
-            adjustment_map[cat] = adj
-else:
-    st.info("No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
+elif step == "📂 Open Existing Project":
+    st.warning("Project loader functionality coming soon.")
 
-# --- Render Simulation Results ---
-sim_df = pd.DataFrame(simulated_risks)
+# --- PROJECT ACTIVE FLOW ---
+if "project_id" in st.session_state:
+    st.success(f"📁 Active Project: {st.session_state['client_name']} | {st.session_state['project_name']}")
 
-if not sim_df.empty and "Adjusted Risk ($)" in sim_df.columns:
-    try:
-        total_components = len(controller.components)
-    except Exception:
-        total_components = 0
+    # --- REVENUE SETUP ---
+    st.markdown("### 💵 Project Revenue")
+    revenue_input = st.text_input("Enter Revenue ($)", key="project_revenue")
+    if revenue_input:
+        cleaned = revenue_input.replace("$", "").replace(",", "")
+        try:
+            st.session_state.baseline_revenue = float(cleaned)
+        except:
+            st.warning("Invalid revenue format.")
 
-    total_risk = sim_df["Adjusted Risk ($)"].sum()
-    avg_risk = sim_df["Adjusted Risk ($)"].mean()
+    # --- COMPONENT UPLOAD ---
+    st.markdown("### 📥 Upload Components")
+    file = st.file_uploader("Upload .csv with: Name, Category, Spend, Renewal Date, Risk Score")
+    if file:
+        df = pd.read_csv(file)
+        required_cols = {"Name", "Category", "Spend", "Renewal Date", "Risk Score"}
+        if required_cols.issubset(set(df.columns)):
+            controller.set_components(df.to_dict(orient="records"))
+            st.success("✅ Components loaded.")
+        else:
+            st.error(f"Missing columns: {required_cols - set(df.columns)}")
 
-    st.markdown(f"""
-    **🧮 Total Components:** `{total_components}`  
-    **🔥 Total Simulated Revenue at Risk:** `${total_risk:,.2f}`  
-    **📊 Average Category Risk:** `${avg_risk:,.2f}`
-    """)
+    # --- COMPONENT PREVIEW ---
+    comps = controller.get_components()
+    if comps:
+        st.markdown("### 🧩 Components Overview")
+        st.dataframe(pd.DataFrame(comps))
 
-    st.subheader("📊 Risk Simulation by Category")
-    st.dataframe(sim_df.set_index("Category").style.format({
-        "Baseline Risk ($)": "${:,.2f}",
-        "Adjustment %": "{:+.0f}%",
-        "Adjusted Risk ($)": "${:,.2f}"
-    }), use_container_width=True)
+    # --- SESSION REVENUE IMPACTS ---
+    if "revenue_impact_by_category" not in st.session_state:
+        st.session_state.revenue_impact_by_category = {
+            "Hardware": 10, "Software": 10, "Personnel": 10, "Maintenance": 10,
+            "Telecom": 10, "Cybersecurity": 10, "BC/DR": 10, "Compliance": 10, "Networking": 10
+        }
 
-    fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=sim_df["Category"],
-        y=sim_df["Adjusted Risk ($)"],
-        text=sim_df["Adjusted Risk ($)"].apply(lambda x: f"${x:,.0f}"),
-        textposition="outside",
-        marker_color="darkred"
-    ))
-    fig.update_layout(
-        title="Simulated Revenue at Risk by Category",
-        xaxis_title="Category",
-        yaxis_title="Adjusted Revenue at Risk ($)",
-        height=460
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    # --- AI Assistant Setup ---
+    page_bootstrap(current_page="Main")
 
-    with st.expander("🧾 View Category Risk Calculation Details"):
-        st.dataframe(sim_df.style.format({
-            "Baseline Risk ($)": "${:,.2f}",
-            "Adjusted Risk ($)": "${:,.2f}"
-        }), use_container_width=True)
-
-    st.markdown("""
-    ### 🧠 Logic Flow Behind This Simulation
-
-    - **Baseline Revenue Source**: Retrieved from the Main Page setup or controller fallback.
-    - **Component Mapping Page**: Revenue Impact % is averaged per category.
-    - **Baseline Risk Calculation**: `Revenue × Average Revenue Impact % per Category`
-    - **Adjustment Slider**: Lets user simulate increase/decrease in risk impact per category.
-    - **Adjusted Risk Output**: `Baseline Risk × (1 + Adjustment %)`
-    - **Visualization**: Table + Bar chart reflecting category risk before/after simulation.
-    """)
-
-else:
-    st.info("No valid simulation data to display.")
-
-
+# --- SIDEBAR ---
+with st.sidebar:
+    st.markdown("### 📊 Session Info")
+    st.write(f"Client: {st.session_state.get('client_name', '-')}")
+    st.write(f"Project: {st.session_state.get('project_name', '-')}")
+    st.write(f"Revenue: {st.session_state.get('project_revenue', '-')}")
 
 
