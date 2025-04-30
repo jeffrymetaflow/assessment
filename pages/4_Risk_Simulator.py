@@ -65,6 +65,13 @@ category_summary = pd.DataFrame([
     for cat, data in category_risk.items()
 ])
 
+# Patch for missing column
+if category_summary.empty or "Total Revenue at Risk ($)" not in category_summary.columns:
+    st.warning("⚠️ No valid 'Revenue at Risk' data found in components. Defaulting to 0s.")
+    category_summary["Total Revenue at Risk ($)"] = 0.0
+    category_summary["# of Components"] = 0
+
+# Ensure correct revenue totals
 total_risk = category_summary["Total Revenue at Risk ($)"].sum()
 avg_risk = category_summary["Total Revenue at Risk ($)"].mean()
 total_components = sum(len(data["components"]) for data in category_risk.values())
@@ -139,5 +146,3 @@ if high_risk_components:
     }), use_container_width=True)
 else:
     st.info(f"No components above risk score threshold ({high_risk_threshold})")
-
-
