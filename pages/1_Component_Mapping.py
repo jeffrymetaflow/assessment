@@ -25,11 +25,11 @@ project_revenue = st.session_state.get("project_revenue", 5_000_000)
 try:
     cleaned = str(project_revenue).replace("$", "").replace(",", "")
     initial_revenue = float(cleaned)
-except ValueError:
-    initial_revenue = 5_000_000
+except Exception:
+    initial_revenue = 5_000_000.0
 
-# Now display and store
-updated_revenue = st.number_input("Total Revenue ($)", value=initial_revenue, step=100_000)
+# Ensure the default value and step are the same type (float)
+updated_revenue = st.number_input("Total Revenue ($)", value=initial_revenue, step=100000.0)
 st.session_state.revenue = updated_revenue
 
 # 🧱 IT Component Builder
