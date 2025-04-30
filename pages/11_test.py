@@ -38,7 +38,7 @@ simulated_risks = []
 if category_baseline_risk:
     st.subheader("⚙️ Simulate Revenue at Risk by Category")
     if isinstance(category_baseline_risk, dict):
-        for cat in sorted(category_baseline_risk.keys()):
+        for cat in sorted(category_baseline_risk.keys(), key=str):
             base = category_baseline_risk[cat]
             adj = st.slider(f"{cat} Adjustment %", -100, 100, 0, key=f"risk_adj_{cat}")
             simulated = base * (1 + adj / 100)
