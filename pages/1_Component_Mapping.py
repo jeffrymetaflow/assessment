@@ -22,7 +22,21 @@ st.subheader("💼 Organization Financial Inputs")
 initial_revenue = st.session_state.get("revenue", 5_000_000)
 
 # Sync with session state
-st.session_state.revenue = st.number_input("Total Revenue ($)", value=initial_revenue, step=100_000)
+# --- Load shared revenue from Main page or fallback ---
+initial_revenue = st.session_state.get("project_revenue", 5_000_000)
+
+# Convert string (like "$40,000,000") to float safely
+try:
+    cleaned = str(initial_revenue).replace("$", "").replace(",", "")
+    numeric_revenue = float(cleaned)
+except:
+    numeric_revenue = 5_000_000
+
+# Use number_input without overwriting session state directly
+updated_revenue = st.number_input("Total Revenue ($)", value=numeric_revenue, step=100_000)
+
+# Store updated value back into session
+st.session_state["revenue"] = updated_revenue
 
 
 # 🧱 IT Component Builder
