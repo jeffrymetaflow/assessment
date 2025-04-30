@@ -44,6 +44,21 @@ class ITRMController:
             "Avg Risk": avg_risk
         }
 
+    def get_category_aggregates(self):
+        aggregates = {}
+        for comp in self.components:
+            category = comp.get("Category")
+            spend = comp.get("Spend", 0)
+            revenue_impact = comp.get("Revenue Impact %", 0)
+
+            if category not in aggregates:
+                aggregates[category] = {"spend": 0, "revenue_impact": 0}
+
+            aggregates[category]["spend"] += spend
+            aggregates[category]["revenue_impact"] += revenue_impact
+
+        return aggregates
+
     def get_ai_context(self):
         return {
             "components": self.components,
