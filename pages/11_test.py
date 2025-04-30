@@ -2,13 +2,21 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 
-# Ensure controller is initialized
-if "controller" not in st.session_state:
+# Ensure controller is initialized and safely accessible
+try:
     from controller import ITRMController
-    st.session_state.controller = ITRMController()
+    if "controller" not in st.session_state:
+        st.session_state.controller = ITRMController()
+    controller = st.session_state.controller
+except Exception as e:
+    st.error(f"❌ Failed to initialize controller: {e}")
+    st.stop()
 
-controller = st.session_state.controller
-baseline_revenue = controller.get_baseline_revenue() or 0
+try:
+    baseline_revenue = controller.get_baseline_revenue() or 0
+except Exception:
+    baseline_revenue = 0
+    st.warning("⚠️ Baseline revenue not found. Please enter it on the main page.")
 
 # Safely get category impact percentages
 try:
@@ -46,7 +54,11 @@ else:
 sim_df = pd.DataFrame(simulated_risks)
 
 if not sim_df.empty and "Adjusted Risk ($)" in sim_df.columns:
-    total_components = len(controller.components)
+    try:
+        total_components = len(controller.components)
+    except Exception:
+        total_components = 0
+
     total_risk = sim_df["Adjusted Risk ($)"].sum()
     avg_risk = sim_df["Adjusted Risk ($)"].mean()
 
