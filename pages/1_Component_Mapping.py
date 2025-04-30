@@ -61,6 +61,16 @@ if components:
         st.session_state["category_spend_summary"] = agg_df  # persist to session state
         st.subheader("🔎 Aggregated Spend by Category")
         st.dataframe(agg_df)
+
+        # 📈 Assign Revenue Impact % by Category
+        category_impact = {}
+        for _, row in agg_df.iterrows():
+            cat = row["Category"]
+            default_val = 20 if cat in ["Hardware", "Software"] else 10
+            pct = st.slider(f"{cat} — Revenue Impact %", 0, 100, default_val, key=f"impact_{cat}")
+            category_impact[cat] = pct
+
+        st.session_state["category_revenue_impact"] = category_impact
 else:
     st.info("No components added yet. Use the form above to get started.")
- 
+
