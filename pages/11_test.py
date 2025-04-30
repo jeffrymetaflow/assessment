@@ -1,43 +1,79 @@
-import streamlit as st
 import pandas as pd
+import streamlit as st
+import plotly.graph_objects as go
 
-st.title("🤖 AIOps Risk Scoring")
+# Ensure controller is initialized
+if "controller" not in st.session_state:
+    from controller import ITRMController
+    st.session_state.controller = ITRMController()
 
-if "controller" in st.session_state:
-    components = st.session_state.controller.get_components()
-else:
-    st.warning("No controller found. Please start from the Component Mapping page.")
-    st.stop()
+controller = st.session_state.controller
+baseline_revenue = controller.get_baseline_revenue() or 0
+category_impact_map = controller.get_category_impact_percentages()
 
-# Load revenue impact mapping
-impact_map = st.session_state.get("category_revenue_impact", {})
+st.title("💸 Revenue at Risk Simulator")
 
-if components:
-    df = pd.DataFrame(components)
-    if not df.empty:
-        # Adjust risk score using Revenue Impact % from category level
-        def adjust_score(row):
-            base_score = row.get("Risk Score", 0)
-            category = row.get("Category", "Unknown")
-            impact_pct = impact_map.get(category, 0)
-            return round(base_score * (1 + impact_pct / 100), 1)
+# --- Calculate Baseline Revenue at Risk Per Category ---
+category_baseline_risk = {}
+for cat, impact_pct in category_impact_map.items():
+    category_baseline_risk[cat] = baseline_revenue * (impact_pct / 100)
 
-        df["Adjusted Risk Score"] = df.apply(adjust_score, axis=1)
+# --- Simulate Adjustment Sliders ---
+st.subheader("⚙️ Simulate Revenue at Risk by Category")
+simulated_risks = []
+for cat in sorted(category_baseline_risk.keys()):
+    base = category_baseline_risk[cat]
+    adj = st.slider(f"{cat} Adjustment %", -100, 100, 0, key=f"risk_adj_{cat}")
+    simulated = base * (1 + adj / 100)
+    simulated_risks.append({
+        "Category": cat,
+        "Baseline Risk ($)": base,
+        "Adjustment %": adj,
+        "Adjusted Risk ($)": simulated
+    })
 
-        st.subheader("📊 Adjusted Component Risk Scores")
-        st.dataframe(df[["Name", "Category", "Spend", "Risk Score", "Adjusted Risk Score"]])
+sim_df = pd.DataFrame(simulated_risks)
 
-        st.metric("🔥 Average Adjusted Risk", f"{df['Adjusted Risk Score'].mean():.1f}")
+# --- Summary KPIs ---
+total_components = len(controller.components)
+total_risk = sim_df["Adjusted Risk ($)"].sum()
+avg_risk = sim_df["Adjusted Risk ($)"].mean()
 
-        # 🔥 Risk Heatmap by Category
-        st.subheader("🌡️ Risk Heatmap by Category")
-        heatmap_df = df.groupby("Category")["Adjusted Risk Score"].mean().reset_index()
-        st.bar_chart(heatmap_df.set_index("Category"))
+st.markdown(f"""
+**🧮 Total Components:** `{total_components}`  
+**🔥 Total Simulated Revenue at Risk:** `${total_risk:,.2f}`  
+**📊 Average Category Risk:** `${avg_risk:,.2f}`
+""")
 
-        # 📈 Spend vs. Adjusted Risk Scatter
-        st.subheader("📉 Spend vs. Adjusted Risk")
-        st.scatter_chart(df[["Spend", "Adjusted Risk Score"]]):.1f}")
-    else:
-        st.info("No components to score.")
-else:
-    st.info("No components loaded yet.")
+# --- Show Simulation Table ---
+st.subheader("📊 Risk Simulation by Category")
+st.dataframe(sim_df.set_index("Category").style.format({
+    "Baseline Risk ($)": "${:,.2f}",
+    "Adjustment %": "{:+.0f}%",
+    "Adjusted Risk ($)": "${:,.2f}"
+}), use_container_width=True)
+
+# --- Visualization ---
+fig = go.Figure()
+fig.add_trace(go.Bar(
+    x=sim_df["Category"],
+    y=sim_df["Adjusted Risk ($)"],
+    text=sim_df["Adjusted Risk ($)"].apply(lambda x: f"${x:,.0f}"),
+    textposition="outside",
+    marker_color="darkred"
+))
+fig.update_layout(
+    title="Simulated Revenue at Risk by Category",
+    xaxis_title="Category",
+    yaxis_title="Adjusted Revenue at Risk ($)",
+    height=460
+)
+st.plotly_chart(fig, use_container_width=True)
+
+# --- Optional Debug/Details ---
+with st.expander("🧾 View Category Risk Calculation Details"):
+    st.dataframe(sim_df.style.format({
+        "Baseline Risk ($)": "${:,.2f}",
+        "Adjusted Risk ($)": "${:,.2f}"
+    }), use_container_width=True)
+
