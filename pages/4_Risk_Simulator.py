@@ -112,6 +112,19 @@ if category_baseline_risk:  # Check if the dictionary is not empty
                 "Adjusted Risk ($)": simulated
             })
             adjustment_map[cat] = adj
+        # Update DataFrame with simulated risks
+        sim_df = pd.DataFrame(simulated_risks)
+    
+        # Render updated table
+        st.subheader("📊 Risk Simulation by Category")
+        st.dataframe(sim_df.style.format({
+            "Baseline Risk ($)": "${:,.2f}",
+            "Adjustment %": "{:+.0f}%",
+            "Adjusted Risk ($)": "${:,.2f}"
+        }))
+else:
+    st.info("No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
+
 else:
     st.info("No category revenue impact data found. Please populate revenue impact % in the Component Mapping tab.")
 
