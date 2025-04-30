@@ -48,13 +48,17 @@ for c in controller.components:
     if "Revenue Impact %" not in c:
         cat = c.get("Category", "Unknown")
         c["Revenue Impact %"] = st.session_state.get("category_revenue_impact", {}).get(cat, 0)
+# Ensure expense_growth keys are initialized
+if "expense_growth" not in st.session_state:
+    st.session_state.expense_growth = {
+        1: 0.03, 2: 0.03, 3: 0.03, 4: 0.03, 5: 0.03, 6: 0.03, 7: 0.03
+    }
+
 try:
     controller.run_simulation()
     init_session_state_from_components(controller)
 except Exception as e:
-    import traceback
     st.error(f"Simulation or sync error: {e}")
-    st.exception(traceback.format_exc())
     
 # 📊 Display Existing Components
 st.subheader("📋 Current Component Inventory")
