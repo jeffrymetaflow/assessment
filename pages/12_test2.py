@@ -430,6 +430,28 @@ if submitted:
     ax.set_title("Raw 'Yes' Responses by Category")
     st.pyplot(fig)
     
+if submitted:
+    # Calculate percentages for each section
+    percentages = {
+        section: round((score * 100), 1) for section, score in section_scores.items()
+    }
+
+    # Create DataFrame for displaying percentages
+    summary_df = pd.DataFrame({
+        "Section": list(percentages.keys()),
+        "Percentage (%)": list(percentages.values())
+    })
+
+    # Display the DataFrame
+    st.dataframe(summary_df)
+
+    # Bar Chart for Percentages
+    fig, ax = plt.subplots()
+    ax.bar(summary_df["Section"], summary_df["Percentage (%)"], color='skyblue')
+    ax.set_ylabel("Percentage (%)")
+    ax.set_title("Maturity Level by Section")
+    st.pyplot(fig)
+
 # Create DataFrame with conditional coloring
 summary_df = pd.DataFrame({
     "Maturity Level": list(percentages.keys()),
