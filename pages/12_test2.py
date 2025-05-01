@@ -305,6 +305,9 @@ Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the 
 
 # Display form
 responses = {}
+# Ensure questionnaire is sorted by category
+questionnaire = sorted(questionnaire, key=lambda x: x["category"])
+
 with st.form("maturity_form"):
     section_scores = {}
     category_scores = {}
