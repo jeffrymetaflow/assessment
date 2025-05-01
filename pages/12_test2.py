@@ -1,6 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
+from itertools import groupby
 
 # Full Cybersecurity Maturity Assessment Questions
 questionnaire = [
