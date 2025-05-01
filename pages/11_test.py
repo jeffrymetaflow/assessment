@@ -52,17 +52,27 @@ def forecast_values(baseline, growth_rates):
     return forecast
 
 # ---------- Inputs Setup ----------
-if section == "⚙️ Inputs Setup":
-    st.title("⚙️ Inputs Setup")
+# --- Category Spend Rollup from Component Mapping ---
+st.subheader("🧾 Inputs Setup")
+st.markdown("#### 📊 Pulled from Component Mapping:")
+category_spend_df = pd.DataFrame(controller.components)
+if not category_spend_df.empty:
+    category_rollup = category_spend_df.groupby("Category")["Spend"].sum().reset_index()
+    st.dataframe(category_rollup.style.format({"Spend": "${:,.2f}"}), use_container_width=True)
+else:
+    st.warning("No component data available to roll up.")
 
-    controller = st.session_state.get("controller", None)
-    if controller and hasattr(controller, "components"):
-        st.write("📊 Pulled from Component Mapping:")
-        st.dataframe(pd.DataFrame(controller.get_components()))
-    if controller and hasattr(controller, "components"):
-        df = pd.DataFrame(controller.components)
-        default_revenue = st.session_state.get("revenue", 5_000_000)
-        default_expense = df["Spend"].sum() if "Spend" in df.columns else 0
+st.markdown(f"""
+**Revenue ($)**
+```text
+{baseline_revenue:,.2f}
+```
+
+**IT Expense Baseline ($)**
+```text
+{category_spend_df['Spend'].sum():,.2f}
+```
+""")
 
         category_totals = df.groupby("Category")["Spend"].sum() if "Category" in df.columns and "Spend" in df.columns else pd.Series(dtype=float)
         full_total = category_totals.sum()
