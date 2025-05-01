@@ -403,31 +403,6 @@ ax.set_ylim([0, 100])
 ax.set_title("Cybersecurity Maturity by Capability Level")
 st.pyplot(fig)
 
-# Scoring and Results
-if submitted:
-    st.success("✅ Responses submitted successfully!")
-    st.write("### Section Scores")
-    if not section_scores:
-        st.warning("No scores available.")
-        st.stop()
-    st.write(section_scores)
-
-    # Radar Chart
-    fig_radar, ax_radar = plt.subplots(figsize=(6, 6), subplot_kw={'projection': 'polar'})
-    categories = list(section_scores.keys())
-    values = list(section_scores.values())
-    values += values[:1]  # Close the loop
-    angles = [n / float(len(categories)) * 2 * 3.14159 for n in range(len(categories))]
-    angles += angles[:1]
-
-    ax_radar.plot(angles, values, linewidth=2, linestyle='solid')
-    ax_radar.fill(angles, values, 'skyblue', alpha=0.4)
-    ax_radar.set_yticklabels([])
-    ax_radar.set_xticks(angles[:-1])
-    ax_radar.set_xticklabels(categories, fontsize=8)
-    ax_radar.set_title("Overall Cybersecurity Maturity Radar Chart", y=1.08)
-    st.pyplot(fig_radar)
-
     # Interpretation Guide
     st.markdown("""
     ### 🔍 Interpretation:
