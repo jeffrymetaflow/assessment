@@ -149,6 +149,12 @@ st.markdown("""
 Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score across several technology domains.
 """)
 
+# Display title
+st.title("\U0001F9E0 Cybersecurity Maturity Assessment Tool")
+st.markdown("""
+Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
+""")
+
 # Display form
 with st.form("maturity_form"):
     responses = {}
@@ -157,37 +163,37 @@ with st.form("maturity_form"):
         st.subheader(block["section"])
         yes_count = 0
         for q in block["questions"]:
-            answer = st.radio(q, ["Yes", "No"], key=q)
+            answer = st.radio(q, ["Yes", "No"], key=f"{block['section']}_{q}")  # Unique keys
             responses[q] = answer
             if answer == "Yes":
                 yes_count += 1
-        section_scores[block["section"]] = yes_count / len(block["questions"])
+        if len(block["questions"]) > 0:
+            section_scores[block["section"]] = yes_count / len(block["questions"])
     submitted = st.form_submit_button("Submit")
 
 # Scoring and Results
 if submitted:
     st.success("✅ Responses submitted successfully!")
     st.write("### Section Scores")
+    if not section_scores:
+        st.warning("No scores available.")
+        st.stop()
     st.write(section_scores)
 
-    if not section_scores:
-        st.warning("No scores available. Please complete the questionnaire.")
-        st.stop()
-
-    # Create and display bar chart
+    # Bar Chart
     df_scores = pd.DataFrame({"Section": list(section_scores.keys()), "Score": list(section_scores.values())})
-    df_scores = df_scores.sort_values(by="Score", ascending=True)  # Sort by score
+    df_scores = df_scores.sort_values(by="Score", ascending=True)
     fig, ax = plt.subplots()
     ax.barh(df_scores["Section"], df_scores["Score"], color='skyblue')
     ax.set_xlabel("Maturity Score")
     ax.set_title("IT Maturity Score by Section")
     st.pyplot(fig)
 
-    # Create radar chart to compare domains
+    # Radar Chart
     fig_radar, ax_radar = plt.subplots(figsize=(6, 6), subplot_kw={'projection': 'polar'})
     categories = list(section_scores.keys())
     values = list(section_scores.values())
-    values += values[:1]  # close the loop for radar chart
+    values += values[:1]  # Close the loop
     angles = [n / float(len(categories)) * 2 * 3.14159 for n in range(len(categories))]
     angles += angles[:1]
 
@@ -195,7 +201,7 @@ if submitted:
     ax_radar.fill(angles, values, 'skyblue', alpha=0.4)
     ax_radar.set_yticklabels([])
     ax_radar.set_xticks(angles[:-1])
-    ax_radar.set_xticklabels([cat[:20] + "..." if len(cat) > 20 else cat for cat in categories], fontsize=8)  # Truncate names
+    ax_radar.set_xticklabels(categories, fontsize=8)
     ax_radar.set_title("Overall Cybersecurity Maturity Radar Chart", y=1.08)
     st.pyplot(fig_radar)
 
