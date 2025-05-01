@@ -264,8 +264,8 @@ questionnaire = [
             "Do you have a process for managing third-party security risks and ensuring secure supply chain practices?",
             "Is there a documented process for regular security assessments and audits?"
         ]
-    }
-]
+    },
+    {
 
 
 # Display title
