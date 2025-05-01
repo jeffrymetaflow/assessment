@@ -2,6 +2,24 @@ import streamlit as st
 import pandas as pd
 from utils.bootstrap import page_bootstrap
 
+
+st.set_page_config(page_title="IT Maturity Assessment", layout="wide")
+st.title("🧠 IT Maturity Assessment Tool")
+st.markdown("""
+Welcome to the interactive IT Maturity Assessment. Please answer the following questions 
+based on your current IT environment. Your responses will be used to calculate a maturity score
+across several technology domains.
+""")
+
+page_bootstrap(current_page="IT Assessment")  # Or "Risk Model", etc.
+
+responses = {}
+st.sidebar.header("Navigation")
+
+# --- Tabs ---
+tabs = st.tabs(["Questionnaire Form", "Scoring and Results", "Admin"])
+
+# --- Questionnaire Tab ---
 # Embedded grouped questions JSON (shortened for readability — insert full content below)
 grouped_questions = {
     "Managed / Automated": [
@@ -110,24 +128,6 @@ grouped_questions = {
         "Network metrics are used effectively to control different flows and sequence variations"
     ]
 }
-st.set_page_config(page_title="IT Maturity Assessment", layout="wide")
-st.title("🧠 IT Maturity Assessment Tool")
-st.markdown("""
-Welcome to the interactive IT Maturity Assessment. Please answer the following questions 
-based on your current IT environment. Your responses will be used to calculate a maturity score
-across several technology domains.
-""")
-
-page_bootstrap(current_page="IT Assessment")  # Or "Risk Model", etc.
-
-# --- Tabs ---
-tabs = st.tabs(["Questionnaire Form", "Scoring and Results", "Admin"])
-
-responses = {}
-st.sidebar.header("Navigation")
-
-# --- Questionnaire Tab ---
-
     # Questionnaire Form
     with st.form("maturity_form"):
         for category, questions in grouped_questions.items():
