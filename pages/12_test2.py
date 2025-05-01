@@ -330,8 +330,11 @@ if submitted:
     - **Below 50%**: Low maturity — ad-hoc or siloed
     """)
 
+if submitted:
+    st.success("Responses recorded. See maturity summary below.")
+
 # --- Maturity Scoring + Visualization ---
-st.markdown("## 📊 Cybersecurity Maturity Summary")
+st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
 
 # Aggregate scores
 maturity_buckets = {
@@ -341,22 +344,12 @@ maturity_buckets = {
     "Service": 0,
     "Business": 0
 }
-totals = {
-    "Survival": 0,
-    "Awareness": 0,
-    "Committed": 0,
-    "Service": 0,
-    "Business": 0
-}
+totals = {k: 0 for k in maturity_buckets}
 
 # Count yes responses by category
 for section in questionnaire:
     section_title = section["section"]
-    category = None
-    for key in maturity_buckets:
-        if key in section_title:
-            category = key
-            break
+    category = next((key for key in maturity_buckets if key in section_title), None)
     if category:
         totals[category] += len(section["questions"])
         for q in section["questions"]:
