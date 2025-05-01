@@ -142,16 +142,6 @@ if "project_id" in st.session_state:
             else:
                 st.error("Please enter a component name.")
 
-    if st.button("📄 Generate Modernization Roadmap PDF"):
-        pdf_path = generate_roadmap_pdf()
-        with open(pdf_path, "rb") as pdf_file:
-            st.download_button(
-                label="📥 Download Roadmap PDF",
-                data=pdf_file,
-                file_name=os.path.basename(pdf_path),
-                mime="application/pdf"
-            )
-
     # --- JSON Upload Protection ---
     if "json_loaded" not in st.session_state:
         st.session_state["json_loaded"] = False
@@ -527,6 +517,17 @@ if user_input:
             break
     if not found:
         st.error("Component not found. Please try again.")
+
+# Generate PDF Button
+if st.button("📄 Generate Modernization Roadmap PDF"):
+    pdf_path = generate_roadmap_pdf()
+    with open(pdf_path, "rb") as pdf_file:
+        st.download_button(
+            label="📥 Download Roadmap PDF",
+            data=pdf_file,
+            file_name=os.path.basename(pdf_path),
+            mime="application/pdf"
+        )
 
 # Updated generate_roadmap_pdf with revenue + KPI injection
 # (Replacing both previous definitions)
