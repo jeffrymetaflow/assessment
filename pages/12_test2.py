@@ -319,8 +319,12 @@ with st.form("maturity_form"):
             for idx, q in enumerate(block["questions"]): 
                 unique_key = f"{category}_{block['section']}_{idx}"
                 st.radio(q, ["Yes", "No"], key=f"{block['section']}_{idx}")
-    submitted = st.form_submit_button("Submit") 
-
+            if answer == "Yes":
+                yes_count += 1
+        if len(block["questions"]) > 0:
+            section_scores[block["section"]] = yes_count / len(block["questions"])
+    submitted = st.form_submit_button("Submit")
+   
 if submitted:
     st.success("Form submitted!")
     
