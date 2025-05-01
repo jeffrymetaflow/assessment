@@ -320,6 +320,9 @@ with st.form("maturity_form"):
                 st.radio(q, ["Yes", "No"], key=f"{block['section']}_{idx}")
     submitted = st.form_submit_button("Submit") 
 
+if submitted:
+    st.success("Form submitted!")
+    
     for block in questionnaire:
         category = block["category"]
         if category not in category_scores:
