@@ -94,13 +94,59 @@ questionnaire = [
             "Have you established secure supply chain practices to verify the security of third-party products and services?"
         ]
     }
-    # Remaining Detect, Respond, Recover, and CIS Controls sections will follow in the next patch
+
+    {
+        "section": "Detect - Survival, Ad-Hoc, Manual Legacy",
+        "questions": [
+            "Do you have a dedicated team responsible for monitoring and detecting cybersecurity threats?",
+            "Is there a process in place to continuously monitor network traffic for unusual or suspicious activities?",
+            "Have you implemented intrusion detection systems (IDS) and intrusion prevention systems (IPS)?",
+            "Is there a process for monitoring system and application logs for security events?"
+        ]
+    },
+    {
+        "section": "Detect - Awareness, measured, semi-automated",
+        "questions": [
+            "Do you regularly review and analyze security logs to detect potential threats?",
+            "Is there a documented incident detection and reporting process in your organization?",
+            "Have you implemented security information and event management (SIEM) solutions for centralized log and event analysis?",
+            "Is there a process for threat intelligence collection and analysis to stay informed about emerging threats?"
+        ]
+    },
+    {
+        "section": "Detect - Committed, Continuous Improvement, Redundant",
+        "questions": [
+            "Do you use vulnerability scanning tools to identify weaknesses in your systems and applications?",
+            "Have you implemented file integrity monitoring (FIM) to detect unauthorized changes to critical files?",
+            "Is there a process for monitoring and detecting anomalies in user account activities and access?",
+            "Do you use behavioral analytics to detect abnormal user behavior that may indicate a security threat?"
+        ]
+    },
+    {
+        "section": "Detect - Service Aligned/Standardization/High Availability",
+        "questions": [
+            "Is there a process for monitoring email traffic for phishing attempts and malicious attachments?",
+            "Have you implemented endpoint detection and response (EDR) solutions on your devices?",
+            "Is there a process for identifying and responding to unauthorized or rogue devices on your network?",
+            "Do you use threat hunting techniques to proactively search for hidden threats within your network?"
+        ]
+    },
+    {
+        "section": "Detect - Business Partnership/Innovation Optimized",
+        "questions": [
+            "Is there a process for correlating and prioritizing security alerts based on risk?",
+            "Do you conduct regular tabletop exercises to test your incident detection and response capabilities?",
+            "Have you established key performance indicators (KPIs) to measure the effectiveness of your detection capabilities?",
+            "Is there a documented process for communicating and coordinating incident detection and response with external stakeholders, such as law enforcement or industry groups?"
+        ]
+    }
 ]
 
+
 # Display title
-st.title("\U0001F9E0 IT Maturity Assessment Tool")
+st.title("\U0001F9E0 Cybersecurity Maturity Assessment Tool")
 st.markdown("""
-Welcome to the interactive IT Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score across several technology domains.
+Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score across several technology domains.
 """)
 
 # Display form
@@ -123,30 +169,30 @@ if submitted:
     st.success("✅ Responses submitted successfully!")
     st.write("### Section Scores")
     st.write(section_scores)
-    
-    if section_scores:
-        # Create DataFrame from section scores
-        df_scores = pd.DataFrame({"Section": list(section_scores.keys()), "Score": list(section_scores.values())})
-        df_scores = df_scores.sort_values(by="Score", ascending=True)  # Sort by score
-        
-        # Create figure and bar chart
-        fig, ax = plt.subplots(figsize=(8, len(df_scores) * 0.5))
-        ax.barh(df_scores["Section"], df_scores["Score"], color='cornflowerblue')
-        
-        # Add chart labels and title
-        ax.set_xlabel("Maturity Score")
-        ax.set_title("IT Maturity Score by Section")
-        ax.grid(axis='x', linestyle='--', alpha=0.7)  # Add gridlines
 
-        # Add score labels at the end of bars
-        for i, v in enumerate(df_scores["Score"]):
-            ax.text(v + 0.5, i, str(v), color='black', va='center')
+    # Create and display bar chart
+    df_scores = pd.DataFrame({"Section": list(section_scores.keys()), "Score": list(section_scores.values())})
+    fig, ax = plt.subplots()
+    ax.barh(df_scores["Section"], df_scores["Score"], color='skyblue')
+    ax.set_xlabel("Maturity Score")
+    ax.set_title("IT Maturity Score by Section")
+    st.pyplot(fig)
 
-        # Display chart in Streamlit
-        st.pyplot(fig)
-    else:
-        st.warning("No section scores available to display.")
+    # Create radar chart to compare domains
+    fig_radar, ax_radar = plt.subplots(figsize=(6,6), subplot_kw={'projection': 'polar'})
+    categories = list(section_scores.keys())
+    values = list(section_scores.values())
+    values += values[:1]  # close the loop for radar chart
+    angles = [n / float(len(categories)) * 2 * 3.14159 for n in range(len(categories))]
+    angles += angles[:1]
 
+    ax_radar.plot(angles, values, linewidth=2, linestyle='solid')
+    ax_radar.fill(angles, values, 'skyblue', alpha=0.4)
+    ax_radar.set_yticklabels([])
+    ax_radar.set_xticks(angles[:-1])
+    ax_radar.set_xticklabels(categories, fontsize=8)
+    ax_radar.set_title("Overall Cybersecurity Maturity Radar Chart", y=1.08)
+    st.pyplot(fig_radar)
   
     st.markdown("""
 ### 🔍 Interpretation:
