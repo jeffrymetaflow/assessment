@@ -360,3 +360,53 @@ st.bar_chart(summary_df.set_index("Maturity Level"))
 # Optional: Color-coded table
 st.dataframe(summary_df.style.background_gradient(cmap="Blues"))
     
+# --- Maturity Scoring + Visualization ---
+st.markdown("## 📊 Cybersecurity Maturity Summary")
+
+# Aggregate scores
+maturity_buckets = {
+    "Survival": 0,
+    "Awareness": 0,
+    "Committed": 0,
+    "Service": 0,
+    "Business": 0
+}
+totals = {
+    "Survival": 0,
+    "Awareness": 0,
+    "Committed": 0,
+    "Service": 0,
+    "Business": 0
+}
+
+# Count yes responses by category
+for section in questionnaire:
+    section_title = section["section"]
+    category = None
+    for key in maturity_buckets:
+        if key in section_title:
+            category = key
+            break
+    if category:
+        totals[category] += len(section["questions"])
+        for q in section["questions"]:
+            if st.session_state.get(q) == "Yes":
+                maturity_buckets[category] += 1
+
+# Calculate percentages
+percentages = {k: round((maturity_buckets[k] / totals[k]) * 100, 1) if totals[k] > 0 else 0 for k in maturity_buckets}
+
+# --- Display Bar Chart ---
+fig, ax = plt.subplots()
+ax.bar(percentages.keys(), percentages.values(), color="skyblue")
+ax.set_ylabel("Maturity Score (%)")
+ax.set_ylim([0, 100])
+ax.set_title("Cybersecurity Maturity by Capability Level")
+st.pyplot(fig)
+
+# --- Summary Table ---
+summary_df = pd.DataFrame({
+    "Maturity Level": list(percentages.keys()),
+    "Score": list(percentages.values())
+})
+st.dataframe(summary_df)
