@@ -118,13 +118,13 @@ based on your current IT environment. Your responses will be used to calculate a
 across several technology domains.
 """)
 
-responses = {}
-st.sidebar.header("Navigation")
-
 page_bootstrap(current_page="IT Assessment")  # Or "Risk Model", etc.
 
 # --- Tabs ---
 tabs = st.tabs(["Questionnaire Form", "Scoring and Results", "Admin"])
+
+responses = {}
+st.sidebar.header("Navigation")
 
 # --- Questionnaire Tab ---
 
