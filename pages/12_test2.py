@@ -385,18 +385,6 @@ def color_score(val):
 
 st.dataframe(summary_df.style.applymap(color_score, subset=["Score (%)"]))
 
-# Display bar chart
-fig, ax = plt.subplots()
-colors = [
-    'green' if val >= 75 else 'orange' if val >= 50 else 'red'
-    for val in summary_df["Score (%)"]
-]
-ax.bar(summary_df["Maturity Level"], summary_df["Score (%)"], color=colors)
-ax.set_ylabel("Maturity Score (%)")
-ax.set_ylim([0, 100])
-ax.set_title("Cybersecurity Maturity by Capability Level")
-st.pyplot(fig)
-
     # Interpretation Guide
     st.markdown("""
     ### 🔍 Interpretation:
