@@ -301,3 +301,29 @@ with tabs[2]:
 
 if st.sidebar.checkbox("Show session state (dev only)"):
     st.write(st.session_state)
+
+    # --- COMPONENT UPLOAD ---
+    st.markdown("### 📥 Upload Components")
+    file = st.file_uploader("Upload .csv with: Name, Category, Spend, Renewal Date, Risk Score")
+    if file:
+        df = pd.read_csv(file)
+        required_cols = {"Name", "Category", "Spend", "Renewal Date", "Risk Score"}
+        if required_cols.issubset(set(df.columns)):
+            controller.set_components(df.to_dict(orient="records"))
+            st.success("✅ Components loaded.")
+        else:
+            st.error(f"Missing columns: {required_cols - set(df.columns)}")
+
+    # --- COMPONENT PREVIEW ---
+    comps = controller.get_components()
+    if comps:
+        st.markdown("### 🧩 Components Overview")
+        st.dataframe(pd.DataFrame(comps))
+
+    # --- SESSION REVENUE IMPACTS ---
+    if "revenue_impact_by_category" not in st.session_state:
+        st.session_state.revenue_impact_by_category = {
+            "Hardware": 10, "Software": 10, "Personnel": 10, "Maintenance": 10,
+            "Telecom": 10, "Cybersecurity": 10, "BC/DR": 10, "Compliance": 10, "Networking": 10
+        }
+
