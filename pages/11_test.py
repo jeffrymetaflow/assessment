@@ -86,6 +86,15 @@ st.title("\U0001F5FA️ IT Architecture - Financial Impact Mapper")
 
 page_bootstrap(current_page="Architecture")
 
+# --- Optional API Payload Injector (for production use)
+def inject_architecture_api_payload(payload):
+    try:
+        if "components" in payload:
+            controller.components.extend(payload["components"])
+            st.success(f"✅ Injected {len(payload['components'])} components from API feed.")
+    except Exception as e:
+        st.error(f"❌ Failed to inject API feed: {e}")
+
 # --- Tabs ---
 tabs = st.tabs(["Component Mapping", "Architecture Diagram", "External Import"])
 
