@@ -429,6 +429,21 @@ def simulate_aws_cloud_pricing(category, spend):
     discount = discount_mapping.get(category, 0.8)
     return int(spend * discount)
 
+# --- Vendor mapping for PDF usage ---
+def generate_roadmap_pdf():
+    # Define vendor_mapping here
+    vendor_mapping = {
+        "Hardware": ["Vendor A", "Vendor B"],
+        "Software": ["Vendor C", "Vendor D"],
+        "Networking": ["Vendor E"],
+        "Cloud": ["Vendor F"],
+        # Add other mappings as needed
+    }
+
+    # Use vendor_mapping in the function
+    suggested_vendors = ", ".join(vendor_mapping.get(category, ["TBD"]))
+    ...
+
 # --- AI Assistant Reasoning Enhancement ---
 def assist_modernization_reasoning(name, category, spend, renewal_date, risk_score):
     modernization = dynamic_generate_modernization_suggestion(category, spend, renewal_date, risk_score)
