@@ -1,202 +1,315 @@
 import streamlit as st
+import openai
+import os
+import json
 import pandas as pd
+import networkx as nx
+import plotly.graph_objects as go
 import matplotlib.pyplot as plt
-from io import BytesIO
-from fpdf import FPDF
+from PIL import Image
+import pytesseract
+
+from utils.intent_classifier import classify_intent
+from langchain.agents import initialize_agent, AgentType
+from langchain_openai import ChatOpenAI
+from langchain_community.tools.tavily_search.tool import TavilySearchResults
+
+from controller.controller import ITRMController
 from utils.bootstrap import page_bootstrap
 
-# ---------- Default Session State Initialization ----------
-default_state = {
-    "revenue": 1_000_000,
-    "it_expense": 1_000_000,
-    "revenue_growth": [5.0, 5.0, 5.0],
-    "expense_growth": [3.0, 3.0, 3.0],
-    "category_expenses_to_total": [0.1] * 5,
-    "category_revenue_to_total": [0.05] * 5
-}
-for key, val in default_state.items():
-    if key not in st.session_state:
-        st.session_state[key] = val
+# --- AI Agent: Vendor Alternative Suggestion ---
+def get_vendor_replacement_suggestion(component_name, category):
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3, openai_api_key=st.secrets["openai_api_key"])
+    tools = [TavilySearchResults()]
+    agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=False)
 
-# ---------- Sidebar Navigation ----------
-st.set_page_config(page_title="ITRM Dashboard", layout="wide")
-st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", [
-    "🧠 Overview Summary",
-    "⚙️ Inputs Setup",
-    "📊 ITRM Calculator",
-    "💰 ITRM Financial Summary",
-])
-client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
+    prompt = (
+        f"Act as an IT procurement strategist. For a component named '{component_name}' in category '{category}', "
+        f"suggest 1-2 modern vendor alternatives and briefly explain the benefits. Include cost or lifecycle improvement if known."
+    )
 
-page_bootstrap(current_page="Calculators")  # Or "Risk Model", etc.
+    try:
+        result = agent.run(prompt)
+    except Exception as e:
+        result = f"(AI Suggestion failed: {e})"
 
-# ---------- Input Requirement Guard ----------
-required_keys = ["revenue", "it_expense", "revenue_growth", "expense_growth"]
-missing = [key for key in required_keys if key not in st.session_state]
-if missing and section != "⚙️ Inputs Setup":
-    st.warning("⚠️ Please configure your inputs in the '⚙️ Inputs Setup' tab first.")
-    st.stop()
+    return result
 
-# ---------- Utility: Forecast Function ----------
-def forecast_values(baseline, growth_rates):
-    forecast = {}
-    for i in range(3):
-        year = f"Year {i+1}"
-        if i == 0:
-            forecast[year] = baseline
-        else:
-            prev = forecast[f"Year {i}"]
-            growth_rate = growth_rates[i] if i < len(growth_rates) else 0
-            forecast[year] = prev * (1 + growth_rate / 100)
-    return forecast
+# --- Sample Component Metadata for AI Scoring ---
+def enrich_component_metadata(component):
+    metadata = {
+        "name": component["Name"],
+        "category": component["Category"],
+        "spend": component["Spend"],
+        "revenue_impact": component["Revenue Impact %"],
+        "risk_score": component["Risk Score"],
+        "lifespan": 3,  # placeholder in years
+        "alternatives": ["AltA", "AltB"],  # placeholder
+        "vendor": "VendorX",  # placeholder
+    }
+    return metadata
 
-# ---------- Inputs Setup ----------
-# --- Category Spend Rollup from Component Mapping ---
-st.subheader("🧾 Inputs Setup")
-st.markdown("#### 📊 Pulled from Component Mapping:")
-category_spend_df = pd.DataFrame(controller.components)
-if not category_spend_df.empty:
-    category_rollup = category_spend_df.groupby("Category")["Spend"].sum().reset_index()
-    st.dataframe(category_rollup.style.format({"Spend": "${:,.2f}"}), use_container_width=True)
-else:
-    st.warning("No component data available to roll up.")
-
-st.markdown(f"""
-**Revenue ($)**
-```text
-{baseline_revenue:,.2f}
-```
-
-**IT Expense Baseline ($)**
-```text
-{category_spend_df['Spend'].sum():,.2f}
-```
-""")
-
-        category_totals = df.groupby("Category")["Spend"].sum() if "Category" in df.columns and "Spend" in df.columns else pd.Series(dtype=float)
-        full_total = category_totals.sum()
-        category_expenses_to_total = [category_totals.get(cat, 0) / full_total for cat in [
-            "Hardware", "Software", "Personnel", "Maintenance", "Telecom"
-        ]]
+# --- AI Scoring Logic ---
+def score_component(metadata, weight_revenue=0.4, weight_risk=0.4, weight_cost=0.2):
+    revenue_score = metadata["revenue_impact"] / 100
+    risk_penalty = 1 - (metadata["risk_score"] / 100)
+    cost_factor = 1 - (metadata["spend"] / 1000000)  # normalized cost
+    score = round((weight_revenue * revenue_score) + (weight_risk * risk_penalty) + (weight_cost * cost_factor), 3)
+    if score >= 0.75:
+        recommendation = "✅ Healthy"
+        color = "#C8E6C9"  # light green
+    elif score >= 0.5:
+        recommendation = "⚠️ Monitor"
+        color = "#FFF9C4"  # light yellow
     else:
-        default_revenue = st.session_state.revenue
-        default_expense = st.session_state.it_expense
-        category_expenses_to_total = st.session_state.category_expenses_to_total
+        recommendation = "❌ Optimize"
+        color = "#FFCDD2"  # light red
+    return score, recommendation, color
 
-    revenue = st.number_input("Revenue ($)", value=default_revenue)
-    it_expense = st.number_input("IT Expense Baseline ($)", value=default_expense)
+# --- Controller Initialization ---
+if "controller" not in st.session_state:
+    st.session_state.controller = ITRMController()
 
-    categories = ["Hardware", "Software", "Personnel", "Maintenance", "Telecom"]
-    category_expenses = [
-        st.number_input(f"{cat} % of IT Expenses", value=category_expenses_to_total[i])
-        for i, cat in enumerate(categories)
+def initialize_state():
+    if "components" not in st.session_state:
+        st.session_state.components = []
+    if "edges" not in st.session_state:
+        st.session_state.edges = []
+    if 'key' not in st.session_state:
+        st.session_state['key'] = 'default_value'
+
+initialize_state()
+controller = st.session_state.controller
+
+st.set_page_config(page_title="IT Architecture to Financial Mapping", layout="wide")
+st.title("\U0001F5FA️ IT Architecture - Financial Impact Mapper")
+
+page_bootstrap(current_page="Architecture")
+
+# --- Tabs ---
+tabs = st.tabs(["Component Mapping", "Architecture Diagram", "External Import"])
+
+# --- Component Mapping Tab ---
+with tabs[0]:
+    st.header("\U0001F4C8 Define Components")
+    with st.expander("+ Add IT Component"):
+        name = st.text_input("Component Name")
+        category = st.selectbox("Category", ["Hardware", "Software", "Personnel", "Maintenance", "Telecom", "Cybersecurity", "BC/DR"])
+        spend = st.number_input("Annual Spend ($)", min_value=0, value=100000, step=10000, format="%d")
+        revenue_support = st.slider("% Revenue Supported", 0, 100, 20)
+        risk_score = st.slider("Risk if Fails (0 = none, 100 = catastrophic)", 0, 100, 50)
+
+        if st.button("Add Component"):
+            st.session_state.components.append({
+                "Name": name,
+                "Category": category,
+                "Spend": spend,
+                "Revenue Impact %": revenue_support,
+                "Risk Score": risk_score
+            })
+
+    with st.expander("+ Add Manual Link Between Components"):
+        component_names = [c["Name"] for c in st.session_state.components]
+        if component_names:
+            source = st.selectbox("From Component", component_names, key="src")
+            target = st.selectbox("To Component", component_names, key="tgt")
+
+            if st.button("Add Link"):
+                if source != target and (source, target) not in st.session_state.edges:
+                    st.session_state.edges.append((source, target))
+                else:
+                    st.warning("Invalid or duplicate link.")
+
+    # --- Filter by Category ---
+    if st.session_state.components:
+        df = pd.DataFrame(st.session_state.components)
+        category_filter = st.multiselect("Filter by Category", df["Category"].unique().tolist(), default=df["Category"].unique().tolist())
+        df = df[df["Category"].isin(category_filter)]
+
+        st.subheader("\U0001F4CA Component Mapping Table")
+        st.dataframe(df)
+
+        st.subheader("\U0001F52C Detailed Category Breakdown with Scores")
+        categories = df["Category"].unique()
+        for cat in categories:
+            cat_df = df[df["Category"] == cat]
+            cat_df = cat_df.copy()
+            cat_df[["AI Score", "Recommendation", "Color"]] = cat_df.apply(
+                lambda row: pd.Series(score_component(enrich_component_metadata(row.to_dict()))), axis=1
+            )
+            cat_df["Suggested Action"] = cat_df["Recommendation"].apply(lambda rec: (
+    "Maintain current configuration" if "Healthy" in rec else
+    "Flag for quarterly review" if "Monitor" in rec else
+    "Review for vendor alternatives / consolidation opportunities"
+))
+            with st.expander(f"{cat} - {len(cat_df)} Components"):
+                def highlight_row(row):
+                    return ['background-color: {}'.format(row['Color']) if col == 'AI Score' else '' for col in row.index]
+                st.dataframe(cat_df.style.apply(highlight_row, axis=1))
+    else:
+        st.info("Add components using the form above to get started.")
+
+# --- Architecture Diagram Tab ---
+with tabs[1]:
+    if st.session_state.components:
+        st.subheader("\U0001F4D0 Architecture Dependency Map")
+        df = pd.DataFrame(st.session_state.components)
+
+        G = nx.Graph()
+        for _, row in df.iterrows():
+            G.add_node(row['Name'], category=row['Category'], spend=row['Spend'], revenue=row['Revenue Impact %'], risk=row['Risk Score'])
+
+        for edge in st.session_state.edges:
+            G.add_edge(*edge)
+
+        pos = nx.spring_layout(G, seed=42)
+        node_x, node_y, node_text = [], [], []
+
+        for node in G.nodes():
+            x, y = pos[node]
+            node_x.append(x)
+            node_y.append(y)
+            attr = G.nodes[node]
+            node_text.append(f"{node}<br>Category: {attr['category']}<br>Spend: ${attr['spend']:,}<br>Revenue Support: {attr['revenue']}%<br>Risk: {attr['risk']}")
+
+        edge_x, edge_y = [], []
+        for edge in G.edges():
+            x0, y0 = pos[edge[0]]
+            x1, y1 = pos[edge[1]]
+            edge_x.extend([x0, x1, None])
+            edge_y.extend([y0, y1, None])
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=edge_x, y=edge_y, line=dict(width=1, color='gray'), hoverinfo='none', mode='lines'))
+        fig.add_trace(go.Scatter(
+            x=node_x, y=node_y,
+            mode='markers+text',
+            textposition="top center",
+            marker=dict(size=20, color=df['Risk Score'], colorscale='YlOrRd', showscale=True, colorbar=dict(title="Risk")),
+            text=df['Name'], hovertext=node_text, hoverinfo='text'))
+
+        fig.update_layout(title="\U0001F5FA️ Visual Architecture Layout", showlegend=False, height=600, margin=dict(l=20, r=20, t=40, b=20))
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.subheader("\U0001F4B0 Financial Summary")
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Total IT Spend", f"${df['Spend'].sum():,.0f}")
+        col2.metric("Avg. Revenue Supported", f"{df['Revenue Impact %'].mean():.1f}%")
+        col3.metric("Avg. Risk Score", f"{df['Risk Score'].mean():.1f}")
+    else:
+        st.info("Add components in the first tab to generate an architecture diagram.")
+
+# --- Roadmap Recommendations Tab ---
+st.subheader("🛣️ AI-Powered Roadmap Recommendations")
+if st.session_state.components:
+    df = pd.DataFrame(st.session_state.components)
+    df = df.copy()
+    df[["AI Score", "Recommendation", "Color"]] = df.apply(
+        lambda row: pd.Series(score_component(enrich_component_metadata(row.to_dict()))), axis=1
+    )
+    df["Suggested Action"] = df["Recommendation"].apply(lambda rec: (
+        "Maintain current configuration" if "Healthy" in rec else
+        "Flag for quarterly review" if "Monitor" in rec else
+        "Review for vendor alternatives / consolidation opportunities"
+    ))
+
+    st.markdown("### 🔍 Priority Actions")
+    low_score_df = df[df["Recommendation"].str.contains("Optimize")].sort_values("AI Score")
+    if not low_score_df.empty:
+        st.write("Below are the most critical components to address:")
+        for i, row in low_score_df.iterrows():
+            st.markdown(f"**{row['Name']}** ({row['Category']})")
+            st.markdown(f"- Spend: ${row['Spend']:,.0f}")
+            st.markdown(f"- Risk Score: {row['Risk Score']} | AI Score: {row['AI Score']}")
+            st.markdown(f"- Suggested Action: _{row['Suggested Action']}_")
+            if i < 3:
+                if f"ai_{row['Name']}" not in st.session_state:
+                    st.session_state[f"ai_{row['Name']}"] = get_vendor_replacement_suggestion(row['Name'], row['Category'])
+                st.markdown(f"- **AI Suggested Vendors:** {st.session_state[f'ai_{row['Name']}']}")
+            else:
+                if st.button(f"Suggest Alternatives for {row['Name']}", key=f"btn_{i}"):
+                    st.session_state[f"ai_{row['Name']}"] = get_vendor_replacement_suggestion(row['Name'], row['Category'])
+                if f"ai_{row['Name']}" in st.session_state:
+                    st.markdown(f"- **AI Suggested Vendors:** {st.session_state[f'ai_{row['Name']}']}")
+    else:
+        st.success("No critical components flagged for optimization.")
+
+    st.markdown("### ⬇️ Export Plan")
+    csv = low_score_df.to_csv(index=False).encode('utf-8')
+    st.download_button("Download Optimization Roadmap (CSV)", csv, "optimization_roadmap.csv", "text/csv")
+
+    st.markdown("### 📊 Gantt Chart: Prioritized Remediation Timeline")
+    low_score_df = low_score_df.copy()
+    low_score_df["Priority Index"] = low_score_df["Spend"] / (low_score_df["Risk Score"] + 1)  # Prevent divide-by-zero
+    low_score_df = low_score_df.sort_values("Priority Index", ascending=False)
+    low_score_df["Start"] = pd.to_datetime("today")
+    low_score_df["Finish"] = low_score_df["Start"] + pd.to_timedelta((low_score_df["Priority Index"] * 2).astype(int), unit='D')
+
+    gantt_fig = go.Figure()
+    for _, row in low_score_df.iterrows():
+        gantt_fig.add_trace(go.Bar(
+            x=[(row["Finish"] - row["Start"]).days],
+            y=[row["Name"]],
+            base=row["Start"],
+            orientation='h',
+            marker=dict(color='crimson' if row["Risk Score"] > 70 else 'gold' if row["Risk Score"] > 40 else 'lightgreen'),
+            name=row["Category"],
+            hovertext=f"Spend: ${row['Spend']:,.0f}<br>Risk: {row['Risk Score']}<br>Priority: {row['Priority Index']:.2f}"
+        ))
+
+    gantt_fig.update_layout(
+        title="Remediation Timeline by Priority (Gantt View)",
+        barmode='stack',
+        xaxis_title="Date",
+        yaxis_title="Component",
+        height=600,
+        margin=dict(l=40, r=40, t=60, b=40)
+    )
+    st.plotly_chart(gantt_fig, use_container_width=True)
+
+# --- Simulation Tab ---
+st.subheader("🧪 Simulation Mode: Live Feed Preview")
+st.markdown("Use this simulator to preview how real-time architecture updates might flow into the system from an external AIOps or CMDB API.")
+
+api_response_mock = {
+    "components": [
+        {"Name": "Simulated Switch X930", "Category": "Hardware", "Spend": 125000, "Revenue Impact %": 12, "Risk Score": 66},
+        {"Name": "Simulated WAF Cluster", "Category": "Cybersecurity", "Spend": 89000, "Revenue Impact %": 18, "Risk Score": 72},
+        {"Name": "Simulated HRIS System", "Category": "Software", "Spend": 210000, "Revenue Impact %": 25, "Risk Score": 55}
     ]
-    category_revenue = [st.number_input(f"Category {i+1} % of Revenue", value=st.session_state.category_revenue_to_total[i]) for i in range(5)]
+}
 
-    revenue_growth = [st.number_input(f"Year {i+1} Revenue Growth (%)", value=st.session_state.revenue_growth[i]) for i in range(3)]
-    expense_growth = [st.number_input(f"Year {i+1} Expense Growth (%)", value=st.session_state.expense_growth[i] if i < len(st.session_state.expense_growth) else 0) for i in range(3)]
+if st.button("Inject Simulated API Feed"):
+    st.session_state.components.extend(api_response_mock["components"])
+    st.success("Simulated data injected into the component mapping.")
 
-    if st.button("Save Inputs"):
-        st.session_state.update({
-            "revenue": revenue,
-            "it_expense": it_expense,
-            "category_expenses_to_total": category_expenses,
-            "category_revenue_to_total": category_revenue,
-            "revenue_growth": revenue_growth,
-            "expense_growth": expense_growth
-        })
-        st.success("Inputs saved successfully!")
+with st.expander("View Mock API Payload"):
+    st.code(json.dumps(api_response_mock, indent=2), language='json')
 
-# ---------- ITRM Calculator ----------
-elif section == "📊 ITRM Calculator":
-    st.title("📊 ITRM Multi-Year Calculator")
+# --- External Import Tab ---
+with tabs[2]:
+    st.subheader("\U0001F4C2 Upload External Architecture (Visio / AIOps")
+    visio_file = st.file_uploader("Upload Visio Diagram (.vsdx)", type="vsdx")
+    if visio_file:
+        st.info("(Placeholder) Parsing of Visio files will be added here.")
+        st.write("File name:", visio_file.name)
 
-    revenue = forecast_values(st.session_state.revenue, st.session_state.revenue_growth)
-    expenses = forecast_values(st.session_state.it_expense, st.session_state.expense_growth)
+    st.markdown("---")
+    st.subheader("\U0001F916 Optional AIOps Integration")
+    st.text_input("Enter AIOps API URL", key="aiops_url")
+    st.button("Test Connection", key="test_aiops")
 
-    st.session_state.revenue_input = revenue
-    st.session_state.expense_input = expenses
+if st.sidebar.checkbox("Show session state (dev only)"):
+    st.write(st.session_state)
 
-    for year in revenue:
-        st.markdown(f"**{year}: Revenue = ${revenue[year]:,.2f}, Expenses = ${expenses[year]:,.2f}**")
-
-    itrm = {
-        year: (expenses[year] / revenue[year]) * 100 if revenue[year] else 0
-        for year in revenue
-    }
-
-    st.markdown("### ITRM Over Time")
-    years = list(itrm.keys())
-    values = list(itrm.values())
-    fig, ax = plt.subplots()
-    ax.plot(years, values, marker='o')
-    ax.set_ylabel("IT Revenue Margin (%)")
-    st.pyplot(fig)
-
-# ---------- Financial Summary ----------
-elif section == "💰 ITRM Financial Summary":
-    st.title("💰 ITRM Financial Summary")
-
-    revenue = st.session_state.revenue_input
-    expenses = st.session_state.expense_input
-
-    st.markdown("### Projected Revenue and Expenses")
-    for year in revenue:
-        st.markdown(f"**{year}**: Revenue = ${revenue[year]:,.2f}, Expenses = ${expenses[year]:,.2f}")
-
-    itrm = {
-        year: (expenses[year] / revenue[year]) * 100 if revenue[year] else 0
-        for year in revenue
-    }
-
-    st.markdown("### ITRM by Year")
-    for year in itrm:
-        st.markdown(f"**{year} ITRM:** {itrm[year]:.2f}%")
-
-    # Year-over-Year Revenue vs Expense Comparison
-    st.markdown("### 📊 Year-over-Year Revenue vs. Expenses")
-    years = list(revenue.keys())
-    revenue_values = list(revenue.values())
-    expense_values = list(expenses.values())
-
-    fig2, ax2 = plt.subplots(figsize=(8, 6))
-    ax2.bar(years, revenue_values, color='green', alpha=0.6, label='Revenue')
-    ax2.bar(years, expense_values, color='red', alpha=0.6, label='Expenses')
-    ax2.set_title("Year-over-Year Comparison")
-    ax2.set_xlabel("Year")
-    ax2.set_ylabel("Amount ($)")
-    ax2.legend()
-    st.pyplot(fig2)
-
-    # Recommendations based on ITRM
-    st.markdown("### 📌 Recommendations")
-    for year in itrm:
-        margin = itrm[year]
-        if margin < 20:
-            st.error(f"{year}: 🔴 Low Margin - Consider automation and reducing waste.")
-        elif margin < 40:
-            st.warning(f"{year}: 🟡 Medium Margin - Improve IT operations and cost control.")
-        else:
-            st.success(f"{year}: 🟢 Healthy Margin - Maintain and enhance automation.")
-
-# ---------- Overview Summary ----------
-elif section == "🧠 Overview Summary":
-    st.title("🧠 IT Revenue Margin Strategy Summary")
-
-    summary = f"""
-    
-st.markdown(summary)     
-    
-**Client Name:** {client_name or '<Client>'}
-
-## Strategy Overview
-- Optimize hybrid IT environments
-- Improve cybersecurity maturity
-- Reduce IT margin leakage via automation
-
-## ITRM Next Steps
-1. Conduct Workshops
-2. Deploy Dashboards
-3. Integrate Toolkits
-"""
+# --- COMPONENT UPLOAD ---
+st.markdown("### 📥 Upload Components")
+file = st.file_uploader("Upload .csv with: Name, Category, Spend, Renewal Date, Risk Score")
+if file:
+    df = pd.read_csv(file)
+    required_cols = {"Name", "Category", "Spend", "Renewal Date", "Risk Score"}
+    if required_cols.issubset(set(df.columns)):
+        controller.set_components(df.to_dict(orient="records"))
+        st.success("✅ Components loaded.")
+    else:
+        st.error(f"Missing columns: {required_cols - set(df.columns)}")
