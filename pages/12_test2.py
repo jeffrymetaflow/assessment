@@ -273,18 +273,6 @@ st.markdown("""
 Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
 """)
 
-# Questionnaire
-questionnaire = [
-    {
-        "section": "Identity - Survival, Ad-Hoc, Manual Legacy",
-        "questions": [
-            "Does your organization maintain an inventory of all authorized and unauthorized devices connected to your network?",
-            "Do you have an inventory of all authorized and unauthorized software within your organization?",
-        ]
-    },
-    # Add more sections here...
-]
-
 # Display form
 responses = {}
 with st.form("maturity_form"):
