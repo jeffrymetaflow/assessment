@@ -406,6 +406,15 @@ if submitted:
     # Initialize score_data as an empty list
     score_data = []
 
+    category_scores = {}
+    for category in grouped_questions:
+        questions = grouped_questions[category]
+        yes_count = sum(
+            1 for idx, q in enumerate(questions) 
+            if responses.get(f"{category}_{block['section']}_{idx}") == "Yes"
+        )
+        category_scores[category] = yes_count
+    
     for category in grouped_questions:
         questions = grouped_questions[category]
         yes_count = sum(
@@ -419,6 +428,20 @@ if submitted:
             "Total Questions": total
         })
 
+    # Prepare data for the DataFrame and charts
+    score_data = [{"Category": cat, "Yes Count": count} for cat, count in category_scores.items()]
+    score_df = pd.DataFrame(score_data)
+    
+    # Display the DataFrame
+    st.dataframe(score_df)
+    
+    # Create the bar chart
+    fig, ax = plt.subplots()
+    ax.bar(score_df["Category"], score_df["Yes Count"], color='skyblue')
+    ax.set_ylabel("Yes Count")
+    ax.set_title("Yes Responses by Category")
+    st.pyplot(fig)
+    
     # Create a DataFrame for the raw scores
     score_df = pd.DataFrame(score_data).sort_values(by="Category")
     st.dataframe(score_df, use_container_width=True)
