@@ -397,6 +397,9 @@ if submitted:
 
 # Scoring and Results
 if submitted:
+    percentages = {section: round(score * 100, 1) for section, score in section_scores.items()
+    }
+    
     st.write("### Category Scores")
     st.write(category_percentages)
     
