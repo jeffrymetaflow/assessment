@@ -270,18 +270,30 @@ questionnaire = [
 # Display title
 st.title("\U0001F9E0 Cybersecurity Maturity Assessment Tool")
 st.markdown("""
-Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score across several technology domains.
+Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
 """)
 
+# Questionnaire
+questionnaire = [
+    {
+        "section": "Identity - Survival, Ad-Hoc, Manual Legacy",
+        "questions": [
+            "Does your organization maintain an inventory of all authorized and unauthorized devices connected to your network?",
+            "Do you have an inventory of all authorized and unauthorized software within your organization?",
+        ]
+    },
+    # Add more sections here...
+]
+
 # Display form
+responses = {}
 with st.form("maturity_form"):
-    responses = {}
     section_scores = {}
     for block in questionnaire:
         st.subheader(block["section"])
         yes_count = 0
         for q in block["questions"]:
-            answer = st.radio(q, ["Yes", "No"], key=f"{block['section']}_{q}")  # Unique keys
+            answer = st.radio(q, ["Yes", "No"], key=f"{block['section']}_{q}")
             responses[q] = answer
             if answer == "Yes":
                 yes_count += 1
@@ -289,70 +301,38 @@ with st.form("maturity_form"):
             section_scores[block["section"]] = yes_count / len(block["questions"])
     submitted = st.form_submit_button("Submit")
 
-# --- Form Input Logic ---
-with st.form("cyber_maturity_form"):
-    for section in questionnaire:
-        st.subheader(section["section"])
-        for q in section["questions"]:
-            st.radio(q, ["Yes", "No"], key=q)
-    submitted = st.form_submit_button("Submit")
+# Handle submission
 if submitted:
-    st.success("Responses recorded. See maturity summary below.")
+    st.success("✅ Responses submitted successfully!")
+    st.write("### Section Scores")
+    st.write(section_scores)
 
-# --- Maturity Scoring + Visualization ---
-st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
+    # Bar Chart
+    df_scores = pd.DataFrame({
+        "Section": list(section_scores.keys()),
+        "Score": list(section_scores.values())
+    })
+    fig, ax = plt.subplots()
+    ax.barh(df_scores["Section"], df_scores["Score"], color='skyblue')
+    ax.set_xlabel("Maturity Score")
+    ax.set_title("Cybersecurity Maturity by Section")
+    st.pyplot(fig)
 
-# Aggregate scores
-maturity_buckets = {
-    "Survival": 0,
-    "Awareness": 0,
-    "Committed": 0,
-    "Service": 0,
-    "Business": 0
-}
-totals = {k: 0 for k in maturity_buckets}
+    # Radar Chart
+    fig_radar, ax_radar = plt.subplots(figsize=(6, 6), subplot_kw={'projection': 'polar'})
+    categories = list(section_scores.keys())
+    values = list(section_scores.values())
+    values += values[:1]  # Close the loop
+    angles = [n / float(len(categories)) * 2 * 3.14159 for n in range(len(categories))]
+    angles += angles[:1]
 
-# Count yes responses by category
-for section in questionnaire:
-    section_title = section["section"]
-    category = next((key for key in maturity_buckets if key in section_title), None)
-    if category:
-        totals[category] += len(section["questions"])
-        for q in section["questions"]:
-            if st.session_state.get(q) == "Yes":
-                maturity_buckets[category] += 1
-
-# Calculate percentages
-percentages = {k: round((maturity_buckets[k] / totals[k]) * 100, 1) if totals[k] > 0 else 0 for k in maturity_buckets}
-
-# Create DataFrame with conditional coloring
-summary_df = pd.DataFrame({
-    "Maturity Level": list(percentages.keys()),
-    "Score (%)": list(percentages.values())
-})
-
-def color_score(val):
-    if val >= 75:
-        color = 'lightgreen'
-    elif val >= 50:
-        color = 'khaki'
-    else:
-        color = 'salmon'
-    return f'background-color: {color}'
-
-st.dataframe(summary_df.style.applymap(color_score, subset=["Score (%)"]))
-
-# Display bar chart
-fig, ax = plt.subplots()
-colors = [
-    'green' if val >= 75 else 'orange' if val >= 50 else 'red'
-    for val in summary_df["Score (%)"]
-]
-ax.bar(summary_df["Maturity Level"], summary_df["Score (%)"], color=colors)
-ax.set_ylabel("Maturity Score (%)")
-ax.set_ylim([0, 100])
-ax.set_title("Cybersecurity Maturity by Capability Level")
-st.pyplot(fig)
+    ax_radar.plot(angles, values, linewidth=2, linestyle='solid')
+    ax_radar.fill(angles, values, 'skyblue', alpha=0.4)
+    ax_radar.set_yticklabels([])
+    ax_radar.set_xticks(angles[:-1])
+    ax_radar.set_xticklabels([title[:15] + "..." if len(title) > 15 else title for title in categories])
+    ax_radar.set_title("Overall Cybersecurity Maturity Radar Chart", y=1.08)
+    st.pyplot(fig_radar)
 
     # Interpretation Guide
     st.markdown("""
