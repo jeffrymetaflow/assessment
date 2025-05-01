@@ -318,7 +318,7 @@ with st.form("maturity_form"):
             st.write(block["section"])
             for idx, q in enumerate(block["questions"]): 
                 unique_key = f"{category}_{block['section']}_{idx}"
-                st.radio(q, ["Yes", "No"], key=f"{block['section']}_{idx}")
+                answer = st.radio(q, ["Yes", "No"], key=unique_key)
             if answer == "Yes":
                 yes_count += 1
         if len(block["questions"]) > 0:
