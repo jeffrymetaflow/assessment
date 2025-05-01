@@ -54,14 +54,14 @@ questionnaire = [
             "Have you established an incident response plan that includes identity and access management considerations?",
             "Is there a process for regular auditing and testing of identity and access controls?",
             "Does your organization regularly assess the effectiveness of your identity and access management program and make improvements as needed?"
-        ]
+         ]
     },
     {
-        "category": "Identity",
+        "category": "Protect",
         "section": "Survival, Ad-Hoc, Manual Legacy",
         "questions": [
-            "Do you have a documented information security policy?",
-            "Is there a process for classifying data and information assets based on sensitivity?",
+            "Do you have a documented information security policy",
+            "Is there a process for classifying data ancd information assets based on sensitivity?",
             "Have you implemented access control measures to restrict unauthorized access to sensitive data?",
             "Do you regularly update and patch your software and systems to address known vulnerabilities?"
         ]
@@ -154,6 +154,16 @@ questionnaire = [
             "Do you conduct regular tabletop exercises to test your incident detection and response capabilities?",
             "Have you established key performance indicators (KPIs) to measure the effectiveness of your detection capabilities?",
             "Is there a documented process for communicating and coordinating incident detection and response with external stakeholders, such as law enforcement or industry groups?"
+        ]
+    },
+    {
+        "category": "Respond",
+        "section": "Survival, Ad-Hoc, Manual Legacy",
+        "questions": [
+            "Do you have an incident response plan place?",
+            "Is there a dedicated incident response team ora clearly defined incident response role within your organization?",
+            "Have you established an incident notification process to report and escalate security incidents?",
+            "Is there a process for classifying and prioritizing incidents based on severity?"
         ]
     },
     {
