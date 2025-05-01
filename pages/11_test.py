@@ -93,8 +93,7 @@ questionnaire = [
             "Is there a process for securely disposing of hardware and media containing sensitive data?",
             "Have you established secure supply chain practices to verify the security of third-party products and services?"
         ]
-    }
-
+    },
     {
         "section": "Detect - Survival, Ad-Hoc, Manual Legacy",
         "questions": [
