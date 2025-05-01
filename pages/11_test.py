@@ -289,48 +289,6 @@ with st.form("maturity_form"):
             section_scores[block["section"]] = yes_count / len(block["questions"])
     submitted = st.form_submit_button("Submit")
 
-# Scoring and Results
-if submitted:
-    st.success("✅ Responses submitted successfully!")
-    st.write("### Section Scores")
-    if not section_scores:
-        st.warning("No scores available.")
-        st.stop()
-    st.write(section_scores)
-
-    # Bar Chart
-    df_scores = pd.DataFrame({"Section": list(section_scores.keys()), "Score": list(section_scores.values())})
-    df_scores = df_scores.sort_values(by="Score", ascending=True)
-    fig, ax = plt.subplots()
-    ax.barh(df_scores["Section"], df_scores["Score"], color='skyblue')
-    ax.set_xlabel("Maturity Score")
-    ax.set_title("IT Maturity Score by Section")
-    st.pyplot(fig)
-
-    # Radar Chart
-    fig_radar, ax_radar = plt.subplots(figsize=(6, 6), subplot_kw={'projection': 'polar'})
-    categories = list(section_scores.keys())
-    values = list(section_scores.values())
-    values += values[:1]  # Close the loop
-    angles = [n / float(len(categories)) * 2 * 3.14159 for n in range(len(categories))]
-    angles += angles[:1]
-
-    ax_radar.plot(angles, values, linewidth=2, linestyle='solid')
-    ax_radar.fill(angles, values, 'skyblue', alpha=0.4)
-    ax_radar.set_yticklabels([])
-    ax_radar.set_xticks(angles[:-1])
-    ax_radar.set_xticklabels(categories, fontsize=8)
-    ax_radar.set_title("Overall Cybersecurity Maturity Radar Chart", y=1.08)
-    st.pyplot(fig_radar)
-
-    # Interpretation Guide
-    st.markdown("""
-    ### 🔍 Interpretation:
-    - **80%+**: High maturity — optimized or automated
-    - **50-79%**: Moderate maturity — standardized or in transition
-    - **Below 50%**: Low maturity — ad-hoc or siloed
-    """)
-
 # --- Calculate Maturity Summary ---
 st.header("📊 Cybersecurity Maturity Summary")
 
@@ -410,3 +368,47 @@ summary_df = pd.DataFrame({
     "Score": list(percentages.values())
 })
 st.dataframe(summary_df)
+
+# Scoring and Results
+if submitted:
+    st.success("✅ Responses submitted successfully!")
+    st.write("### Section Scores")
+    if not section_scores:
+        st.warning("No scores available.")
+        st.stop()
+    st.write(section_scores)
+
+    # Bar Chart
+    df_scores = pd.DataFrame({"Section": list(section_scores.keys()), "Score": list(section_scores.values())})
+    df_scores = df_scores.sort_values(by="Score", ascending=True)
+    fig, ax = plt.subplots()
+    ax.barh(df_scores["Section"], df_scores["Score"], color='skyblue')
+    ax.set_xlabel("Maturity Score")
+    ax.set_title("IT Maturity Score by Section")
+    st.pyplot(fig)
+
+    # Radar Chart
+    fig_radar, ax_radar = plt.subplots(figsize=(6, 6), subplot_kw={'projection': 'polar'})
+    categories = list(section_scores.keys())
+    values = list(section_scores.values())
+    values += values[:1]  # Close the loop
+    angles = [n / float(len(categories)) * 2 * 3.14159 for n in range(len(categories))]
+    angles += angles[:1]
+
+    ax_radar.plot(angles, values, linewidth=2, linestyle='solid')
+    ax_radar.fill(angles, values, 'skyblue', alpha=0.4)
+    ax_radar.set_yticklabels([])
+    ax_radar.set_xticks(angles[:-1])
+    ax_radar.set_xticklabels(categories, fontsize=8)
+    ax_radar.set_title("Overall Cybersecurity Maturity Radar Chart", y=1.08)
+    st.pyplot(fig_radar)
+
+    # Interpretation Guide
+    st.markdown("""
+    ### 🔍 Interpretation:
+    - **80%+**: High maturity — optimized or automated
+    - **50-79%**: Moderate maturity — standardized or in transition
+    - **Below 50%**: Low maturity — ad-hoc or siloed
+    """)
+
+
