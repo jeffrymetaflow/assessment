@@ -316,7 +316,8 @@ with st.form("maturity_form"):
         st.subheader(category) 
         for block in blocks: 
             st.write(block["section"])
-            for idx, q in enumerate(block["questions"]):
+            for idx, q in enumerate(block["questions"]): 
+                unique_key = f"{category}_{block['section']}_{idx}"
                 st.radio(q, ["Yes", "No"], key=f"{block['section']}_{idx}")
     submitted = st.form_submit_button("Submit") 
 
