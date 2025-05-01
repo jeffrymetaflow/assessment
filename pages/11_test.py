@@ -170,8 +170,13 @@ if submitted:
     st.write("### Section Scores")
     st.write(section_scores)
 
+    if not section_scores:
+        st.warning("No scores available. Please complete the questionnaire.")
+        st.stop()
+
     # Create and display bar chart
     df_scores = pd.DataFrame({"Section": list(section_scores.keys()), "Score": list(section_scores.values())})
+    df_scores = df_scores.sort_values(by="Score", ascending=True)  # Sort by score
     fig, ax = plt.subplots()
     ax.barh(df_scores["Section"], df_scores["Score"], color='skyblue')
     ax.set_xlabel("Maturity Score")
@@ -179,7 +184,7 @@ if submitted:
     st.pyplot(fig)
 
     # Create radar chart to compare domains
-    fig_radar, ax_radar = plt.subplots(figsize=(6,6), subplot_kw={'projection': 'polar'})
+    fig_radar, ax_radar = plt.subplots(figsize=(6, 6), subplot_kw={'projection': 'polar'})
     categories = list(section_scores.keys())
     values = list(section_scores.values())
     values += values[:1]  # close the loop for radar chart
@@ -190,14 +195,23 @@ if submitted:
     ax_radar.fill(angles, values, 'skyblue', alpha=0.4)
     ax_radar.set_yticklabels([])
     ax_radar.set_xticks(angles[:-1])
-    ax_radar.set_xticklabels(categories, fontsize=8)
+    ax_radar.set_xticklabels([cat[:20] + "..." if len(cat) > 20 else cat for cat in categories], fontsize=8)  # Truncate names
     ax_radar.set_title("Overall Cybersecurity Maturity Radar Chart", y=1.08)
     st.pyplot(fig_radar)
-  
+
+    # Interpretation Guide
     st.markdown("""
-### 🔍 Interpretation:
+    ### 🔍 Interpretation:
     - **80%+**: High maturity — optimized or automated
     - **50-79%**: Moderate maturity — standardized or in transition
     - **Below 50%**: Low maturity — ad-hoc or siloed
     """)
+
+    # Option to download scores as CSV
+    st.download_button(
+        label="📥 Download Section Scores",
+        data=df_scores.to_csv(index=False),
+        file_name="section_scores.csv",
+        mime="text/csv"
+    )
 
