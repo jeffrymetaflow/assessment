@@ -174,6 +174,96 @@ questionnaire = [
             "Is there a process for conducting a root cause analysis of incidents to prevent future occurrences?",
             "Have you established key performance indicators (KPIs) and metrics to measure the effectiveness of your incident response capabilities?"
         ]
+    },
+    {
+        "section": "Recover - Survival, Ad-Hoc, Manual Legacy",
+        "questions": [
+            "Do you have a documented business continuity and disaster recovery (BC/DR) plan in place?",
+            "Is there a dedicated BC/DR team or a clearly defined BC/DR role within your organization?",
+            "Have you identified critical business processes and assets that need to be prioritized for recovery?",
+            "Is there a process for regularly backing up critical data and systems?"
+        ]
+    },
+    {
+        "section": "Recover - Awareness, measured, semi-automated",
+        "questions": [
+            "Have you established recovery time objectives (RTOs) and recovery point objectives (RPOs) for key systems and data?",
+            "Is there a process for testing and validating backups to ensure they can be restored successfully?",
+            "Do you have off-site or remote data backups to protect against physical disasters?",
+            "Is there a documented procedure for restoring critical systems and data in a timely manner?"
+        ]
+    },
+    {
+        "section": "Recover - Committed, Continuous Improvement, Redundant",
+        "questions": [
+            "Have you identified and documented alternative IT infrastructure and facilities for use during recovery?",
+            "Is there a process for notifying employees and stakeholders about recovery procedures and expectations?",
+            "Do you conduct regular disaster recovery exercises to test your BC/DR plan?",
+            "Is there a documented process for re-establishing network connectivity and access after an incident?"
+        ]
+    },
+    {
+        "section": "Recover - Service Aligned/Standardization/High Availability",
+        "questions": [
+            "Have you established a process for restoring user access and privileges in a secure manner?",
+            "Is there a procedure for conducting a post-incident assessment to identify areas for recovery process improvement?",
+            "Do you have a plan for ensuring that employees can work remotely if needed during a disruption?",
+            "Is there a process for coordinating recovery efforts with third-party service providers and suppliers?"
+        ]
+    },
+    {
+        "section": "Recover - Business Partnership/Innovation Optimized",
+        "questions": [
+            "Have you identified and documented legal and regulatory reporting requirements related to recovery?",
+            "Is there a process for communicating recovery progress and status updates to internal and external stakeholders?",
+            "Do you maintain a record of past recovery efforts and lessons learned from incidents?",
+            "Have you established key performance indicators (KPIs) and metrics to measure the effectiveness of your recovery capabilities?"
+        ]
+    },
+    {
+        "section": "CIS Controls - Survival, Ad-Hoc, Manual Legacy",
+        "questions": [
+            "Have you established and documented an inventory of authorized and unauthorized devices on your network?",
+            "Is there a process in place to actively manage and control the use of administrative privileges?",
+            "Do you regularly review and update software and systems to address known vulnerabilities?",
+            "Have you implemented secure configurations for hardware and software used within your organization?"
+        ]
+    },
+    {
+        "section": "CIS Controls - Awareness, measured, semi-automated",
+        "questions": [
+            "Is there a process for continuous vulnerability assessment and remediation?",
+            "Do you restrict and monitor the use of PowerShell, command-line tools, and other scripting languages?",
+            "Have you implemented a process for the secure handling of account credentials, such as passwords and keys?",
+            "Is there a documented process for data protection, including encryption, data classification, and data loss prevention?"
+        ]
+    },
+    {
+        "section": "CIS Controls - Committed, Continuous Improvement, Redundant",
+        "questions": [
+            "Do you actively monitor and analyze network traffic for signs of malicious activities?",
+            "Have you established an incident response plan that includes roles, responsibilities, and communication procedures?",
+            "Is there a process for logging and retaining security events and data for analysis?",
+            "Do you regularly conduct security awareness training for employees and contractors?"
+        ]
+    },
+    {
+        "section": "CIS Controls - Service Aligned/Standardization/High Availability",
+        "questions": [
+            "Have you implemented secure email and web browsing practices and technologies?",
+            "Is there a process for securely configuring and managing mobile devices used in your organization?",
+            "Do you have a data backup and recovery plan that includes regular testing of backups?",
+            "Is there a documented process for securely disposing of hardware and media containing sensitive data?"
+        ]
+    },
+    {
+        "section": "CIS Controls - Business Partnership/Innovation Optimized",
+        "questions": [
+            "Have you established a secure software development lifecycle (SDLC) process?",
+            "Is there a process for securely configuring and monitoring cloud resources?",
+            "Do you have a process for managing third-party security risks and ensuring secure supply chain practices?",
+            "Is there a documented process for regular security assessments and audits?"
+        ]
     }
 ]
 
