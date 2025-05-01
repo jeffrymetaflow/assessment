@@ -306,6 +306,8 @@ Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the 
 responses = {}
 with st.form("maturity_form"):
     section_scores = {}
+    category_scores = {}
+    category_totals = {}
     for block in questionnaire:
         st.subheader(block["section"])
         yes_count = 0
