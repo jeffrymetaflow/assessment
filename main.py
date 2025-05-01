@@ -518,6 +518,11 @@ if user_input:
     if not found:
         st.error("Component not found. Please try again.")
 
+# Updated generate_roadmap_pdf with revenue + KPI injection
+
+def generate_roadmap_pdf():
+    import re
+
 # Generate PDF Button
 if st.button("📄 Generate Modernization Roadmap PDF"):
     pdf_path = generate_roadmap_pdf()
@@ -528,13 +533,7 @@ if st.button("📄 Generate Modernization Roadmap PDF"):
             file_name=os.path.basename(pdf_path),
             mime="application/pdf"
         )
-
-# Updated generate_roadmap_pdf with revenue + KPI injection
-# (Replacing both previous definitions)
-
-def generate_roadmap_pdf():
-    import re
-
+    
     # Optional fallback if bs4 isn't available
     try:
         from bs4 import BeautifulSoup
