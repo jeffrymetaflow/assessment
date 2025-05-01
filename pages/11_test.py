@@ -273,12 +273,6 @@ st.markdown("""
 Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score across several technology domains.
 """)
 
-# Display title
-st.title("\U0001F9E0 Cybersecurity Maturity Assessment Tool")
-st.markdown("""
-Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
-""")
-
 # Display form
 with st.form("maturity_form"):
     responses = {}
@@ -366,11 +360,3 @@ st.bar_chart(summary_df.set_index("Maturity Level"))
 # Optional: Color-coded table
 st.dataframe(summary_df.style.background_gradient(cmap="Blues"))
     
-    # Option to download scores as CSV
-    st.download_button(
-        label="📥 Download Section Scores",
-        data=df_scores.to_csv(index=False),
-        file_name="section_scores.csv",
-        mime="text/csv"
-    )
-
