@@ -155,15 +155,3 @@ if submitted:
     - **Below 50%**: Low maturity — ad-hoc or siloed
     """)
 
-    # Recommendations Section
-    st.header("🧭 Recommendations by Category")
-    for _, row in score_df.iterrows():
-        score = row["Score (%)"]
-        category = row["Category"]
-        if score >= 80:
-            rec = f"✅ *{category}* is highly mature. Continue optimizing with automation and cross-domain integration."
-        elif score >= 50:
-            rec = f"⚠️ *{category}* shows moderate maturity. Focus on standardization, consolidation, and governance improvements."
-        else:
-            rec = f"❌ *{category}* is low maturity. Prioritize modernization, documentation, and automation."
-        st.markdown(rec)
