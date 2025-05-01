@@ -308,10 +308,12 @@ with st.form("maturity_form"):
     section_scores = {}
     category_scores = {}
     category_totals = {}
-    for block in questionnaire:
-        st.subheader(block["section"])
-        yes_count = 0
-        for q in block["questions"]:
+    for category, blocks in groupby (questionnaire, key=lambda X: x["category"]):
+        st.subheader(category)
+        for block in blocks: 
+            st.write(block["section"])
+            yes_count = 0
+            for q in block["questions"]:
             answer = st.radio(q, ["Yes", "No"], key=f"{block['section']}_{q}")
             responses[q] = answer
             if answer == "Yes":
