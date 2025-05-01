@@ -5,6 +5,7 @@ import pandas as pd
 # Full Cybersecurity Maturity Assessment Questions
 questionnaire = [
     {
+        "category": "Identity",
         "section": "Identity - Survival, Ad-Hoc, Manual Legacy",
         "questions": [
             "Does your organization maintain an inventory of all authorized and unauthorized devices connected to your network?",
@@ -14,6 +15,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Identity",
         "section": "Identity - Awareness, measured, semi-automated",
         "questions": [
             "Have you implemented multi-factor authentication (MFA) for accessing sensitive systems and data?",
@@ -23,6 +25,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Identity",
         "section": "Identity - Committed, Continuous Improvement, Redundant",
         "questions": [
             "Is there a process for promptly deactivating accounts for employees who leave your organization?",
@@ -32,6 +35,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Identity",
         "section": "Identity - Service Aligned/Standardization/High Availability",
         "questions": [
             "Is there a process for reviewing and addressing accounts with excessive privileges?",
@@ -41,6 +45,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Identity",
         "section": "Identity - Business Partnership/Innovation Optimized",
         "questions": [
             "Does your organization conduct security awareness training for employees?",
@@ -50,6 +55,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Identity",
         "section": "Protect - Survival, Ad-Hoc, Manual Legacy",
         "questions": [
             "Do you have a documented information security policy?",
