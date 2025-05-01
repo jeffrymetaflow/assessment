@@ -130,3 +130,51 @@ if submitted:
     ax.set_xlabel("Maturity Score")
     ax.set_title("IT Maturity Score by Section")
     st.pyplot(fig)
+
+# Scoring and Results
+if submitted:
+    st.header("📊 Maturity Assessment Results")
+    score_data = []
+
+    for category in grouped_questions:
+        questions = grouped_questions[category]
+        yes_count = sum(
+            1 for q in questions if responses.get(f"{category.strip()}::{q}") == "Yes"
+        )
+        total = len(questions)
+        percent = round((yes_count / total) * 100, 1)
+        score_data.append({"Category": category.strip(), "Score (%)": percent})
+
+    score_df = pd.DataFrame(score_data).sort_values(by="Category")
+    st.dataframe(score_df, use_container_width=True)
+    
+    st.session_state['it_maturity_scores'] = score_df
+    
+    # Heatmap visual (Streamlit-compatible, no matplotlib)
+    st.subheader("🔵 Heatmap View of Maturity by Category")
+    st.dataframe(score_df.style.format({"Score (%)": "{:.1f}"}))
+
+    # Bar chart view
+    st.subheader("📈 Bar Chart of Scores")
+    st.bar_chart(score_df.set_index("Category"))
+
+    
+    st.markdown("""
+### 🔍 Interpretation:
+    - **80%+**: High maturity — optimized or automated
+    - **50-79%**: Moderate maturity — standardized or in transition
+    - **Below 50%**: Low maturity — ad-hoc or siloed
+    """)
+
+    # Recommendations Section
+    st.header("🧭 Recommendations by Category")
+    for _, row in score_df.iterrows():
+        score = row["Score (%)"]
+        category = row["Category"]
+        if score >= 80:
+            rec = f"✅ *{category}* is highly mature. Continue optimizing with automation and cross-domain integration."
+        elif score >= 50:
+            rec = f"⚠️ *{category}* shows moderate maturity. Focus on standardization, consolidation, and governance improvements."
+        else:
+            rec = f"❌ *{category}* is low maturity. Prioritize modernization, documentation, and automation."
+        st.markdown(rec)
