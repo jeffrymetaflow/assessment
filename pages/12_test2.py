@@ -314,13 +314,8 @@ with st.form("maturity_form"):
             st.write(block["section"])
             yes_count = 0
             for q in block["questions"]:
-            answer = st.radio(q, ["Yes", "No"], key=f"{block['section']}_{q}")
-            responses[q] = answer
-            if answer == "Yes":
-                yes_count += 1
-            if len(block["questions"]) > 0:
-            section_scores[block["section"]] = yes_count / len(block["questions"])
-            submitted = st.form_submit_button("Submit")
+                st.radio(q, ["Yes", "No"], key=f"{block['section']}_{q}")
+    submitted = st.form_submit_button("Submit")
 
     for block in questionnaire:
         category = block["category"]
