@@ -313,16 +313,19 @@ with st.form("maturity_form"):
     category_scores = {}
     category_totals = {}
     for category, blocks in groupby(questionnaire, key=lambda x: x["category"]):
-        st.subheader(category) 
-        for block in blocks: 
+        st.subheader(category)
+        for block in blocks:
             st.write(block["section"])
-            for idx, q in enumerate(block["questions"]): 
+            # Initialize yes_count for each block
+            yes_count = 0
+            for idx, q in enumerate(block["questions"]):
                 unique_key = f"{category}_{block['section']}_{idx}"
                 answer = st.radio(q, ["Yes", "No"], key=unique_key)
-            if answer == "Yes":
-                yes_count += 1
-        if len(block["questions"]) > 0:
-            section_scores[block["section"]] = yes_count / len(block["questions"])
+                if answer == "Yes":
+                    yes_count += 1
+            # Calculate the section score
+            if len(block["questions"]) > 0:
+                section_scores[block["section"]] = yes_count / len(block["questions"])
     submitted = st.form_submit_button("Submit")
    
 if submitted:
