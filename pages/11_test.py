@@ -338,6 +338,35 @@ if submitted:
     - **Below 50%**: Low maturity — ad-hoc or siloed
     """)
 
+# --- Calculate Maturity Summary ---
+st.header("📊 Cybersecurity Maturity Summary")
+
+# Tally answers by maturity tier
+maturity_levels = ["Survival", "Awareness", "Committed", "Service", "Business"]
+summary_counts = {level: 0 for level in maturity_levels}
+
+for q in questionnaire:
+    section = q["section"]
+    level = section.split(" - ")[1].split(",")[0].strip()
+    level_key = next((m for m in maturity_levels if m in level), None)
+    if level_key:
+        for question in q["questions"]:
+            answer_key = f"{section}-{question}"
+            if st.session_state.get(answer_key) == "YES":
+                summary_counts[level_key] += 1
+
+# Convert to DataFrame
+summary_df = pd.DataFrame({
+    "Maturity Level": summary_counts.keys(),
+    "Score": summary_counts.values()
+})
+
+# Display bar chart
+st.bar_chart(summary_df.set_index("Maturity Level"))
+
+# Optional: Color-coded table
+st.dataframe(summary_df.style.background_gradient(cmap="Blues"))
+    
     # Option to download scores as CSV
     st.download_button(
         label="📥 Download Section Scores",
