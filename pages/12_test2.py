@@ -318,9 +318,9 @@ with st.form("maturity_form"):
             responses[q] = answer
             if answer == "Yes":
                 yes_count += 1
-        if len(block["questions"]) > 0:
+            if len(block["questions"]) > 0:
             section_scores[block["section"]] = yes_count / len(block["questions"])
-    submitted = st.form_submit_button("Submit")
+            submitted = st.form_submit_button("Submit")
 
     for block in questionnaire:
         category = block["category"]
