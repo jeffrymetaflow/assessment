@@ -48,8 +48,53 @@ questionnaire = [
             "Is there a process for regular auditing and testing of identity and access controls?",
             "Does your organization regularly assess the effectiveness of your identity and access management program and make improvements as needed?"
         ]
+    },
+    {
+        "section": "Protect - Survival, Ad-Hoc, Manual Legacy",
+        "questions": [
+            "Do you have a documented information security policy?",
+            "Is there a process for classifying data and information assets based on sensitivity?",
+            "Have you implemented access control measures to restrict unauthorized access to sensitive data?",
+            "Do you regularly update and patch your software and systems to address known vulnerabilities?"
+        ]
+    },
+    {
+        "section": "Protect - Awareness, measured, semi-automated",
+        "questions": [
+            "Is there an established process for secure software development and code review?",
+            "Have you implemented network segmentation to isolate critical systems and data from less secure areas?",
+            "Is there an intrusion detection system (IDS) in place to monitor for suspicious network activities?",
+            "Have you implemented firewalls to control inbound and outbound network traffic?"
+        ]
+    },
+    {
+        "section": "Protect - Committed, Continuous Improvement, Redundant",
+        "questions": [
+            "Is there a process for monitoring and responding to cybersecurity threats and incidents?",
+            "Do you use encryption to protect sensitive data in transit and at rest?",
+            "Have you implemented endpoint protection solutions (e.g., antivirus, anti-malware) on all devices?",
+            "Is there a documented incident response plan that includes communication and coordination with stakeholders?"
+        ]
+    },
+    {
+        "section": "Protect - Service Aligned/Standardization/High Availability",
+        "questions": [
+            "Have you established secure configurations for your hardware and software?",
+            "Do you conduct regular security awareness training for employees?",
+            "Is there a process for managing and securing removable media (e.g., USB drives)?",
+            "Have you implemented secure email and web browsing practices and technologies?"
+        ]
+    },
+    {
+        "section": "Protect - Business Partnership/Innovation Optimized",
+        "questions": [
+            "Is there a data backup and recovery plan in place, and are backups regularly tested?",
+            "Do you have a secure mobile device management (MDM) solution for company-owned and BYOD devices?",
+            "Is there a process for securely disposing of hardware and media containing sensitive data?",
+            "Have you established secure supply chain practices to verify the security of third-party products and services?"
+        ]
     }
-    # Add Protect, Detect, Respond, Recover, and CIS Controls sections here
+    # Remaining Detect, Respond, Recover, and CIS Controls sections will follow in the next patch
 ]
 
 # Display title
