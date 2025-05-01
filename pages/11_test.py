@@ -128,84 +128,84 @@ tabs = st.tabs(["Questionnaire Form", "Scoring and Results", "Admin"])
 
 # --- Questionnaire Tab ---
 
-# Questionnaire Form
-with st.form("maturity_form"):
-    for category, questions in grouped_questions.items():
-        st.subheader(category.strip())
-        for q in questions:
-            key = f"{category.strip()}::{q}"
-            responses[key] = st.radio(q.strip(), ["Yes", "No"], key=key)
-    submitted = st.form_submit_button("Submit Assessment")
+    # Questionnaire Form
+    with st.form("maturity_form"):
+        for category, questions in grouped_questions.items():
+            st.subheader(category.strip())
+            for q in questions:
+                key = f"{category.strip()}::{q}"
+                responses[key] = st.radio(q.strip(), ["Yes", "No"], key=key)
+        submitted = st.form_submit_button("Submit Assessment")
 
 # --- Scoring & Results Tab ---
 
-# Scoring and Results
-if submitted:
-    st.header("📊 Maturity Assessment Results")
-    score_data = []
-
-    for category in grouped_questions:
-        questions = grouped_questions[category]
-        yes_count = sum(
-            1 for q in questions if responses.get(f"{category.strip()}::{q}") == "Yes"
-        )
-        total = len(questions)
-        percent = round((yes_count / total) * 100, 1)
-        score_data.append({"Category": category.strip(), "Score (%)": percent})
-
-    score_df = pd.DataFrame(score_data).sort_values(by="Category")
-    st.dataframe(score_df, use_container_width=True)
+    # Scoring and Results
+    if submitted:
+        st.header("📊 Maturity Assessment Results")
+        score_data = []
     
-    st.session_state['it_maturity_scores'] = score_df
+        for category in grouped_questions:
+            questions = grouped_questions[category]
+            yes_count = sum(
+                1 for q in questions if responses.get(f"{category.strip()}::{q}") == "Yes"
+            )
+            total = len(questions)
+            percent = round((yes_count / total) * 100, 1)
+            score_data.append({"Category": category.strip(), "Score (%)": percent})
     
-    # Heatmap visual (Streamlit-compatible, no matplotlib)
-    st.subheader("🔵 Heatmap View of Maturity by Category")
-    st.dataframe(score_df.style.format({"Score (%)": "{:.1f}"}))
-
-    # Bar chart view
-    st.subheader("📈 Bar Chart of Scores")
-    st.bar_chart(score_df.set_index("Category"))
-
+        score_df = pd.DataFrame(score_data).sort_values(by="Category")
+        st.dataframe(score_df, use_container_width=True)
+        
+        st.session_state['it_maturity_scores'] = score_df
+        
+        # Heatmap visual (Streamlit-compatible, no matplotlib)
+        st.subheader("🔵 Heatmap View of Maturity by Category")
+        st.dataframe(score_df.style.format({"Score (%)": "{:.1f}"}))
     
-    st.markdown("""
-### 🔍 Interpretation:
-    - **80%+**: High maturity — optimized or automated
-    - **50-79%**: Moderate maturity — standardized or in transition
-    - **Below 50%**: Low maturity — ad-hoc or siloed
-    """)
-
-    # Recommendations Section
-    st.header("🧭 Recommendations by Category")
-    for _, row in score_df.iterrows():
-        score = row["Score (%)"]
-        category = row["Category"]
-        if score >= 80:
-            rec = f"✅ *{category}* is highly mature. Continue optimizing with automation and cross-domain integration."
-        elif score >= 50:
-            rec = f"⚠️ *{category}* shows moderate maturity. Focus on standardization, consolidation, and governance improvements."
-        else:
-            rec = f"❌ *{category}* is low maturity. Prioritize modernization, documentation, and automation."
-        st.markdown(rec)
+        # Bar chart view
+        st.subheader("📈 Bar Chart of Scores")
+        st.bar_chart(score_df.set_index("Category"))
+    
+        
+        st.markdown("""
+    ### 🔍 Interpretation:
+        - **80%+**: High maturity — optimized or automated
+        - **50-79%**: Moderate maturity — standardized or in transition
+        - **Below 50%**: Low maturity — ad-hoc or siloed
+        """)
+    
+        # Recommendations Section
+        st.header("🧭 Recommendations by Category")
+        for _, row in score_df.iterrows():
+            score = row["Score (%)"]
+            category = row["Category"]
+            if score >= 80:
+                rec = f"✅ *{category}* is highly mature. Continue optimizing with automation and cross-domain integration."
+            elif score >= 50:
+                rec = f"⚠️ *{category}* shows moderate maturity. Focus on standardization, consolidation, and governance improvements."
+            else:
+                rec = f"❌ *{category}* is low maturity. Prioritize modernization, documentation, and automation."
+            st.markdown(rec)
 
 # --- Admin Tab ---
 
-# ---------------- : Edit Questions ----------------
-st.markdown("---")
-st.subheader("✏️ Edit Assessment Questions")
+    # ---------------- : Edit Questions ----------------
+    st.markdown("---")
+    st.subheader("✏️ Edit Assessment Questions")
+    
+    if 'grouped_questions' not in st.session_state:
+        st.session_state.grouped_questions = grouped_questions.copy()
+    
+    edited_category = st.selectbox("Select Category to Edit", list(st.session_state.grouped_questions.keys()))
+    new_question = st.text_input("Add a new question to this category:")
+    
+    if st.button("➕ Add Question") and new_question:
+        st.session_state.grouped_questions[edited_category].append(new_question)
+        st.success(f"Question added to {edited_category}!")
+    
+    if st.button("🗑️ Remove Last Question") and st.session_state.grouped_questions[edited_category]:
+        removed = st.session_state.grouped_questions[edited_category].pop()
+        st.warning(f"Removed: {removed}")
 
-if 'grouped_questions' not in st.session_state:
-    st.session_state.grouped_questions = grouped_questions.copy()
-
-edited_category = st.selectbox("Select Category to Edit", list(st.session_state.grouped_questions.keys()))
-new_question = st.text_input("Add a new question to this category:")
-
-if st.button("➕ Add Question") and new_question:
-    st.session_state.grouped_questions[edited_category].append(new_question)
-    st.success(f"Question added to {edited_category}!")
-
-if st.button("🗑️ Remove Last Question") and st.session_state.grouped_questions[edited_category]:
-    removed = st.session_state.grouped_questions[edited_category].pop()
-    st.warning(f"Removed: {removed}")
-
-st.markdown("### Current Questions in Selected Category:")
-st.write(st.session_state.grouped_questions[edited_category])
+    st.markdown("### Current Questions in Selected Category:")
+    st.write(st.session_state.grouped_questions[edited_category])
