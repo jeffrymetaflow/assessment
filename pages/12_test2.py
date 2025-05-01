@@ -313,12 +313,12 @@ with st.form("maturity_form"):
     category_scores = {}
     category_totals = {}
     for category, blocks in groupby(questionnaire, key=lambda x: x["category"]):
-        st.subheader(category)
+        st.subheader(category) 
         for block in blocks: 
             st.write(block["section"])
             for q in block["questions"]:
                 st.radio(q, ["Yes", "No"], key=f"{block['section']}_{q}")
-    submitted = st.form_submit_button("Submit")
+    submitted = st.form_submit_button("Submit") 
 
     for block in questionnaire:
         category = block["category"]
