@@ -320,6 +320,24 @@ with st.form("maturity_form"):
             section_scores[block["section"]] = yes_count / len(block["questions"])
     submitted = st.form_submit_button("Submit")
 
+    for block in questionnaire:
+        category = block["category"]
+        if category not in category_scores:
+            category_scores[category] = 0
+            category_totals[category] = 0
+    
+        # Count "Yes" responses for the category
+        for q in block["questions"]:
+            if st.session_state.get(q) == "Yes":
+                category_scores[category] += 1
+            category_totals[category] += 1
+
+# Calculate percentages for each category
+category_percentages = {
+    cat: round((category_scores[cat] / category_totals[cat]) * 100, 1) if category_totals[cat] > 0 else 0
+    for cat in category_scores
+}
+
 # Handle submission
 if submitted:
     st.success("✅ Responses submitted successfully!")
