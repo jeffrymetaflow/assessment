@@ -450,56 +450,56 @@ if submitted:
     ax.set_title("Maturity Level by Section")
     st.pyplot(fig)
 
-# Prepare data for the DataFrame and charts
-score_data = [{"Category": cat, "Yes Count": count} for cat, count in category_scores.items()]
-score_df = pd.DataFrame(score_data)
-
-# Display the DataFrame
-st.dataframe(score_df)
-
-# Create the bar chart
-fig, ax = plt.subplots()
-ax.bar(score_df["Category"], score_df["Yes Count"], color='skyblue')
-ax.set_ylabel("Yes Count")
-ax.set_title("Yes Responses by Category")
-st.pyplot(fig)
-
-# Create a DataFrame for the raw scores
-score_df = pd.DataFrame(score_data).sort_values(by="Category")
-st.dataframe(score_df, use_container_width=True)
-
-# Bar Chart for Raw Scores
-fig, ax = plt.subplots()
-ax.bar(score_df["Category"], score_df["Yes Count"], color='skyblue')
-ax.set_ylabel("Yes Count")
-ax.set_title("Raw 'Yes' Responses by Category")
-st.pyplot(fig)
-
-# Create DataFrame with conditional coloring
-summary_df = pd.DataFrame({
-    "Maturity Level": list(percentages.keys()),
-    "Score (%)": list(percentages.values())
-})
-
-def color_score(val):
-    if val >= 75:
-        color = 'lightgreen'
-    elif val >= 50:
-        color = 'khaki'
-    else:
-        color = 'salmon'
-    return f'background-color: {color}'
-
-st.dataframe(summary_df.style.applymap(color_score, subset=["Score (%)"]))
-
-# Display bar chart
-fig, ax = plt.subplots()
-colors = [
-    'green' if val >= 75 else 'orange' if val >= 50 else 'red'
-    for val in summary_df["Score (%)"]
-]
-ax.bar(summary_df["Maturity Level"], summary_df["Score (%)"], color=colors)
-ax.set_ylabel("Maturity Score (%)")
-ax.set_ylim([0, 100])
-ax.set_title("Cybersecurity Maturity by Capability Level")
-st.pyplot(fig)
+    # Prepare data for the DataFrame and charts
+    score_data = [{"Category": cat, "Yes Count": count} for cat, count in category_scores.items()]
+    score_df = pd.DataFrame(score_data)
+    
+    # Display the DataFrame
+    st.dataframe(score_df)
+    
+    # Create the bar chart
+    fig, ax = plt.subplots()
+    ax.bar(score_df["Category"], score_df["Yes Count"], color='skyblue')
+    ax.set_ylabel("Yes Count")
+    ax.set_title("Yes Responses by Category")
+    st.pyplot(fig)
+    
+    # Create a DataFrame for the raw scores
+    score_df = pd.DataFrame(score_data).sort_values(by="Category")
+    st.dataframe(score_df, use_container_width=True)
+    
+    # Bar Chart for Raw Scores
+    fig, ax = plt.subplots()
+    ax.bar(score_df["Category"], score_df["Yes Count"], color='skyblue')
+    ax.set_ylabel("Yes Count")
+    ax.set_title("Raw 'Yes' Responses by Category")
+    st.pyplot(fig)
+    
+    # Create DataFrame with conditional coloring
+    summary_df = pd.DataFrame({
+        "Maturity Level": list(percentages.keys()),
+        "Score (%)": list(percentages.values())
+    })
+    
+    def color_score(val):
+        if val >= 75:
+            color = 'lightgreen'
+        elif val >= 50:
+            color = 'khaki'
+        else:
+            color = 'salmon'
+        return f'background-color: {color}'
+    
+    st.dataframe(summary_df.style.applymap(color_score, subset=["Score (%)"]))
+    
+    # Display bar chart
+    fig, ax = plt.subplots()
+    colors = [
+        'green' if val >= 75 else 'orange' if val >= 50 else 'red'
+        for val in summary_df["Score (%)"]
+    ]
+    ax.bar(summary_df["Maturity Level"], summary_df["Score (%)"], color=colors)
+    ax.set_ylabel("Maturity Score (%)")
+    ax.set_ylim([0, 100])
+    ax.set_title("Cybersecurity Maturity by Capability Level")
+    st.pyplot(fig)
