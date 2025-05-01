@@ -333,6 +333,7 @@ with st.form("maturity_form"):
    
 if submitted:
     st.success("Form submitted!")
+    st.write("Session State:", st.session_state)
     st.write("### Section Scores")
     st.write(section_scores)
     st.write(category_scores)
