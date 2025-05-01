@@ -400,35 +400,36 @@ grouped_questions = {
 }
 
 if submitted:
-    percentages = {section: round(score * 100, 1) for section, score in section_scores.items()
-    }
-    
     st.write("### Category Scores")
     st.write(category_percentages)
+
+    # Initialize score_data as an empty list
     score_data = []
-    
+
     for category in grouped_questions:
         questions = grouped_questions[category]
         yes_count = sum(
             1 for q in questions if responses.get(f"{category.strip()}::{q}") == "Yes"
         )
         total = len(questions)
-        percent = round((yes_count / total) * 100, 1)
-        score_data.append({"Category": category.strip(), "Score (%)": percent})
+        # Append raw score data
+        score_data.append({
+            "Category": category.strip(),
+            "Yes Count": yes_count,
+            "Total Questions": total
+        })
 
+    # Create a DataFrame for the raw scores
     score_df = pd.DataFrame(score_data).sort_values(by="Category")
     st.dataframe(score_df, use_container_width=True)
-    
-    st.session_state['it_maturity_scores'] = score_df
-    
-    # Heatmap visual (Streamlit-compatible, no matplotlib)
-    st.subheader("🔵 Heatmap View of Maturity by Category")
-    st.dataframe(score_df.style.format({"Score (%)": "{:.1f}"}))
 
-    # Bar chart view
-    st.subheader("📈 Bar Chart of Scores")
-    st.bar_chart(score_df.set_index("Category"))
-
+    # Bar Chart for Raw Scores
+    fig, ax = plt.subplots()
+    ax.bar(score_df["Category"], score_df["Yes Count"], color='skyblue')
+    ax.set_ylabel("Yes Count")
+    ax.set_title("Raw 'Yes' Responses by Category")
+    st.pyplot(fig)
+    
 # Create DataFrame with conditional coloring
 summary_df = pd.DataFrame({
     "Maturity Level": list(percentages.keys()),
