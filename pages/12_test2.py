@@ -5,7 +5,8 @@ import pandas as pd
 # Full Cybersecurity Maturity Assessment Questions
 questionnaire = [
     {
-        "section": "Identity - Survival, Ad-Hoc, Manual Legacy",
+        "Group": "Identity"
+        "section": "Survival, Ad-Hoc, Manual Legacy",
         "questions": [
             "Does your organization maintain an inventory of all authorized and unauthorized devices connected to your network?",
             "Do you have an inventory of all authorized and unauthorized software within your organization?",
