@@ -4,6 +4,7 @@ import json
 import uuid
 import pandas as pd
 import matplotlib.pyplot as plt
+import openai
 from io import BytesIO
 from fpdf import FPDF
 from controller.controller import ITRMController
