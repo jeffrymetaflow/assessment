@@ -440,6 +440,43 @@ vendor_mapping = {
     # Add other mappings as needed
 }
 
+def assist_modernization_reasoning(name, category, spend, renewal_date, risk_score):
+    # Check if a suggestion is already cached
+    if "modernization_suggestions" not in st.session_state:
+        st.session_state["modernization_suggestions"] = {}
+
+    if name in st.session_state["modernization_suggestions"]:
+        modernization = st.session_state["modernization_suggestions"][name]
+    else:
+        # Call AI to generate a suggestion
+        modernization = dynamic_generate_modernization_suggestion(category, spend, renewal_date, risk_score)
+        st.session_state["modernization_suggestions"][name] = modernization
+
+    # Generate other details
+    savings = generate_spend_saving_estimate(category, spend, modernization)
+    avg_market_spend = simulate_external_pricing_lookup(category)
+    variance = ((spend - avg_market_spend) / avg_market_spend) * 100 if avg_market_spend else 0
+    aws_cloud_cost = simulate_aws_cloud_pricing(category, spend)
+    cloud_savings = spend - aws_cloud_cost
+
+    reasoning = f"""
+    Component: {name}
+    Category: {category}
+    Spend: ${spend:,}
+    Renewal Date: {renewal_date}
+    Risk Score: {risk_score}/10
+    Industry Average Spend: ~${avg_market_spend:,}
+    Variance vs Market: {variance:+.1f}%
+    AWS Cloud Alternative: ~${aws_cloud_cost:,}
+    Potential Cloud Migration Savings: ~${cloud_savings:,}
+    
+    Modernization Recommendation: {modernization}
+    {savings}
+    
+    Reasoning: Based on high spend, risk profile, renewal timing, variance against market average, and potential cloud migration savings, modernization is prioritized to optimize cost, performance, security, and compliance.
+    """
+    return reasoning
+
 # --- AI Assistant Reasoning Enhancement ---
 def assist_modernization_reasoning(name, category, spend, renewal_date, risk_score):
     modernization = dynamic_generate_modernization_suggestion(category, spend, renewal_date, risk_score)
@@ -480,20 +517,15 @@ if components:
             st.write(f"**Renewal Date:** {comp.get('Renewal Date', 'TBD')}")
             st.write(f"**Risk Score:** {comp.get('Risk Score', 5)}/10")
 
-            avg_market_spend = simulate_external_pricing_lookup(category)
-            st.write(f"**Industry Average Spend:** ~${avg_market_spend:,}")
-            if avg_market_spend:
-                variance = ((spend_val - avg_market_spend) / avg_market_spend) * 100
-                st.write(f"**Variance:** {variance:+.1f}% vs. Market")
-
-            aws_cloud_cost = simulate_aws_cloud_pricing(category, spend_val)
-            cloud_savings = spend_val - aws_cloud_cost
-            st.write(f"**AWS Cloud Alternative:** ~${aws_cloud_cost:,}")
-            st.write(f"**Potential Cloud Migration Savings:** ~${cloud_savings:,}")
-
-            if category in ["Hardware", "Storage", "Cloud"]:
-                service_pricing = simulate_aws_service_pricing("EC2" if category == "Hardware" else "S3")
-                st.write(f"**Simulated AWS Service Pricing:** ~${service_pricing}/month")
+            if st.button(f"Ask AI Why ({comp['Name']})"):
+                        reasoning = assist_modernization_reasoning(
+                            comp.get('Name', 'Unknown'),
+                            category,
+                            spend_val,
+                            renewal,
+                            risk_score
+                        )
+                        st.success(reasoning)
 
         for i, comp in enumerate(components):  # Add an index for uniqueness
             with st.expander(f"{comp.get('Name', 'Unnamed Component')}"):
