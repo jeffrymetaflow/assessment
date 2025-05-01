@@ -118,19 +118,6 @@ with st.form("maturity_form"):
         section_scores[block["section"]] = yes_count / len(block["questions"])
     submitted = st.form_submit_button("Submit")
 
-if submitted:
-    st.success("✅ Responses submitted successfully!")
-    st.write("### Section Scores")
-    st.write(section_scores)
-
-    # Create and display bar chart
-    df_scores = pd.DataFrame({"Section": list(section_scores.keys()), "Score": list(section_scores.values())})
-    fig, ax = plt.subplots()
-    ax.barh(df_scores["Section"], df_scores["Score"], color='skyblue')
-    ax.set_xlabel("Maturity Score")
-    ax.set_title("IT Maturity Score by Section")
-    st.pyplot(fig)
-
 # Scoring and Results
 if submitted:
     st.header("📊 Maturity Assessment Results")
