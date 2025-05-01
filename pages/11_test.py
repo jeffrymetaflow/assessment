@@ -138,6 +138,42 @@ questionnaire = [
             "Have you established key performance indicators (KPIs) to measure the effectiveness of your detection capabilities?",
             "Is there a documented process for communicating and coordinating incident detection and response with external stakeholders, such as law enforcement or industry groups?"
         ]
+    },
+    {
+        "section": "Respond - Awareness, measured, semi-automated",
+        "questions": [
+            "Do you have predefined communication procedures for internal and external stakeholders during an incident?",
+            "Have you identified and established contact information for key incident response contacts, both internal and external?",
+            "Is there a documented procedure for preserving evidence and maintaining chain of custody during an incident?",
+            "Do you regularly conduct tabletop exercises and simulations to test your incident response plan?"
+        ]
+    },
+    {
+        "section": "Respond - Committed, Continuous Improvement, Redundant",
+        "questions": [
+            "Is there a process for isolating and containing affected systems or networks during an incident?",
+            "Have you established a procedure for collecting and analyzing forensic evidence to determine the scope and impact of an incident?",
+            "Is there a process for documenting incident details, actions taken, and lessons learned?",
+            "Have you identified and documented legal and regulatory reporting requirements in case of a data breach or incident?"
+        ]
+    },
+    {
+        "section": "Respond - Service Aligned/Standardization/High Availability",
+        "questions": [
+            "Is there a process for notifying affected individuals or organizations in compliance with data breach notification laws?",
+            "Do you have predefined incident response playbooks for common incident types?",
+            "Is there a process for coordinating incident response activities with external organizations, such as law enforcement or industry peers?",
+            "Have you established a post-incident review process to assess the effectiveness of your response and identify areas for improvement?"
+        ]
+    },
+    {
+        "section": "Respond - Business Partnership/Innovation Optimized",
+        "questions": [
+            "Is there a documented process for providing executive management and relevant stakeholders with incident status updates?",
+            "Do you maintain a record of past incidents and the actions taken to resolve them?",
+            "Is there a process for conducting a root cause analysis of incidents to prevent future occurrences?",
+            "Have you established key performance indicators (KPIs) and metrics to measure the effectiveness of your incident response capabilities?"
+        ]
     }
 ]
 
