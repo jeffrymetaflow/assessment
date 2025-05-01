@@ -332,7 +332,9 @@ if submitted:
 
 # Scoring and Results
 if submitted:
-      
+    st.write("### Section Scores")
+    st.write(section_scores) 
+    
     for category in grouped_questions:
         questions = grouped_questions[category]
         yes_count = sum(
