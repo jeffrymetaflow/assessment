@@ -320,7 +320,7 @@ with st.form("maturity_form"):
             for q in block["questions"]:
                 st.radio(q, ["Yes", "No"], key=f"{block['section']}_{q}")
     
-    submitted = st.form_submit_button("Submit")
+submitted = st.form_submit_button("Submit")
 
     for block in questionnaire:
         category = block["category"]
