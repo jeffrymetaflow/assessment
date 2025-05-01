@@ -101,7 +101,12 @@ tabs = st.tabs(["Component Mapping", "Architecture Diagram", "External Import"])
 # --- Component Mapping Tab ---
 with tabs[0]:
     st.header("\U0001F4C8 Define Components")
-    with st.expander("+ Add IT Component"):
+    with st.expander("🔍 View All Components from Mapping Page"):
+    if controller.components:
+        df = pd.DataFrame(controller.components)
+        st.dataframe(df, use_container_width=True)
+    else:
+        st.info("No components found. Please add them in the Component Mapping page.")
         name = st.text_input("Component Name")
         category = st.selectbox("Category", ["Hardware", "Software", "Personnel", "Maintenance", "Telecom", "Cybersecurity", "BC/DR"])
         spend = st.number_input("Annual Spend ($)", min_value=0, value=100000, step=10000, format="%d")
