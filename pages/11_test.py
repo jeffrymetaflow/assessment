@@ -1,49 +1,42 @@
 import streamlit as st
-import pandas as pd
 
-# Load Questionnaire and Admin sheet
-@st.cache_data
-def load_questionnaire():
-    df_q = pd.read_excel("Cybersecurity questionnaire.xlsx", sheet_name="Questionnaire")
-    df_admin = pd.read_excel("Cybersecurity questionnaire.xlsx", sheet_name="Admin sheet")
-    return df_q, df_admin
+# Static questionnaire definition
+questionnaire = [
+    {
+        "section": "Managed / Automated",
+        "questions": [
+            "Failover between sites",
+            "Software Intelligence",
+            "Converged Infrastructure standardization",
+            "Replication",
+            "User Defined Recovery"
+        ]
+    },
+    {
+        "section": "Governance / Policy",
+        "questions": [
+            "Formal incident response policy exists",
+            "Quarterly risk assessments are conducted",
+            "Compliance framework is implemented (e.g., NIST, ISO)"
+        ]
+    }
+]
 
-questionnaire_df, admin_df = load_questionnaire()
+# Display title
+st.title("\U0001F9E0 IT Maturity Assessment Tool")
+st.markdown("""
+Welcome to the interactive IT Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score across several technology domains.
+""")
 
-# --- Streamlit Page Setup ---
-st.set_page_config(page_title="Cybersecurity Maturity Assessment", layout="wide")
-st.title("🛡️ Cybersecurity Maturity Assessment Tool")
-tabs = st.tabs(["Assessment", "Admin Panel"])
-
-# --- Tab 1: Assessment ---
-with tabs[0]:
-    st.markdown("""
-    Welcome to the Cybersecurity Assessment. Please answer the following questions based on your current IT practices.
-    """)
-
-    grouped = questionnaire_df.groupby("Category")
+# Display form
+with st.form("maturity_form"):
     responses = {}
+    for block in questionnaire:
+        st.subheader(block["section"])
+        for q in block["questions"]:
+            responses[q] = st.radio(q, ["Yes", "No"], key=q)
+    submitted = st.form_submit_button("Submit")
 
-    for category, group in grouped:
-        with st.expander(f"**{category}**"):
-            for _, row in group.iterrows():
-                q_id = f"q_{row['ID']}"
-                response = st.radio(row["Question"], ["Yes", "No"], key=q_id)
-                responses[q_id] = response
-
-    if st.button("Submit Responses"):
-        st.success("✅ Responses saved (mock - no backend yet).")
-        st.json(responses)
-
-# --- Tab 2: Admin Panel ---
-with tabs[1]:
-    st.subheader("🛠️ Admin Question Configuration")
-    st.write("Below is the current question configuration loaded from the Admin sheet:")
-    st.dataframe(admin_df, use_container_width=True)
-
-    if st.checkbox("Enable editing mode"):
-        edited_df = st.data_editor(admin_df, num_rows="dynamic")
-        if st.button("Save Changes (mock)"):
-            st.success("✅ Changes saved (mock - no backend yet).")
-            st.dataframe(edited_df)
-
+if submitted:
+    st.success("✅ Responses submitted successfully!")
+    st.write(responses)
