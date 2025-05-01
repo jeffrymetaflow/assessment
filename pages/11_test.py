@@ -1,4 +1,6 @@
 import streamlit as st
+import matplotlib.pyplot as plt
+import pandas as pd
 
 # Full Cybersecurity Maturity Assessment Questions
 questionnaire = [
@@ -47,7 +49,7 @@ questionnaire = [
             "Does your organization regularly assess the effectiveness of your identity and access management program and make improvements as needed?"
         ]
     }
-    # Additional sections such as Protect, Detect, Respond, Recover, CIS Controls would follow the same format and be appended here.
+    # Add Protect, Detect, Respond, Recover, and CIS Controls sections here
 ]
 
 # Display title
@@ -59,12 +61,27 @@ Welcome to the interactive IT Maturity Assessment. Please answer the following q
 # Display form
 with st.form("maturity_form"):
     responses = {}
+    section_scores = {}
     for block in questionnaire:
         st.subheader(block["section"])
+        yes_count = 0
         for q in block["questions"]:
-            responses[q] = st.radio(q, ["Yes", "No"], key=q)
+            answer = st.radio(q, ["Yes", "No"], key=q)
+            responses[q] = answer
+            if answer == "Yes":
+                yes_count += 1
+        section_scores[block["section"]] = yes_count / len(block["questions"])
     submitted = st.form_submit_button("Submit")
 
 if submitted:
     st.success("✅ Responses submitted successfully!")
-    st.write(responses)
+    st.write("### Section Scores")
+    st.write(section_scores)
+
+    # Create and display bar chart
+    df_scores = pd.DataFrame({"Section": list(section_scores.keys()), "Score": list(section_scores.values())})
+    fig, ax = plt.subplots()
+    ax.barh(df_scores["Section"], df_scores["Score"], color='skyblue')
+    ax.set_xlabel("Maturity Score")
+    ax.set_title("IT Maturity Score by Section")
+    st.pyplot(fig)
