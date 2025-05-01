@@ -356,9 +356,6 @@ category_percentages = {
 
 # Handle submission
 if submitted:
-    st.success("✅ Responses submitted successfully!")
-    st.write("### Section Scores")
-    st.write(section_scores)
 
     # Bar Chart
     df_scores = pd.DataFrame({
@@ -408,6 +405,7 @@ if submitted:
     
     st.write("### Category Scores")
     st.write(category_percentages)
+    score_data = []
     
     for category in grouped_questions:
         questions = grouped_questions[category]
