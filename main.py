@@ -523,16 +523,16 @@ if user_input:
 def generate_roadmap_pdf():
     import re
 
-# Generate PDF Button
-if st.button("📄 Generate Modernization Roadmap PDF"):
-    pdf_path = generate_roadmap_pdf()
-    with open(pdf_path, "rb") as pdf_file:
-        st.download_button(
-            label="📥 Download Roadmap PDF",
-            data=pdf_file,
-            file_name=os.path.basename(pdf_path),
-            mime="application/pdf"
-        )
+    # Generate PDF Button
+    if st.button("📄 Generate Modernization Roadmap PDF"):
+        pdf_path = generate_roadmap_pdf()
+        with open(pdf_path, "rb") as pdf_file:
+            st.download_button(
+                label="📥 Download Roadmap PDF",
+                data=pdf_file,
+                file_name=os.path.basename(pdf_path),
+                mime="application/pdf"
+            )
     
     # Optional fallback if bs4 isn't available
     try:
