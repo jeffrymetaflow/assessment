@@ -427,32 +427,7 @@ if submitted:
             "Yes Count": yes_count,
             "Total Questions": total
         })
-
-    # Prepare data for the DataFrame and charts
-    score_data = [{"Category": cat, "Yes Count": count} for cat, count in category_scores.items()]
-    score_df = pd.DataFrame(score_data)
-    
-    # Display the DataFrame
-    st.dataframe(score_df)
-    
-    # Create the bar chart
-    fig, ax = plt.subplots()
-    ax.bar(score_df["Category"], score_df["Yes Count"], color='skyblue')
-    ax.set_ylabel("Yes Count")
-    ax.set_title("Yes Responses by Category")
-    st.pyplot(fig)
-    
-    # Create a DataFrame for the raw scores
-    score_df = pd.DataFrame(score_data).sort_values(by="Category")
-    st.dataframe(score_df, use_container_width=True)
-
-    # Bar Chart for Raw Scores
-    fig, ax = plt.subplots()
-    ax.bar(score_df["Category"], score_df["Yes Count"], color='skyblue')
-    ax.set_ylabel("Yes Count")
-    ax.set_title("Raw 'Yes' Responses by Category")
-    st.pyplot(fig)
-    
+  
 if submitted:
     # Calculate percentages for each section
     percentages = {
@@ -474,6 +449,31 @@ if submitted:
     ax.set_ylabel("Percentage (%)")
     ax.set_title("Maturity Level by Section")
     st.pyplot(fig)
+
+# Prepare data for the DataFrame and charts
+score_data = [{"Category": cat, "Yes Count": count} for cat, count in category_scores.items()]
+score_df = pd.DataFrame(score_data)
+
+# Display the DataFrame
+st.dataframe(score_df)
+
+# Create the bar chart
+fig, ax = plt.subplots()
+ax.bar(score_df["Category"], score_df["Yes Count"], color='skyblue')
+ax.set_ylabel("Yes Count")
+ax.set_title("Yes Responses by Category")
+st.pyplot(fig)
+
+# Create a DataFrame for the raw scores
+score_df = pd.DataFrame(score_data).sort_values(by="Category")
+st.dataframe(score_df, use_container_width=True)
+
+# Bar Chart for Raw Scores
+fig, ax = plt.subplots()
+ax.bar(score_df["Category"], score_df["Yes Count"], color='skyblue')
+ax.set_ylabel("Yes Count")
+ax.set_title("Raw 'Yes' Responses by Category")
+st.pyplot(fig)
 
 # Create DataFrame with conditional coloring
 summary_df = pd.DataFrame({
