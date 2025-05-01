@@ -440,9 +440,6 @@ def generate_roadmap_pdf():
         # Add other mappings as needed
     }
 
-    # Use vendor_mapping in the function
-    suggested_vendors = ", ".join(vendor_mapping.get(category, ["TBD"]))
-    ...
 
 # --- AI Assistant Reasoning Enhancement ---
 def assist_modernization_reasoning(name, category, spend, renewal_date, risk_score):
