@@ -381,7 +381,8 @@ if submitted:
 
 # Scoring and Results
 if submitted:
-    st.write(section_scores) 
+    st.write("### Category Scores")
+    st.write(category_percentages)
     
     for category in grouped_questions:
         questions = grouped_questions[category]
