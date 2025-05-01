@@ -335,6 +335,7 @@ if submitted:
     st.success("Form submitted!")
     st.write("### Section Scores")
     st.write(section_scores)
+    st.write(category_scores)
     
     for block in questionnaire:
         category = block["category"]
