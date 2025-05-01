@@ -120,32 +120,34 @@ with st.form("maturity_form"):
 
 # Scoring and Results
 if submitted:
-    st.header("📊 Maturity Assessment Results")
-    score_data = []
-
-    for category in grouped_questions:
-        questions = grouped_questions[category]
-        yes_count = sum(
-            1 for q in questions if responses.get(f"{category.strip()}::{q}") == "Yes"
-        )
-        total = len(questions)
-        percent = round((yes_count / total) * 100, 1)
-        score_data.append({"Category": category.strip(), "Score (%)": percent})
-
-    score_df = pd.DataFrame(score_data).sort_values(by="Category")
-    st.dataframe(score_df, use_container_width=True)
+    st.success("✅ Responses submitted successfully!")
+    st.write("### Section Scores")
+    st.write(section_scores)
     
-    st.session_state['it_maturity_scores'] = score_df
-    
-    # Heatmap visual (Streamlit-compatible, no matplotlib)
-    st.subheader("🔵 Heatmap View of Maturity by Category")
-    st.dataframe(score_df.style.format({"Score (%)": "{:.1f}"}))
+    if section_scores:
+        # Create DataFrame from section scores
+        df_scores = pd.DataFrame({"Section": list(section_scores.keys()), "Score": list(section_scores.values())})
+        df_scores = df_scores.sort_values(by="Score", ascending=True)  # Sort by score
+        
+        # Create figure and bar chart
+        fig, ax = plt.subplots(figsize=(8, len(df_scores) * 0.5))
+        ax.barh(df_scores["Section"], df_scores["Score"], color='cornflowerblue')
+        
+        # Add chart labels and title
+        ax.set_xlabel("Maturity Score")
+        ax.set_title("IT Maturity Score by Section")
+        ax.grid(axis='x', linestyle='--', alpha=0.7)  # Add gridlines
 
-    # Bar chart view
-    st.subheader("📈 Bar Chart of Scores")
-    st.bar_chart(score_df.set_index("Category"))
+        # Add score labels at the end of bars
+        for i, v in enumerate(df_scores["Score"]):
+            ax.text(v + 0.5, i, str(v), color='black', va='center')
 
-    
+        # Display chart in Streamlit
+        st.pyplot(fig)
+    else:
+        st.warning("No section scores available to display.")
+
+  
     st.markdown("""
 ### 🔍 Interpretation:
     - **80%+**: High maturity — optimized or automated
