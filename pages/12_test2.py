@@ -289,6 +289,15 @@ with st.form("maturity_form"):
             section_scores[block["section"]] = yes_count / len(block["questions"])
     submitted = st.form_submit_button("Submit")
 
+# Scoring and Results
+if submitted:
+    st.success("✅ Responses submitted successfully!")
+    st.write("### Section Scores")
+    if not section_scores:
+        st.warning("No scores available.")
+        st.stop()
+    st.write(section_scores)
+
 # --- Maturity Scoring + Visualization ---
 st.markdown("## 📊 Cybersecurity Maturity Summary")
 
@@ -353,15 +362,6 @@ ax.set_ylabel("Maturity Score (%)")
 ax.set_ylim([0, 100])
 ax.set_title("Cybersecurity Maturity by Capability Level")
 st.pyplot(fig)
-
-# Scoring and Results
-if submitted:
-    st.success("✅ Responses submitted successfully!")
-    st.write("### Section Scores")
-    if not section_scores:
-        st.warning("No scores available.")
-        st.stop()
-    st.write(section_scores)
 
     # Radar Chart
     fig_radar, ax_radar = plt.subplots(figsize=(6, 6), subplot_kw={'projection': 'polar'})
