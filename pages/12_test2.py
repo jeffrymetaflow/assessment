@@ -273,6 +273,22 @@ st.markdown("""
 Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score across several technology domains.
 """)
 
+# Display form
+with st.form("maturity_form"):
+    responses = {}
+    section_scores = {}
+    for block in questionnaire:
+        st.subheader(block["section"])
+        yes_count = 0
+        for q in block["questions"]:
+            answer = st.radio(q, ["Yes", "No"], key=f"{block['section']}_{q}")  # Unique keys
+            responses[q] = answer
+            if answer == "Yes":
+                yes_count += 1
+        if len(block["questions"]) > 0:
+            section_scores[block["section"]] = yes_count / len(block["questions"])
+    submitted = st.form_submit_button("Submit")
+
 # --- Form Input Logic ---
 with st.form("cyber_maturity_form"):
     for section in questionnaire:
