@@ -123,6 +123,11 @@ st.sidebar.header("Navigation")
 
 page_bootstrap(current_page="IT Assessment")  # Or "Risk Model", etc.
 
+# --- Tabs ---
+tabs = st.tabs(["Questionnaire Form", "Scoring and Results", "Admin"])
+
+# --- Questionnaire Tab ---
+
 # Questionnaire Form
 with st.form("maturity_form"):
     for category, questions in grouped_questions.items():
@@ -131,6 +136,8 @@ with st.form("maturity_form"):
             key = f"{category.strip()}::{q}"
             responses[key] = st.radio(q.strip(), ["Yes", "No"], key=key)
     submitted = st.form_submit_button("Submit Assessment")
+
+# --- Scoring & Results Tab ---
 
 # Scoring and Results
 if submitted:
@@ -180,7 +187,9 @@ if submitted:
             rec = f"❌ *{category}* is low maturity. Prioritize modernization, documentation, and automation."
         st.markdown(rec)
 
-# ---------------- Admin Tab: Edit Questions ----------------
+# --- Admin Tab ---
+
+# ---------------- : Edit Questions ----------------
 st.markdown("---")
 st.subheader("✏️ Edit Assessment Questions")
 
