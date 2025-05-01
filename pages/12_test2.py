@@ -65,6 +65,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Protect",
         "section": "Protect - Awareness, measured, semi-automated",
         "questions": [
             "Is there an established process for secure software development and code review?",
@@ -74,6 +75,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Protect",
         "section": "Protect - Committed, Continuous Improvement, Redundant",
         "questions": [
             "Is there a process for monitoring and responding to cybersecurity threats and incidents?",
@@ -83,6 +85,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Protect",
         "section": "Protect - Service Aligned/Standardization/High Availability",
         "questions": [
             "Have you established secure configurations for your hardware and software?",
@@ -92,6 +95,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Protect",
         "section": "Protect - Business Partnership/Innovation Optimized",
         "questions": [
             "Is there a data backup and recovery plan in place, and are backups regularly tested?",
@@ -101,6 +105,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Detect",
         "section": "Detect - Survival, Ad-Hoc, Manual Legacy",
         "questions": [
             "Do you have a dedicated team responsible for monitoring and detecting cybersecurity threats?",
@@ -110,6 +115,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Detect",
         "section": "Detect - Awareness, measured, semi-automated",
         "questions": [
             "Do you regularly review and analyze security logs to detect potential threats?",
@@ -119,6 +125,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Detect",
         "section": "Detect - Committed, Continuous Improvement, Redundant",
         "questions": [
             "Do you use vulnerability scanning tools to identify weaknesses in your systems and applications?",
@@ -128,6 +135,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Detect",
         "section": "Detect - Service Aligned/Standardization/High Availability",
         "questions": [
             "Is there a process for monitoring email traffic for phishing attempts and malicious attachments?",
@@ -137,6 +145,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Detect",
         "section": "Detect - Business Partnership/Innovation Optimized",
         "questions": [
             "Is there a process for correlating and prioritizing security alerts based on risk?",
@@ -146,6 +155,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Respond",
         "section": "Respond - Awareness, measured, semi-automated",
         "questions": [
             "Do you have predefined communication procedures for internal and external stakeholders during an incident?",
@@ -155,6 +165,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Respond",
         "section": "Respond - Committed, Continuous Improvement, Redundant",
         "questions": [
             "Is there a process for isolating and containing affected systems or networks during an incident?",
@@ -164,6 +175,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Respond",
         "section": "Respond - Service Aligned/Standardization/High Availability",
         "questions": [
             "Is there a process for notifying affected individuals or organizations in compliance with data breach notification laws?",
@@ -173,6 +185,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Respond",
         "section": "Respond - Business Partnership/Innovation Optimized",
         "questions": [
             "Is there a documented process for providing executive management and relevant stakeholders with incident status updates?",
@@ -182,6 +195,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Recover",
         "section": "Recover - Survival, Ad-Hoc, Manual Legacy",
         "questions": [
             "Do you have a documented business continuity and disaster recovery (BC/DR) plan in place?",
@@ -191,6 +205,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Recover",
         "section": "Recover - Awareness, measured, semi-automated",
         "questions": [
             "Have you established recovery time objectives (RTOs) and recovery point objectives (RPOs) for key systems and data?",
@@ -200,6 +215,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Recover",
         "section": "Recover - Committed, Continuous Improvement, Redundant",
         "questions": [
             "Have you identified and documented alternative IT infrastructure and facilities for use during recovery?",
@@ -209,6 +225,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Recover",
         "section": "Recover - Service Aligned/Standardization/High Availability",
         "questions": [
             "Have you established a process for restoring user access and privileges in a secure manner?",
@@ -218,6 +235,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "Recover",
         "section": "Recover - Business Partnership/Innovation Optimized",
         "questions": [
             "Have you identified and documented legal and regulatory reporting requirements related to recovery?",
@@ -227,6 +245,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "CIS Controls",
         "section": "CIS Controls - Survival, Ad-Hoc, Manual Legacy",
         "questions": [
             "Have you established and documented an inventory of authorized and unauthorized devices on your network?",
@@ -236,6 +255,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "CIS Controls",
         "section": "CIS Controls - Awareness, measured, semi-automated",
         "questions": [
             "Is there a process for continuous vulnerability assessment and remediation?",
@@ -245,6 +265,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "CIS Controls",
         "section": "CIS Controls - Committed, Continuous Improvement, Redundant",
         "questions": [
             "Do you actively monitor and analyze network traffic for signs of malicious activities?",
@@ -254,6 +275,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "CIS Controls",
         "section": "CIS Controls - Service Aligned/Standardization/High Availability",
         "questions": [
             "Have you implemented secure email and web browsing practices and technologies?",
@@ -263,6 +285,7 @@ questionnaire = [
         ]
     },
     {
+        "category": "CIS Controls",
         "section": "CIS Controls - Business Partnership/Innovation Optimized",
         "questions": [
             "Have you established a secure software development lifecycle (SDLC) process?",
