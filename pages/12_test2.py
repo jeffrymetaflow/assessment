@@ -330,9 +330,6 @@ if submitted:
     - **Below 50%**: Low maturity — ad-hoc or siloed
     """)
 
-if submitted:
-    st.success("Responses recorded. See maturity summary below.")
-
 # --- Maturity Scoring + Visualization ---
 st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
 
