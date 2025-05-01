@@ -246,7 +246,7 @@ questionnaire = [
     },
     {
         "category": "CIS Controls",
-        "section": "CIS Controls - Survival, Ad-Hoc, Manual Legacy",
+        "section": "Survival, Ad-Hoc, Manual Legacy",
         "questions": [
             "Have you established and documented an inventory of authorized and unauthorized devices on your network?",
             "Is there a process in place to actively manage and control the use of administrative privileges?",
@@ -256,7 +256,7 @@ questionnaire = [
     },
     {
         "category": "CIS Controls",
-        "section": "CIS Controls - Awareness, measured, semi-automated",
+        "section": "Awareness, measured, semi-automated",
         "questions": [
             "Is there a process for continuous vulnerability assessment and remediation?",
             "Do you restrict and monitor the use of PowerShell, command-line tools, and other scripting languages?",
@@ -266,7 +266,7 @@ questionnaire = [
     },
     {
         "category": "CIS Controls",
-        "section": "CIS Controls - Committed, Continuous Improvement, Redundant",
+        "section": "Committed, Continuous Improvement, Redundant",
         "questions": [
             "Do you actively monitor and analyze network traffic for signs of malicious activities?",
             "Have you established an incident response plan that includes roles, responsibilities, and communication procedures?",
@@ -276,7 +276,7 @@ questionnaire = [
     },
     {
         "category": "CIS Controls",
-        "section": "CIS Controls - Service Aligned/Standardization/High Availability",
+        "section": "Service Aligned/Standardization/High Availability",
         "questions": [
             "Have you implemented secure email and web browsing practices and technologies?",
             "Is there a process for securely configuring and managing mobile devices used in your organization?",
@@ -286,7 +286,7 @@ questionnaire = [
     },
     {
         "category": "CIS Controls",
-        "section": "CIS Controls - Business Partnership/Innovation Optimized",
+        "section": "Business Partnership/Innovation Optimized",
         "questions": [
             "Have you established a secure software development lifecycle (SDLC) process?",
             "Is there a process for securely configuring and monitoring cloud resources?",
