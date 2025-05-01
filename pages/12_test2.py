@@ -330,31 +330,30 @@ if submitted:
     - **Below 50%**: Low maturity — ad-hoc or siloed
     """)
 
-# --- Maturity Scoring + Visualization ---
-st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
+# Scoring and Results
+if submitted:
+      
+    for category in grouped_questions:
+        questions = grouped_questions[category]
+        yes_count = sum(
+            1 for q in questions if responses.get(f"{category.strip()}::{q}") == "Yes"
+        )
+        total = len(questions)
+        percent = round((yes_count / total) * 100, 1)
+        score_data.append({"Category": category.strip(), "Score (%)": percent})
 
-# Aggregate scores
-maturity_buckets = {
-    "Survival": 0,
-    "Awareness": 0,
-    "Committed": 0,
-    "Service": 0,
-    "Business": 0
-}
-totals = {k: 0 for k in maturity_buckets}
+    score_df = pd.DataFrame(score_data).sort_values(by="Category")
+    st.dataframe(score_df, use_container_width=True)
+    
+    st.session_state['it_maturity_scores'] = score_df
+    
+    # Heatmap visual (Streamlit-compatible, no matplotlib)
+    st.subheader("🔵 Heatmap View of Maturity by Category")
+    st.dataframe(score_df.style.format({"Score (%)": "{:.1f}"}))
 
-# Count yes responses by category
-for section in questionnaire:
-    section_title = section["section"]
-    category = next((key for key in maturity_buckets if key in section_title), None)
-    if category:
-        totals[category] += len(section["questions"])
-        for q in section["questions"]:
-            if st.session_state.get(q) == "Yes":
-                maturity_buckets[category] += 1
-
-# Calculate percentages
-percentages = {k: round((maturity_buckets[k] / totals[k]) * 100, 1) if totals[k] > 0 else 0 for k in maturity_buckets}
+    # Bar chart view
+    st.subheader("📈 Bar Chart of Scores")
+    st.bar_chart(score_df.set_index("Category"))
 
 # Create DataFrame with conditional coloring
 summary_df = pd.DataFrame({
