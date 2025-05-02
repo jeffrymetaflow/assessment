@@ -10,11 +10,15 @@ st.title("\U0001F4CA Unified Executive Dashboard")
 
 page_bootstrap(current_page="Executive Dashboard")  # Or "Risk Model", etc.
 
-# --- Sample Inputs (would eventually link to live modules) ---
+# --- Sidebar Inputs ---
 st.sidebar.header("\U0001F4B0 High-Level Inputs")
 revenue = st.sidebar.number_input("Annual Revenue ($M)", min_value=1, value=100) * 1_000_000
 comparison_mode = st.sidebar.radio("Comparison Mode", ["Annual", "Quarterly"])
 variance_threshold = st.sidebar.slider("Variance Threshold %", min_value=0, max_value=100, value=20)
+
+# --- Simulated Data Generation ---
+st.markdown("---")
+st.markdown("## \U0001F4C8 Key Metrics")
 
 # Simulated multi-period data
 data = {
@@ -38,7 +42,6 @@ risk_impact = {
 }
 
 # --- KPI Summary ---
-st.subheader("\U0001F4C8 Key Metrics")
 total_spend = sum(category_data.values())
 it_ratio = total_spend / revenue * 100
 
@@ -48,7 +51,8 @@ col2.metric("IT Spend / Revenue", f"{it_ratio:.2f}%")
 col3.metric("Revenue at Risk (Protected)", f"{sum([v['Revenue Protected %'] for v in risk_impact.values()])}%")
 
 # --- Multi-Period Line Chart with Variance Highlighting ---
-st.subheader("\U0001F4C9 IT Spend Trends by Category")
+st.markdown("---")
+st.markdown("## \U0001F4C9 IT Spend Trends by Category")
 fig_trend = go.Figure()
 thresh = variance_threshold / 100
 high_variance_categories = []
@@ -74,7 +78,9 @@ if high_variance_categories:
         "\n".join([f"- {cat}: {val}" for cat, val in high_variance_categories])
     ))
 
-st.subheader("💰 Financial Summary Snapshot")
+# --- Financial Summary ---
+st.markdown("---")
+st.markdown("## 💰 Financial Summary Snapshot")
 
 if "category_spend_summary" in st.session_state and "category_revenue_impact" in st.session_state:
     cat_df = st.session_state["category_spend_summary"].copy()
@@ -89,7 +95,8 @@ else:
     st.warning("Missing data: Please define revenue impact in Component Mapping first.")
 
 # --- ROPR Line Chart ---
-st.subheader("\U0001F4A1 Risk-Related ROI (ROPR)")
+st.markdown("---")
+st.markdown("## \U0001F4A1 Risk-Related ROI (ROPR)")
 ropr_df = pd.DataFrame([(k, v['ROPR']) for k, v in risk_impact.items()], columns=['Category', 'ROPR'])
 fig2 = go.Figure(go.Scatter(
     x=ropr_df['Category'],
@@ -102,7 +109,8 @@ fig2.update_layout(yaxis_title='Return on Risk Prevention (x)', height=400)
 st.plotly_chart(fig2, use_container_width=True)
 
 # --- Pie Chart: Revenue Protection Impact ---
-st.subheader("\U0001F4B8 Revenue Protected by Category")
+st.markdown("---")
+st.markdown("## \U0001F4B8 Revenue Protected by Category")
 protection_df = pd.DataFrame([(k, v['Revenue Protected %']) for k, v in risk_impact.items()], columns=['Category', 'Protected %'])
 fig3 = go.Figure(go.Pie(
     labels=protection_df['Category'],
@@ -114,8 +122,9 @@ fig3.update_layout(height=400)
 st.plotly_chart(fig3, use_container_width=True)
 
 # --- Summary ---
+st.markdown("---")
+st.markdown("## \U0001F4DD Summary")
 st.markdown("""
-### \U0001F4DD Summary
 This executive dashboard provides a high-level view of IT financials, risk-adjusted investments, and revenue protection. It enables leadership to:
 - Understand where IT spend is concentrated
 - Track ROI on cybersecurity and continuity investments
@@ -126,10 +135,8 @@ This executive dashboard provides a high-level view of IT financials, risk-adjus
 """)
 
 # ✅ Embedded AIOps Risk Scoring for Executive Dashboard
-import streamlit as st
-import pandas as pd
-
-st.subheader("🤖 AIOps Risk Scoring")
+st.markdown("---")
+st.markdown("## 🤖 AIOps Risk Scoring")
 
 if "controller" in st.session_state:
     components = st.session_state.controller.get_components()
@@ -155,12 +162,17 @@ if components:
         st.markdown("### 📊 Adjusted Component Risk Scores")
         st.dataframe(df[["Name", "Category", "Spend", "Risk Score", "Adjusted Risk Score"]])
 
-        st.metric("🔥 Average Adjusted Risk", f"{df['Adjusted Risk Score'].mean():.1f}")
+        avg_risk = df['Adjusted Risk Score'].mean()
+        emoji = "🟢" if avg_risk < 4 else "🟡" if avg_risk < 7 else "🔴"
+        st.metric("🔥 Average Adjusted Risk", f"{avg_risk:.1f} {emoji}")
 
         # 🔥 Risk Heatmap by Category
         st.markdown("### 🌡️ Risk Heatmap by Category")
         heatmap_df = df.groupby("Category")["Adjusted Risk Score"].mean().reset_index()
-        st.bar_chart(heatmap_df.set_index("Category"))
+        import plotly.express as px
+        fig4 = px.bar(heatmap_df, x="Category", y="Adjusted Risk Score", color="Adjusted Risk Score", height=400)
+        fig4.update_layout(title="Average Adjusted Risk by Category")
+        st.plotly_chart(fig4, use_container_width=True)
 
         # 📈 Spend vs. Adjusted Risk Scatter
         st.markdown("### 📉 Spend vs. Adjusted Risk")
