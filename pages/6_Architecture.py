@@ -18,7 +18,8 @@ from controller.controller import ITRMController
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 initialize_session()
-
+from utils.auth import enforce_login
+enforce_login()
 
 # --- AI Agent: Vendor Alternative Suggestion ---
 def get_vendor_replacement_suggestion(component_name, category):
