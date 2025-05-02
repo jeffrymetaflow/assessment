@@ -4,6 +4,8 @@ import plotly.graph_objects as go
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 initialize_session()
+from utils.auth import enforce_login
+enforce_login()
 
 st.set_page_config(page_title="Unified Executive Dashboard", layout="wide")
 st.title("\U0001F4CA Unified Executive Dashboard")
