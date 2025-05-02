@@ -1,4 +1,7 @@
 import streamlit as st
+from utils.auth import enforce_login
+enforce_login()
+
 
 st.set_page_config(page_title="📘 ITRM Platform Tour", layout="wide")
 
