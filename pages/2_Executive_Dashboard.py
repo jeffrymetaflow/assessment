@@ -312,7 +312,17 @@ if st.button("📄 Generate PDF Summary"):
         plt.close(fig2)
         pdf.image(tmpfile.name, w=180)
         os.unlink(tmpfile.name)
-
+   
+    if "dashboard_component_map_df" in st.session_state:
+        pdf.add_page()
+        pdf.set_font("Arial", 'B', 14)
+        pdf.cell(200, 10, txt="Component Mapping Overview:", ln=True)
+        pdf.set_font("Arial", size=12)
+    
+        df_map = st.session_state["dashboard_component_map_df"]
+        for _, row in df_map.iterrows():
+            pdf.multi_cell(0, 8, f"{row.get('Name', '')} ({row.get('Category', '')}): ${row.get('Spend', 0):,.0f}")
+    
     # Finalize PDF
     pdf_buffer = BytesIO()
     pdf_output = pdf.output(dest="S").encode("latin1")
