@@ -354,8 +354,7 @@ if submitted:
     st.write(section_scores)
     st.write(category_scores)
     st.write("### Category Scores")
-    st.write(category_percentages)
-    
+        
     for block in questionnaire:
         category = block["category"]
         if category not in category_scores:
