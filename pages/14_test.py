@@ -426,196 +426,196 @@ elif section == "⚙️ Inputs":
             for cat in category_scores
         }
 
-if submitted:
-
-    # Bar Chart
-    df_scores = pd.DataFrame({
-        "Section": list(section_scores.keys()),
-        "Score": list(section_scores.values())
-    })
-    fig, ax = plt.subplots()
-    ax.barh(df_scores["Section"], df_scores["Score"], color='skyblue')
-    ax.set_xlabel("Maturity Score")
-    ax.set_title("Cybersecurity Maturity by Section")
-    st.pyplot(fig)
-
-    # Radar Chart
-    fig_radar, ax_radar = plt.subplots(figsize=(6, 6), subplot_kw={'projection': 'polar'})
-    categories = list(section_scores.keys())
-    values = list(section_scores.values())
-    values += values[:1]  # Close the loop
-    angles = [n / float(len(categories)) * 2 * 3.14159 for n in range(len(categories))]
-    angles += angles[:1]
-
-    ax_radar.plot(angles, values, linewidth=2, linestyle='solid')
-    ax_radar.fill(angles, values, 'skyblue', alpha=0.4)
-    ax_radar.set_yticklabels([])
-    ax_radar.set_xticks(angles[:-1])
-    ax_radar.set_xticklabels([title[:15] + "..." if len(title) > 15 else title for title in categories])
-    ax_radar.set_title("Overall Cybersecurity Maturity Radar Chart", y=1.08)
-    st.pyplot(fig_radar)
-
-    # Interpretation Guide
-    st.markdown("""
-    ### 🔍 Interpretation:
-    - **80%+**: High maturity — optimized or automated
-    - **50-79%**: Moderate maturity — standardized or in transition
-    - **Below 50%**: Low maturity — ad-hoc or siloed
-    """)
-
-if submitted:
-
-    # Initialize score_data as an empty list
-    score_data = []
-
-    category_scores = {}
-    for category in grouped_questions:
-        questions = grouped_questions[category]
-        yes_count = sum(
-            1 for idx, q in enumerate(questions) 
-            if st.session_state.get(f"{category}_{block['section']}_{idx}") == "Yes"
-)
-        category_scores[category] = yes_count
+    if submitted:
     
-    for category in grouped_questions:
-        questions = grouped_questions[category]
-        yes_count = sum(
-            1 for q in questions if responses.get(f"{category.strip()}::{q}") == "Yes"
-        )
-        total = len(questions)
-        # Append raw score data
-        score_data.append({
-            "Category": category.strip(),
-            "Yes Count": yes_count,
-            "Total Questions": total
+        # Bar Chart
+        df_scores = pd.DataFrame({
+            "Section": list(section_scores.keys()),
+            "Score": list(section_scores.values())
         })
-  
-if submitted: 
-    # Calculate percentages for each section
-    percentages = {
-        section: round((score * 100), 1) for section, score in section_scores.items()
-    }
-
-    # Create DataFrame for displaying percentages
-    summary_df = pd.DataFrame({
-        "Section": list(percentages.keys()),
-        "Percentage (%)": list(percentages.values())
-    })
-
-    # Display the DataFrame
-    st.dataframe(summary_df)
-
-if submitted:
-
-    # --- Maturity Scoring + Visualization ---
-    st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
+        fig, ax = plt.subplots()
+        ax.barh(df_scores["Section"], df_scores["Score"], color='skyblue')
+        ax.set_xlabel("Maturity Score")
+        ax.set_title("Cybersecurity Maturity by Section")
+        st.pyplot(fig)
     
-     # Aggregate scores
-    maturity_buckets = {
-        "Survival": 0,
-        "Awareness": 0,
-        "Committed": 0,
-        "Service": 0,
-        "Business": 0
-    }
-    totals = {k: 0 for k in maturity_buckets}
+        # Radar Chart
+        fig_radar, ax_radar = plt.subplots(figsize=(6, 6), subplot_kw={'projection': 'polar'})
+        categories = list(section_scores.keys())
+        values = list(section_scores.values())
+        values += values[:1]  # Close the loop
+        angles = [n / float(len(categories)) * 2 * 3.14159 for n in range(len(categories))]
+        angles += angles[:1]
     
-    # Recalculate unique keys to match responses in st.session_state
-    for section in questionnaire:
-        section_title = section["section"]
-        category = next((key for key in maturity_buckets if key in section_title), None)
-        if category:
-            for q in section["questions"]:
-                hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
-                unique_key = f"{category}_{section_title}_{hashed_q}"  # Match earlier key structure
-                if st.session_state.get(unique_key) == "Yes":
-                    maturity_buckets[category] += 1
-                 
+        ax_radar.plot(angles, values, linewidth=2, linestyle='solid')
+        ax_radar.fill(angles, values, 'skyblue', alpha=0.4)
+        ax_radar.set_yticklabels([])
+        ax_radar.set_xticks(angles[:-1])
+        ax_radar.set_xticklabels([title[:15] + "..." if len(title) > 15 else title for title in categories])
+        ax_radar.set_title("Overall Cybersecurity Maturity Radar Chart", y=1.08)
+        st.pyplot(fig_radar)
     
-    # Count yes responses by maturity level
-    for section in questionnaire:
-        section_title = section["section"]
-        category = next((key for key in maturity_buckets if key in section_title), None)
-        if category:
-            totals[category] += len(section["questions"])
-            for q in section["questions"]:
-                # Reconstruct the unique key for each question
-                hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
-                unique_key = f"{category}_{section_title}_{hashed_q}"  # Match earlier key structure
-                if st.session_state.get(unique_key) == "Yes":  # Use the unique key to check the response
-                    maturity_buckets[category] += 1    
+        # Interpretation Guide
+        st.markdown("""
+        ### 🔍 Interpretation:
+        - **80%+**: High maturity — optimized or automated
+        - **50-79%**: Moderate maturity — standardized or in transition
+        - **Below 50%**: Low maturity — ad-hoc or siloed
+        """)
     
-    # Calculate percentages
-    percentages = {k: round((maturity_buckets[k] / totals[k]) * 100, 1) if totals[k] > 0 else 0 for k in maturity_buckets}
+    if submitted:
     
-    # Create DataFrame with conditional coloring
-    summary_df = pd.DataFrame({
-        "Maturity Level": list(percentages.keys()),
-        "Score (%)": list(percentages.values())
-    })
+        # Initialize score_data as an empty list
+        score_data = []
     
-    # Horizontal bar chart for clarity
-    fig, ax = plt.subplots()
-    colors = [
-        'green' if val >= 75 else 'orange' if val >= 50 else 'red'
-        for val in summary_df["Score (%)"]
-    ]
-    ax.barh(summary_df["Maturity Level"], summary_df["Score (%)"], color=colors)
-    ax.set_xlabel("Maturity Score (%)")
-    ax.set_xlim([0, 100])
-    ax.set_title("Cybersecurity Maturity (Horizontal View)")
-    st.pyplot(fig)
+        category_scores = {}
+        for category in grouped_questions:
+            questions = grouped_questions[category]
+            yes_count = sum(
+                1 for idx, q in enumerate(questions) 
+                if st.session_state.get(f"{category}_{block['section']}_{idx}") == "Yes"
+    )
+            category_scores[category] = yes_count
+        
+        for category in grouped_questions:
+            questions = grouped_questions[category]
+            yes_count = sum(
+                1 for q in questions if responses.get(f"{category.strip()}::{q}") == "Yes"
+            )
+            total = len(questions)
+            # Append raw score data
+            score_data.append({
+                "Category": category.strip(),
+                "Yes Count": yes_count,
+                "Total Questions": total
+            })
+      
+    if submitted: 
+        # Calculate percentages for each section
+        percentages = {
+            section: round((score * 100), 1) for section, score in section_scores.items()
+        }
     
-    # Color score for DataFrame
-    def color_score(val):
-        if val >= 75:
-            color = 'lightgreen'
-        elif val >= 50:
-            color = 'khaki'
-        else:
-            color = 'salmon'
-        return f'background-color: {color}'
+        # Create DataFrame for displaying percentages
+        summary_df = pd.DataFrame({
+            "Section": list(percentages.keys()),
+            "Percentage (%)": list(percentages.values())
+        })
     
-    st.dataframe(summary_df.style.applymap(color_score, subset=["Score (%)"]))
+        # Display the DataFrame
+        st.dataframe(summary_df)
     
-    # --- Category Score Calculation ---
-    categories = ["CIS Controls", "Detect", "Identity", "Protect", "Recover", "Respond"]
-    category_totals = {category: 0 for category in categories}
-    category_scores = {category: 0 for category in categories}
+    if submitted:
     
-    for key, value in st.session_state.items():
-        parts = key.split("_")
-        if len(parts) >= 2:
-            category = parts[0]
-            if category in category_scores:
-                category_totals[category] += 1  # always count total
-                if value == "Yes":
-                    category_scores[category] += 1  # only count Yes
+        # --- Maturity Scoring + Visualization ---
+        st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
+        
+         # Aggregate scores
+        maturity_buckets = {
+            "Survival": 0,
+            "Awareness": 0,
+            "Committed": 0,
+            "Service": 0,
+            "Business": 0
+        }
+        totals = {k: 0 for k in maturity_buckets}
+        
+        # Recalculate unique keys to match responses in st.session_state
+        for section in questionnaire:
+            section_title = section["section"]
+            category = next((key for key in maturity_buckets if key in section_title), None)
+            if category:
+                for q in section["questions"]:
+                    hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
+                    unique_key = f"{category}_{section_title}_{hashed_q}"  # Match earlier key structure
+                    if st.session_state.get(unique_key) == "Yes":
+                        maturity_buckets[category] += 1
+                     
+        
+        # Count yes responses by maturity level
+        for section in questionnaire:
+            section_title = section["section"]
+            category = next((key for key in maturity_buckets if key in section_title), None)
+            if category:
+                totals[category] += len(section["questions"])
+                for q in section["questions"]:
+                    # Reconstruct the unique key for each question
+                    hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
+                    unique_key = f"{category}_{section_title}_{hashed_q}"  # Match earlier key structure
+                    if st.session_state.get(unique_key) == "Yes":  # Use the unique key to check the response
+                        maturity_buckets[category] += 1    
+        
+        # Calculate percentages
+        percentages = {k: round((maturity_buckets[k] / totals[k]) * 100, 1) if totals[k] > 0 else 0 for k in maturity_buckets}
+        
+        # Create DataFrame with conditional coloring
+        summary_df = pd.DataFrame({
+            "Maturity Level": list(percentages.keys()),
+            "Score (%)": list(percentages.values())
+        })
+        
+        # Horizontal bar chart for clarity
+        fig, ax = plt.subplots()
+        colors = [
+            'green' if val >= 75 else 'orange' if val >= 50 else 'red'
+            for val in summary_df["Score (%)"]
+        ]
+        ax.barh(summary_df["Maturity Level"], summary_df["Score (%)"], color=colors)
+        ax.set_xlabel("Maturity Score (%)")
+        ax.set_xlim([0, 100])
+        ax.set_title("Cybersecurity Maturity (Horizontal View)")
+        st.pyplot(fig)
+        
+        # Color score for DataFrame
+        def color_score(val):
+            if val >= 75:
+                color = 'lightgreen'
+            elif val >= 50:
+                color = 'khaki'
+            else:
+                color = 'salmon'
+            return f'background-color: {color}'
+        
+        st.dataframe(summary_df.style.applymap(color_score, subset=["Score (%)"]))
+        
+        # --- Category Score Calculation ---
+        categories = ["CIS Controls", "Detect", "Identity", "Protect", "Recover", "Respond"]
+        category_totals = {category: 0 for category in categories}
+        category_scores = {category: 0 for category in categories}
+        
+        for key, value in st.session_state.items():
+            parts = key.split("_")
+            if len(parts) >= 2:
+                category = parts[0]
+                if category in category_scores:
+                    category_totals[category] += 1  # always count total
+                    if value == "Yes":
+                        category_scores[category] += 1  # only count Yes
+        
+        category_percentages = {
+            k: round((category_scores[k] / category_totals[k]) * 100, 1) if category_totals[k] > 0 else 0
+            for k in category_scores
+        }
+        
+        # Create category DataFrame
+        cat_df = pd.DataFrame({
+            "Category": list(category_percentages.keys()),
+            "Score (%)": list(category_percentages.values())
+        })
+        
+        fig2, ax2 = plt.subplots()
+        colors2 = [
+            'green' if val >= 75 else 'orange' if val >= 50 else 'red'
+            for val in cat_df["Score (%)"]
+        ]
+        ax2.barh(cat_df["Category"], cat_df["Score (%)"], color=colors2)
+        ax2.set_xlabel("Category Score (%)")
+        ax2.set_xlim([0, 100])
+        ax2.set_title("Cybersecurity Category Scores")
+        st.pyplot(fig2)
+        st.dataframe(cat_df.style.applymap(color_score, subset=["Score (%)"]))
     
-    category_percentages = {
-        k: round((category_scores[k] / category_totals[k]) * 100, 1) if category_totals[k] > 0 else 0
-        for k in category_scores
-    }
     
-    # Create category DataFrame
-    cat_df = pd.DataFrame({
-        "Category": list(category_percentages.keys()),
-        "Score (%)": list(category_percentages.values())
-    })
-    
-    fig2, ax2 = plt.subplots()
-    colors2 = [
-        'green' if val >= 75 else 'orange' if val >= 50 else 'red'
-        for val in cat_df["Score (%)"]
-    ]
-    ax2.barh(cat_df["Category"], cat_df["Score (%)"], color=colors2)
-    ax2.set_xlabel("Category Score (%)")
-    ax2.set_xlim([0, 100])
-    ax2.set_title("Cybersecurity Category Scores")
-    st.pyplot(fig2)
-    st.dataframe(cat_df.style.applymap(color_score, subset=["Score (%)"]))
-
-
 
 
 
