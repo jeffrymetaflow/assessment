@@ -5,6 +5,8 @@ from io import BytesIO
 from fpdf import FPDF
 import uuid
 import numpy as np
+from utils.auth import enforce_login
+enforce_login()
 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
