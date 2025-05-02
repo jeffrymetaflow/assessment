@@ -35,11 +35,16 @@ if not st.session_state.started:
 
     st.markdown("""
     The **IT Revenue Margin (ITRM)** Platform helps align IT operations with strategic business value.  
+    ITRM is an AI driven strategic tool for IT professionals & sellers
     Before we begin, here’s what you’ll get:
 
-    - A snapshot of your current IT maturity  
-    - AI-generated recommendations to reduce IT Revenue Margin  
-    - A visualized breakdown of spend vs value, risk, and optimization  
+    - AI-generated recommendations to reduce IT Revenue Margin
+    - Financial justification for strategic decisions 
+    - A visualized breakdown of spend vs value, risk, and optimization 
+    - Simulation models for what-if scenarios
+    - Assessments for optimization/pipeline developent
+    - Roadmaps for strategic planning of campaigns
+    - Technical modules for architecture decisions/optimization
 
     > Click below to begin your journey.
     """)
