@@ -231,8 +231,16 @@ if "cybersecurity_scores" in st.session_state and st.session_state["cybersecurit
     df_cyber.index.name = "Control"
     df_cyber.reset_index(inplace=True)
     df_cyber["Score"] = df_cyber["Score"].astype(float)
-    fig_heat = px.density_heatmap(df_cyber, x="Control", y="Score", color_continuous_scale="RdBu", height=400)
-    fig_heat.update_layout(title="Cybersecurity Control Heatmap")
+    fig_heat = px.bar(
+        df_cyber.sort_values(by="Score", ascending=True),
+        x="Score",
+        y="Control",
+        orientation="h",
+        color="Score",
+        color_continuous_scale="RdBu",
+        title="Cybersecurity Control Risk Scores",
+        height=400
+    )
     st.plotly_chart(fig_heat, use_container_width=True)
 else:
     st.info("No cybersecurity scores available yet.")
