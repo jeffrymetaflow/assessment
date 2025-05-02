@@ -6,6 +6,8 @@ from fpdf import FPDF
 import uuid
 import numpy as np
 from utils.bootstrap import page_bootstrap
+from utils.session_state import initialize_session
+initialize_session()
 
 st.set_page_config(page_title="Strategic_Roadmap", layout="wide")
 st.title("📈 Strategic_Roadmap")
