@@ -382,11 +382,11 @@ if submitted:
                             category_scores[category] += 1  # Increment "Yes" count
 
 
-# Calculate percentages for each category
-category_percentages = {
-    cat: round((category_scores[cat] / category_totals[cat]) * 100, 1) if category_totals[cat] > 0 else 0
-    for cat in category_scores
-}
+    # Calculate percentages for each category
+    category_percentages = {
+        cat: round((category_scores[cat] / category_totals[cat]) * 100, 1) if category_totals[cat] > 0 else 0
+        for cat in category_scores
+    }
 
 if submitted:
 
