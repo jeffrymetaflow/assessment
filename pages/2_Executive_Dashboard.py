@@ -182,7 +182,67 @@ if components:
 else:
     st.info("No components loaded yet.")
 
+# --- Sidebar Inputs ---
+st.sidebar.header("\U0001F4B0 High-Level Inputs")
+revenue = st.sidebar.number_input("Annual Revenue ($M)", min_value=1, value=100) * 1_000_000
+comparison_mode = st.sidebar.radio("Comparison Mode", ["Annual", "Quarterly"])
+variance_threshold = st.sidebar.slider("Variance Threshold %", min_value=0, max_value=100, value=20)
 
-st.markdown("### 🧪 Session Data Debug")
-for k in st.session_state:
-    st.write(f"{k}: {type(st.session_state[k]).__name__}")
+# --- Forecast Data Integration ---
+st.markdown("---")
+st.markdown("## \U0001F4C5 Forecast Overview")
+if "financial_forecast" in st.session_state:
+    forecast_data = st.session_state["financial_forecast"]
+    if isinstance(forecast_data, dict) and "years" in forecast_data:
+        df_forecast = pd.DataFrame(forecast_data)
+        st.line_chart(df_forecast.set_index("years"))
+    else:
+        st.info("Forecast data format invalid.")
+else:
+    st.info("No forecast data available. Please complete the Forecast module.")
+
+# --- Roadmap Integration ---
+st.markdown("---")
+st.markdown("## \U0001F6A7 Strategic Roadmap Summary")
+if "strategic_roadmap" in st.session_state and st.session_state["strategic_roadmap"]:
+    for area, actions in st.session_state["strategic_roadmap"].items():
+        st.markdown(f"**{area}**")
+        for action in actions:
+            st.write(f"• {action}")
+else:
+    st.info("No roadmap data found. Please complete the Strategic Roadmap module.")
+
+# --- Cybersecurity Score Summary ---
+st.markdown("---")
+st.markdown("## \U0001F512 Cybersecurity Snapshot")
+if "cybersecurity_scores" in st.session_state and st.session_state["cybersecurity_scores"]:
+    df_cyber = pd.DataFrame.from_dict(st.session_state["cybersecurity_scores"], orient='index', columns=['Score'])
+    df_cyber.index.name = "Control"
+    df_cyber.reset_index(inplace=True)
+    st.dataframe(df_cyber.sort_values(by="Score", ascending=True))
+else:
+    st.info("No cybersecurity scores available yet.")
+
+# --- Assessment Answers Summary ---
+st.markdown("---")
+st.markdown("## \U0001F4CB Assessment Highlights")
+if "assessment_answers" in st.session_state and st.session_state["assessment_answers"]:
+    answer_summary = {k.split("_")[0]: 0 for k in st.session_state["assessment_answers"]}
+    for k, v in st.session_state["assessment_answers"].items():
+        category = k.split("_")[0]
+        if v == "Yes":
+            answer_summary[category] += 1
+    df_assess = pd.DataFrame(list(answer_summary.items()), columns=["Category", "Yes Count"])
+    st.bar_chart(df_assess.set_index("Category"))
+else:
+    st.info("No assessment responses found.")
+
+# --- Component Mapping Overview ---
+st.markdown("---")
+st.markdown("## \U0001F527 Component Mapping Overview")
+if "component_mapping" in st.session_state and st.session_state["component_mapping"]:
+    df_map = pd.DataFrame.from_dict(st.session_state["component_mapping"], orient='index')
+    st.dataframe(df_map)
+else:
+    st.info("No component mapping data available.")
+
