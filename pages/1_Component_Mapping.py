@@ -5,6 +5,8 @@ from utils.component_utils import init_session_state_from_components
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 initialize_session()
+from utils.auth import enforce_login
+enforce_login()
 
 page_bootstrap(current_page="Component_Mapping")  # Or "Risk Model", etc.
 
