@@ -772,5 +772,10 @@ if not components_df.empty and "Name" in components_df and "Risk Score" in compo
     ax.set_title("Component Risk Overview")
     st.pyplot(fig)
 
-
+st.markdown("---")
+st.markdown(
+    "📄 By using this prototype, you agree to our [Terms](#) and [Privacy Notice](#). "
+    "This tool is for pilot use only and does not represent final security controls.",
+    unsafe_allow_html=True
+)
 
