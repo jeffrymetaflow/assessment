@@ -502,33 +502,22 @@ for section in questionnaire:
 # Calculate percentages
 percentages = {k: round((maturity_buckets[k] / totals[k]) * 100, 1) if totals[k] > 0 else 0 for k in maturity_buckets}
 
-# Create DataFrame with conditional coloring
-summary_df = pd.DataFrame({
-    "Maturity Level": list(percentages.keys()),
-    "Score (%)": list(percentages.values())
+# Create category DataFrame
+cat_df = pd.DataFrame({
+    "Category": list(category_percentages.keys()),
+    "Score (%)": list(category_percentages.values())
 })
 
-# Horizontal bar chart for clarity
-fig, ax = plt.subplots()
-colors = [
+fig2, ax2 = plt.subplots()
+colors2 = [
     'green' if val >= 75 else 'orange' if val >= 50 else 'red'
-    for val in summary_df["Score (%)"]
+    for val in cat_df["Score (%)"]
 ]
-ax.barh(summary_df["Maturity Level"], summary_df["Score (%)"], color=colors)
-ax.set_xlabel("Maturity Score (%)")
-ax.set_xlim([0, 100])
-ax.set_title("Cybersecurity Maturity (Horizontal View)")
-st.pyplot(fig)
+ax2.barh(cat_df["Category"], cat_df["Score (%)"], color=colors2)
+ax2.set_xlabel("Category Score (%)")
+ax2.set_xlim([0, 100])
+ax2.set_title("Cybersecurity Category Scores")
+st.pyplot(fig2)
+st.dataframe(cat_df.style.applymap(color_score, subset=["Score (%)"]))
 
-# Color score for DataFrame
-def color_score(val):
-    if val >= 75:
-        color = 'lightgreen'
-    elif val >= 50:
-        color = 'khaki'
-    else:
-        color = 'salmon'
-    return f'background-color: {color}'
-
-st.dataframe(summary_df.style.applymap(color_score, subset=["Score (%)"]))
 
