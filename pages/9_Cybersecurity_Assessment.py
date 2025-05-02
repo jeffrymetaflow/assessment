@@ -4,6 +4,8 @@ import pandas as pd
 from itertools import groupby
 import hashlib
 from utils.bootstrap import page_bootstrap
+from utils.session_state import initialize_session
+initialize_session()
 
 # ---------- Sidebar Navigation ----------
 st.set_page_config(page_title="Cybersecurity Assessment", layout="wide")
@@ -459,15 +461,16 @@ elif section == "⚙️ Inputs":
             
             # Iterate through st.session_state keys
             for key, value in st.session_state.items():
-                if value == "Yes":  # Only count "Yes" responses
+                if isinstance(value, (str, bool, int, float)):
+                    if value == "Yes":  # Only count "Yes" responses
                     # Split the key to extract the category
-                    parts = key.split("_")
-                    if len(parts) >= 2:  # Ensure the key has at least "Category_Section_UniqueIdentifier"
-                        category = parts[0]  # The first part is the category
-                        if category in category_scores:
-                            category_totals[category] += 1  # Increment total questions
-                            if value == "Yes":
-                                category_scores[category] += 1  # Increment "Yes" count
+                        parts = key.split("_")
+                        if len(parts) >= 2:  # Ensure the key has at least "Category_Section_UniqueIdentifier"
+                            category = parts[0]  # The first part is the category
+                            if category in category_scores:
+                                category_totals[category] += 1  # Increment total questions
+                                if value == "Yes":
+                                    category_scores[category] += 1  # Increment "Yes" count
     
     
         # Calculate percentages for each category

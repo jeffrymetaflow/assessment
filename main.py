@@ -9,9 +9,53 @@ from io import BytesIO
 from fpdf import FPDF
 from controller.controller import ITRMController
 from utils.bootstrap import page_bootstrap
+from utils.session_state import initialize_session
+initialize_session()
 
 # ✅ MUST BE FIRST STREAMLIT COMMAND
 st.set_page_config(page_title="ITRM Main Dashboard", layout="wide")
+
+import streamlit as st
+from PIL import Image
+
+logo_url = "https://raw.githubusercontent.com/jeffrymetaflow/ITRM-Prototype-v2/main/ITRM%20Logo.png"
+
+st.markdown(
+    f"""
+    <div style='background-color:#f5f5f5; padding:10px 20px; border-bottom:1px solid #ccc; display:flex; align-items:center; justify-content:space-between;'>
+        <img src='{logo_url}' style='height:40px;' alt='Logo'>
+        <h4 style='margin:0; color:#333;'>IT Strategy. Business Impact. Real-Time.</h4>
+    </div>
+    """, unsafe_allow_html=True
+)
+
+if "started" not in st.session_state:
+    st.session_state.started = False
+
+if not st.session_state.started:
+    st.title("👋 Welcome to the ITRM Platform")
+
+    st.markdown("""
+    The **IT Revenue Margin (ITRM)** Platform helps align IT operations with strategic business value.  
+    ITRM is an AI driven strategic tool for IT professionals & sellers
+    
+    Before we begin, here’s what you’ll get:
+
+    - AI-generated recommendations to reduce IT Revenue Margin
+    - Financial justification for strategic decisions 
+    - A visualized breakdown of spend vs value, risk, and optimization 
+    - Simulation models for what-if scenarios
+    - Assessments for optimization/pipeline developent
+    - Roadmaps for strategic planning of campaigns
+    - Technical modules for architecture decisions/optimization
+
+    > Click below to begin your journey.
+    """)
+
+    if st.button("🚀 Start Assessment"):
+        st.session_state.started = True
+        st.rerun()
+    st.stop()
 
 # --- INIT CONTROLLER ---
 if "controller" not in st.session_state:
@@ -272,6 +316,29 @@ with st.sidebar:
     st.write(f"Client: {st.session_state.get('client_name', '-')}")
     st.write(f"Project: {st.session_state.get('project_name', '-')}")
     st.write(f"Revenue: {st.session_state.get('project_revenue', '-')}")
+
+# Export session as downloadable JSON
+session_data = {k: v for k, v in st.session_state.items() if not k.startswith('_')}
+json_str = json.dumps(session_data, default=str)
+st.sidebar.download_button(
+    label="💾 Export Session",
+    data=json_str,
+    file_name="ITRM-session.json",
+    mime="application/json"
+)
+
+# Upload session to restore state
+uploaded_file = st.sidebar.file_uploader("🔁 Import Session", type="json")
+if uploaded_file is not None:
+    uploaded_state = json.load(uploaded_file)
+    for k, v in uploaded_state.items():
+        st.session_state[k] = v
+    st.sidebar.success("✅ Session loaded!")
+
+if st.sidebar.button("🧹 Reset Session"):
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    st.experimental_rerun()
 
 # --- Polished AIOps-Specific Risk Insights Dashboard ---
 if st.session_state.controller.get_components():
@@ -705,5 +772,10 @@ if not components_df.empty and "Name" in components_df and "Risk Score" in compo
     ax.set_title("Component Risk Overview")
     st.pyplot(fig)
 
-
+st.markdown("---")
+st.markdown(
+    "📄 By using this prototype, you agree to our [Terms](#) and [Privacy Notice](#). "
+    "This tool is for pilot use only and does not represent final security controls.",
+    unsafe_allow_html=True
+)
 

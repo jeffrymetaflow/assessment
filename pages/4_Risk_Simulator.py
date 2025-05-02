@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+from utils.session_state import initialize_session
+initialize_session()
 
 st.title("💸 Revenue at Risk Simulator")
 
