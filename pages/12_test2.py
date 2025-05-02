@@ -534,13 +534,13 @@ if submitted:
     category_scores = {category: 0 for category in categories}
     
     for key, value in st.session_state.items():
-        if value == "Yes":
-            parts = key.split("_")
-            if len(parts) >= 2:
-                category = parts[0]
-                if category in category_scores:
-                    category_totals[category] += 1
-                    category_scores[category] += 1
+        parts = key.split("_")
+        if len(parts) >= 2:
+            category = parts[0]
+            if category in category_scores:
+                category_totals[category] += 1  # always count total
+                if value == "Yes":
+                    category_scores[category] += 1  # only count Yes
     
     category_percentages = {
         k: round((category_scores[k] / category_totals[k]) * 100, 1) if category_totals[k] > 0 else 0
