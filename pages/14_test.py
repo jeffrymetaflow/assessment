@@ -17,6 +17,10 @@ client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp"
 
 page_bootstrap(current_page="Cybersecurity_Assessment")  
 
+def render_charts(section_scores):    
+    # --- Maturity Scoring + Visualization ---
+    st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
+
 # ---------- Overview Summary ----------
 if section == "🧠 Overview Summary":
     st.title("🧠 Cybersecurity Assessment Summary")
