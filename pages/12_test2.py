@@ -468,43 +468,7 @@ if submitted:
     st.dataframe(summary_df)
 
 if submitted:
-    # --- Maturity Scoring + Visualization ---
-    st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
-    
-     # Aggregate scores
-    maturity_buckets = {
-        "Survival": 0,
-        "Awareness": 0,
-        "Committed": 0,
-        "Service": 0,
-        "Business": 0
-    }
-    totals = {k: 0 for k in maturity_buckets}
-    
-    # Recalculate unique keys to match responses in st.session_state
-    for section in questionnaire:
-        section_title = section["section"]
-        category = next((key for key in maturity_buckets if key in section_title), None)
-        if category:
-            for q in section["questions"]:
-                hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
-                unique_key = f"{category}_{section_title}_{hashed_q}"  # Match earlier key structure
-                if st.session_state.get(unique_key) == "Yes":
-                    maturity_buckets[category] += 1
-                 
-    
-    # Count yes responses by maturity level
-    for section in questionnaire:
-        section_title = section["section"]
-        category = next((key for key in maturity_buckets if key in section_title), None)
-        if category:
-            totals[category] += len(section["questions"])
-            for q in section["questions"]:
-                # Reconstruct the unique key for each question
-                hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
-                unique_key = f"{category}_{section_title}_{hashed_q}"  # Match earlier key structure
-                if st.session_state.get(unique_key) == "Yes":  # Use the unique key to check the response
-                    maturity_buckets[category] += 1
+
     
     # Calculate percentages
     percentages = {k: round((maturity_buckets[k] / totals[k]) * 100, 1) if totals[k] > 0 else 0 for k in maturity_buckets}
