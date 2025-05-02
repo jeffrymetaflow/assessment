@@ -322,7 +322,7 @@ client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp"
 page_bootstrap(current_page="Cybersecurity_Assessment")  
 
 # ---------- Overview Summary ----------
-elif section == "🧠 Overview Summary":
+if section == "🧠 Overview Summary":
     st.title("🧠 CS Assessment Summary")
 
     summary = f"""
@@ -343,11 +343,7 @@ st.markdown(summary)
 """
 
 # ---------- Inputs Setup ----------
-if section == "⚙️ 🧠 Overview Summary":
-    st.title("⚙️ Inputs Setup")
-
-# ---------- Inputs Setup ----------
-if section == "⚙️ Inputs Setup":
+elif section == "⚙️ Inputs Setup":
     st.title("⚙️ Inputs Setup")
 
 # Display title
