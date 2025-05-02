@@ -355,11 +355,21 @@ if submitted:
             category_totals[category] = 0
     
         # Count "Yes" responses for the category
-        for q in block["questions"]:
-            if st.session_state.get(f"{block['section']}_{q}") == "Yes":
-                category_scores[category] += 1
-            category_totals[category] += 1
+        # Initialize category scores
+        category_scores = {category: 0 for category in ["CIS Controls", "Detect", "Identity", "Protect", "Recover", "Respond"]}
+        
+        # Iterate through st.session_state keys
+        for key, value in st.session_state.items():
+            if value == "Yes":  # Only count "Yes" responses
+                # Split the key to extract the category
+                parts = key.split("_")
+                if len(parts) >= 2:  # Ensure the key has at least "Category_Section_UniqueIdentifier"
+                    category = parts[0]  # The first part is the category
+                    if category in category_scores:
+                        category_scores[category] += 1
 
+# Debug: Print the updated category scores
+st.write("Updated Category Scores:", category_scores)
 # Calculate percentages for each category
 category_percentages = {
     cat: round((category_scores[cat] / category_totals[cat]) * 100, 1) if category_totals[cat] > 0 else 0
