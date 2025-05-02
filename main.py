@@ -13,6 +13,42 @@ from utils.bootstrap import page_bootstrap
 # ✅ MUST BE FIRST STREAMLIT COMMAND
 st.set_page_config(page_title="ITRM Main Dashboard", layout="wide")
 
+import streamlit as st
+from PIL import Image
+
+logo_url = "https://raw.githubusercontent.com/jeffrymetaflow/ITRM-Prototype-v2/main/ITRM%20Logo.png"
+
+st.markdown(
+    f"""
+    <div style='background-color:#f5f5f5; padding:10px 20px; border-bottom:1px solid #ccc; display:flex; align-items:center; justify-content:space-between;'>
+        <img src='{logo_url}' style='height:40px;' alt='Logo'>
+        <h4 style='margin:0; color:#333;'>IT Strategy. Business Impact. Real-Time.</h4>
+    </div>
+    """, unsafe_allow_html=True
+)
+
+if "started" not in st.session_state:
+    st.session_state.started = False
+
+if not st.session_state.started:
+    st.title("👋 Welcome to the ITRM Platform")
+
+    st.markdown("""
+    The **IT Revenue Margin (ITRM)** Platform helps align IT operations with strategic business value.  
+    Before we begin, here’s what you’ll get:
+
+    - A snapshot of your current IT maturity  
+    - AI-generated recommendations to reduce IT Revenue Margin  
+    - A visualized breakdown of spend vs value, risk, and optimization  
+
+    > Click below to begin your journey.
+    """)
+
+    if st.button("🚀 Start Assessment"):
+        st.session_state.started = True
+        st.experimental_rerun()
+    st.stop()
+
 # --- INIT CONTROLLER ---
 if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
