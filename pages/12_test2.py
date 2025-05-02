@@ -471,6 +471,17 @@ if submitted:
     # --- Maturity Scoring + Visualization ---
     st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
     
+    # Recalculate unique keys to match responses in st.session_state
+    for section in questionnaire:
+        section_title = section["section"]
+        category = next((key for key in maturity_buckets if key in section_title), None)
+        if category:
+            for q in section["questions"]:
+                hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
+                unique_key = f"{category}_{section_title}_{hashed_q}"  # Match earlier key structure
+                if st.session_state.get(unique_key) == "Yes":
+                    maturity_buckets[category] += 1
+                    
     # Aggregate scores
     maturity_buckets = {
         "Survival": 0,
