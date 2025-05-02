@@ -50,7 +50,7 @@ if section == "🧠 Overview Summary":
     section_scores = st.session_state.get("section_scores", default_section_scores)
     
     # Render the charts
-        render_charts(section_scores)
+render_charts(section_scores)
 
 # ---------- Inputs Setup ----------
 elif section == "⚙️ Inputs":
