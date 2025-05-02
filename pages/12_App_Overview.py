@@ -2,11 +2,13 @@ import streamlit as st
 from utils.auth import enforce_login
 enforce_login()
 
-
 st.set_page_config(page_title="📘 ITRM Platform Tour", layout="wide")
 
-st.title("📘 Welcome to the ITRM Platform")
+st.title(":blue_book: Welcome to the ITRM Platform")
 st.markdown("This guide will walk you through the core modules of the ITRM app and how to use them effectively.")
+
+# Embed platform map image
+st.image("assets/Modules.png", caption="ITRM Platform Overview", use_column_width=True)
 
 with st.expander("🔐 Login & Session Setup"):
     st.markdown("""
@@ -36,7 +38,7 @@ with st.expander("📈 Forecast & Risk Simulators"):
     - Justify IT investment with simulation-backed evidence
     """)
 
-with st.expander("🏛 Architecture + AI"):
+with st.expander("🏩 Architecture + AI"):
     st.markdown("""
     - Upload Visio or describe project structure
     - Run AI analysis on optimization opportunities
@@ -50,7 +52,7 @@ with st.expander("🔐 Cybersecurity & IT Maturity"):
     - Feed results into the dashboard for strategic alignment
     """)
 
-with st.expander("🧭 Strategic Roadmap + Personas"):
+with st.expander("🤡 Strategic Roadmap + Personas"):
     st.markdown("""
     - Build a transformation roadmap
     - Map against industry personas and use cases
@@ -66,3 +68,5 @@ with st.expander("🤖 AI Assist Module"):
 
 st.markdown("---")
 st.info("You're now ready to begin exploring! Use the sidebar to start your ITRM journey.")
+
+
