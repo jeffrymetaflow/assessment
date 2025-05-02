@@ -181,3 +181,8 @@ if components:
         st.info("No components to score.")
 else:
     st.info("No components loaded yet.")
+
+
+st.markdown("### 🧪 Session Data Debug")
+for k in st.session_state:
+    st.write(f"{k}: {type(st.session_state[k]).__name__}")
