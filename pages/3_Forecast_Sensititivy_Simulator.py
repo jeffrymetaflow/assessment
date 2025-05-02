@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from utils.bootstrap import page_bootstrap
+from utils.session_state import initialize_session
+initialize_session()
 
 st.set_page_config(page_title="IT Spend Forecast & Sensitivity Simulator", layout="wide")
 st.title("📊 IT Spend Forecast & Sensitivity Model")
