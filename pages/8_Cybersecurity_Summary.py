@@ -8,6 +8,8 @@ import numpy as np
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 initialize_session()
+from utils.auth import enforce_login
+enforce_login()
 
 st.set_page_config(page_title="Cybersecurity_Assessment", layout="wide")
 st.title("📈 Cybersecurity_Assessment")
