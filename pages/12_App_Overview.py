@@ -8,7 +8,7 @@ st.title(":blue_book: Welcome to the ITRM Platform")
 st.markdown("This guide will walk you through the core modules of the ITRM app and how to use them effectively.")
 
 # Embed platform map image
-st.image("assets/Modules.png", caption="ITRM Platform Overview", use_column_width=True)
+st.image("assets/Modules.png", caption="ITRM Platform Overview", use_container_width=True)
 
 with st.expander("🔐 Login & Session Setup"):
     st.markdown("""
