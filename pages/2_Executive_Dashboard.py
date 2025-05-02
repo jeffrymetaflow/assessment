@@ -223,17 +223,20 @@ if "strategic_roadmap" in st.session_state and st.session_state["strategic_roadm
 else:
     st.info("No roadmap data found. Please complete the Strategic Roadmap module.")
 
-# --- Cybersecurity Score Summary ---
+# --- Cybersecurity Heatmap ---
 st.markdown("---")
 st.markdown("## \U0001F512 Cybersecurity Snapshot")
 if "cybersecurity_scores" in st.session_state and st.session_state["cybersecurity_scores"]:
     df_cyber = pd.DataFrame.from_dict(st.session_state["cybersecurity_scores"], orient='index', columns=['Score'])
     df_cyber.index.name = "Control"
     df_cyber.reset_index(inplace=True)
-    st.dataframe(df_cyber.sort_values(by="Score", ascending=True))
+    df_cyber["Score"] = df_cyber["Score"].astype(float)
+    fig_heat = px.density_heatmap(df_cyber, x="Control", y="Score", color_continuous_scale="RdBu", height=400)
+    fig_heat.update_layout(title="Cybersecurity Control Heatmap")
+    st.plotly_chart(fig_heat, use_container_width=True)
 else:
     st.info("No cybersecurity scores available yet.")
-
+    
 # --- Assessment Answers Summary ---
 st.markdown("---")
 st.markdown("## \U0001F4CB Assessment Highlights")
