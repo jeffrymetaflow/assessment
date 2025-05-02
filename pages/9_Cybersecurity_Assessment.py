@@ -461,7 +461,7 @@ elif section == "⚙️ Inputs":
             
             # Iterate through st.session_state keys
             for key, value in st.session_state.items():
-                if str(value == "Yes").any():  # Only count "Yes" responses
+                if value == "Yes":  # Only count "Yes" responses
                     # Split the key to extract the category
                     parts = key.split("_")
                     if len(parts) >= 2:  # Ensure the key has at least "Category_Section_UniqueIdentifier"
