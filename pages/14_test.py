@@ -19,24 +19,38 @@ page_bootstrap(current_page="Cybersecurity_Assessment")
 
 # ---------- Overview Summary ----------
 if section == "🧠 Overview Summary":
-    st.title("🧠 CS Assessment Summary")
+    st.title("🧠 Cybersecurity Assessment Summary")
 
     summary = f"""
- 
-st.markdown(summary)     
+    **Client Name:** {client_name or '<Client>'}   
+   
+    ## Strategy Overview
+    - Optimize Cybersecurity environments
+    - Improve cybersecurity maturity
+    - Define action steps to move from "no" to "yes"
     
-**Client Name:** {client_name or '<Client>'}
+    ## Cybersecurity Next Steps
+    1. Conduct Workshops
+    2. Develop Strategic Roadmap
+    3. Integrate Technologies
+    """
 
-## Strategy Overview
-- Optimize Cybersecurity environments
-- Improve cybersecurity maturity
-- Define action steps to move from "no" to "yes"
+st.markdown(summary) 
 
-## Cybersecurity Next Steps
-1. Conduct Workshops
-2. Develop Strategic Roadmap
-3. Integrate Technologies
-"""
+    # Default values for section_scores if form hasn't been submitted
+    default_section_scores = {
+        "Identity": 0.5,
+        "Protect": 0.5,
+        "Detect": 0.5,
+        "Respond": 0.5,
+        "Recover": 0.5
+    }
+
+    # Use session state if the form has already been submitted
+    section_scores = st.session_state.get("section_scores", default_section_scores)
+
+    # Render the charts
+    render_charts(section_scores)
 
 # ---------- Inputs Setup ----------
 elif section == "⚙️ Inputs":
@@ -392,7 +406,21 @@ elif section == "⚙️ Inputs":
         st.write(section_scores)
         st.write(category_scores)
         st.write("### Category Scores")
-            
+
+        section_scores = {
+            "Identity": 0.75,
+            "Protect": 0.65,
+            "Detect": 0.80,
+            "Respond": 0.60,
+            "Recover": 0.85
+        }
+
+        # Store section_scores in session state for use in the "Summary" page
+        st.session_state["section_scores"] = section_scores
+
+        # Render the charts
+        render_charts(section_scores)
+        
         for block in questionnaire:
             category = block["category"]
             if category not in category_scores:
@@ -506,7 +534,7 @@ elif section == "⚙️ Inputs":
         st.dataframe(summary_df)
     
     if submitted:
-    
+    def render_charts(section_scores):    
         # --- Maturity Scoring + Visualization ---
         st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
         
