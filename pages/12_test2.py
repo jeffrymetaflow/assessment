@@ -338,11 +338,13 @@ with st.form("maturity_form"):
             # Calculate the section score
             if len(block["questions"]) > 0:
                 section_scores[block["section"]] = yes_count / len(block["questions"])
-
+   
     submitted = st.form_submit_button("Submit")
    
 if submitted:
     st.success("Form submitted!")
+    st.session_state["category_scores"] = category_scores
+    st.session_state["category_totals"] = category_totals
     st.write("Session State:", st.session_state)
     st.write("### Section Scores")
     st.write(section_scores)
