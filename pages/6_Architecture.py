@@ -16,6 +16,9 @@ from langchain_community.tools.tavily_search.tool import TavilySearchResults
 
 from controller.controller import ITRMController
 from utils.bootstrap import page_bootstrap
+from utils.session_state import initialize_session
+initialize_session()
+
 
 # --- AI Agent: Vendor Alternative Suggestion ---
 def get_vendor_replacement_suggestion(component_name, category):
