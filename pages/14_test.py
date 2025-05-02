@@ -49,8 +49,8 @@ if section == "🧠 Overview Summary":
     # Use session state if the form has already been submitted
     section_scores = st.session_state.get("section_scores", default_section_scores)
     
-    # Render the charts
-    render_charts(section_scores)
+# Render the charts
+render_charts(section_scores)
 
 # ---------- Inputs Setup ----------
 elif section == "⚙️ Inputs":
