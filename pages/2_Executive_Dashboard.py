@@ -182,16 +182,33 @@ if components:
 else:
     st.info("No components loaded yet.")
 
-# --- Forecast Data Integration ---
+# --- Forecast Chart from IT Spend Forecast Page ---
 st.markdown("---")
 st.markdown("## \U0001F4C5 Forecast Overview")
-if "financial_forecast" in st.session_state:
-    forecast_data = st.session_state["financial_forecast"]
-    if isinstance(forecast_data, dict) and "years" in forecast_data:
-        df_forecast = pd.DataFrame(forecast_data)
-        st.line_chart(df_forecast.set_index("years"))
-    else:
-        st.info("Forecast data format invalid.")
+if "forecast_df" in st.session_state and "forecast_categories" in st.session_state:
+    forecast_df = st.session_state["forecast_df"]
+    categories = st.session_state["forecast_categories"]
+    years = forecast_df["Year"].unique()
+
+    fig = go.Figure()
+    for cat in categories:
+        df_cat = forecast_df[forecast_df["Category"] == cat]
+        fig.add_trace(go.Bar(
+            name=cat,
+            x=df_cat["Year"],
+            y=df_cat["Spend"],
+            text=df_cat["Spend"].apply(lambda x: f"${x:,.0f}"),
+            textposition='auto'
+        ))
+
+    fig.update_layout(
+        barmode='stack',
+        title='Projected IT Spend by Category',
+        xaxis_title='Year',
+        yaxis_title='Total Spend ($)',
+        height=500
+    )
+    st.plotly_chart(fig, use_container_width=True)
 else:
     st.info("No forecast data available. Please complete the Forecast module.")
 
@@ -239,4 +256,3 @@ if "component_mapping" in st.session_state and st.session_state["component_mappi
     st.dataframe(df_map)
 else:
     st.info("No component mapping data available.")
-
