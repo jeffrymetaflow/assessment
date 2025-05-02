@@ -182,12 +182,6 @@ if components:
 else:
     st.info("No components loaded yet.")
 
-# --- Sidebar Inputs ---
-st.sidebar.header("\U0001F4B0 High-Level Inputs")
-revenue = st.sidebar.number_input("Annual Revenue ($M)", min_value=1, value=100) * 1_000_000
-comparison_mode = st.sidebar.radio("Comparison Mode", ["Annual", "Quarterly"])
-variance_threshold = st.sidebar.slider("Variance Threshold %", min_value=0, max_value=100, value=20)
-
 # --- Forecast Data Integration ---
 st.markdown("---")
 st.markdown("## \U0001F4C5 Forecast Overview")
