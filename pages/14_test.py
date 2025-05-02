@@ -346,85 +346,85 @@ elif section == "⚙️ Inputs":
         }
     ]
 
-# Display title
-st.title("\U0001F9E0 Cybersecurity Maturity Assessment Tool")
-st.markdown("""
-Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
-""")
-
-# Display form
-responses = {}
-# Ensure questionnaire is sorted by category
-questionnaire = sorted(questionnaire, key=lambda x: x["category"])
-
-# Group questions by category
-grouped_questions = {
-    category: [q for block in blocks for q in block["questions"]]
-    for category, blocks in groupby(questionnaire, key=lambda x: x["category"])
-}
-
-with st.form("maturity_form"):
-    section_scores = {}
-    category_scores = {}
-    category_totals = {}
-    for category, blocks in groupby(questionnaire, key=lambda x: x["category"]):
-        st.subheader(category)
-        for block in blocks:
-            st.write(block["section"])
-            # Initialize yes_count for each block
-            yes_count = 0
-            for idx, q in enumerate(block["questions"]):
-                hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
-                unique_key = f"{category}_{block['section']}_{hashed_q}"
-                answer = st.radio(q, ["Yes", "No"], key=unique_key)
-                if answer == "Yes":
-                    yes_count += 1
-            # Calculate the section score
-            if len(block["questions"]) > 0:
-                section_scores[block["section"]] = yes_count / len(block["questions"])
-   
-    submitted = st.form_submit_button("Submit")
-   
-if submitted:
-    st.success("Form submitted!")
-    st.session_state["category_scores"] = category_scores
-    st.session_state["category_totals"] = category_totals
-    st.write(section_scores)
-    st.write(category_scores)
-    st.write("### Category Scores")
-        
-    for block in questionnaire:
-        category = block["category"]
-        if category not in category_scores:
-            category_scores[category] = 0
-            category_totals[category] = 0
+    # Display title
+    st.title("\U0001F9E0 Cybersecurity Maturity Assessment Tool")
+    st.markdown("""
+    Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
+    """)
     
-        # Count "Yes" responses for the category
-        # Initialize category scores
-        category_scores = {category: 0 for category in ["CIS Controls", "Detect", "Identity", "Protect", "Recover", "Respond"]}
-
-        categories = ["CIS Controls", "Detect", "Identity", "Protect", "Recover", "Respond"]
-        category_totals = {category: 0 for category in categories}
-        category_scores = {category: 0 for category in categories}
-        
-        # Iterate through st.session_state keys
-        for key, value in st.session_state.items():
-            if value == "Yes":  # Only count "Yes" responses
-                # Split the key to extract the category
-                parts = key.split("_")
-                if len(parts) >= 2:  # Ensure the key has at least "Category_Section_UniqueIdentifier"
-                    category = parts[0]  # The first part is the category
-                    if category in category_scores:
-                        category_totals[category] += 1  # Increment total questions
-                        if value == "Yes":
-                            category_scores[category] += 1  # Increment "Yes" count
-
-
-    # Calculate percentages for each category
-    category_percentages = {
-        cat: round((category_scores[cat] / category_totals[cat]) * 100, 1) if category_totals[cat] > 0 else 0
-        for cat in category_scores
+    # Display form
+    responses = {}
+    # Ensure questionnaire is sorted by category
+    questionnaire = sorted(questionnaire, key=lambda x: x["category"])
+    
+    # Group questions by category
+    grouped_questions = {
+        category: [q for block in blocks for q in block["questions"]]
+        for category, blocks in groupby(questionnaire, key=lambda x: x["category"])
     }
+    
+    with st.form("maturity_form"):
+        section_scores = {}
+        category_scores = {}
+        category_totals = {}
+        for category, blocks in groupby(questionnaire, key=lambda x: x["category"]):
+            st.subheader(category)
+            for block in blocks:
+                st.write(block["section"])
+                # Initialize yes_count for each block
+                yes_count = 0
+                for idx, q in enumerate(block["questions"]):
+                    hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
+                    unique_key = f"{category}_{block['section']}_{hashed_q}"
+                    answer = st.radio(q, ["Yes", "No"], key=unique_key)
+                    if answer == "Yes":
+                        yes_count += 1
+                # Calculate the section score
+                if len(block["questions"]) > 0:
+                    section_scores[block["section"]] = yes_count / len(block["questions"])
+       
+        submitted = st.form_submit_button("Submit")
+       
+    if submitted:
+        st.success("Form submitted!")
+        st.session_state["category_scores"] = category_scores
+        st.session_state["category_totals"] = category_totals
+        st.write(section_scores)
+        st.write(category_scores)
+        st.write("### Category Scores")
+            
+        for block in questionnaire:
+            category = block["category"]
+            if category not in category_scores:
+                category_scores[category] = 0
+                category_totals[category] = 0
+        
+            # Count "Yes" responses for the category
+            # Initialize category scores
+            category_scores = {category: 0 for category in ["CIS Controls", "Detect", "Identity", "Protect", "Recover", "Respond"]}
+    
+            categories = ["CIS Controls", "Detect", "Identity", "Protect", "Recover", "Respond"]
+            category_totals = {category: 0 for category in categories}
+            category_scores = {category: 0 for category in categories}
+            
+            # Iterate through st.session_state keys
+            for key, value in st.session_state.items():
+                if value == "Yes":  # Only count "Yes" responses
+                    # Split the key to extract the category
+                    parts = key.split("_")
+                    if len(parts) >= 2:  # Ensure the key has at least "Category_Section_UniqueIdentifier"
+                        category = parts[0]  # The first part is the category
+                        if category in category_scores:
+                            category_totals[category] += 1  # Increment total questions
+                            if value == "Yes":
+                                category_scores[category] += 1  # Increment "Yes" count
+    
+    
+        # Calculate percentages for each category
+        category_percentages = {
+            cat: round((category_scores[cat] / category_totals[cat]) * 100, 1) if category_totals[cat] > 0 else 0
+            for cat in category_scores
+        }
 
 if submitted:
 
