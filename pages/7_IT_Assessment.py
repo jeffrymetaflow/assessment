@@ -3,6 +3,8 @@ import pandas as pd
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 initialize_session()
+from utils.auth import enforce_login
+enforce_login()
 
 # Embedded grouped questions JSON (shortened for readability — insert full content below)
 grouped_questions = {
