@@ -319,6 +319,12 @@ responses = {}
 # Ensure questionnaire is sorted by category
 questionnaire = sorted(questionnaire, key=lambda x: x["category"])
 
+# Group questions by category
+grouped_questions = {
+    category: [q for block in blocks for q in block["questions"]]
+    for category, blocks in groupby(questionnaire, key=lambda x: x["category"])
+}
+
 with st.form("maturity_form"):
     section_scores = {}
     category_scores = {}
@@ -382,7 +388,6 @@ category_percentages = {
     for cat in category_scores
 }
 
-# Handle submission
 if submitted:
 
     # Bar Chart
@@ -419,13 +424,6 @@ if submitted:
     - **50-79%**: Moderate maturity — standardized or in transition
     - **Below 50%**: Low maturity — ad-hoc or siloed
     """)
-
-# Scoring and Results
-# Group questions by category
-grouped_questions = {
-    category: [q for block in blocks for q in block["questions"]]
-    for category, blocks in groupby(questionnaire, key=lambda x: x["category"])
-}
 
 if submitted:
     st.write("### Category Scores")
