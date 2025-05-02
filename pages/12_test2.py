@@ -457,6 +457,21 @@ if submitted:
         })
   
 if submitted:
+    # Calculate percentages for each section
+    percentages = {
+        section: round((score * 100), 1) for section, score in section_scores.items()
+    }
+
+    # Create DataFrame for displaying percentages
+    summary_df = pd.DataFrame({
+        "Section": list(percentages.keys()),
+        "Percentage (%)": list(percentages.values())
+    })
+
+    # Display the DataFrame
+    st.dataframe(summary_df)
+
+if submitted:
     # --- Maturity Scoring + Visualization ---
     st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
     
