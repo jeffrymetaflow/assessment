@@ -423,8 +423,8 @@ if submitted:
         questions = grouped_questions[category]
         yes_count = sum(
             1 for idx, q in enumerate(questions) 
-            if responses.get(f"{category}_{block['section']}_{idx}") == "Yes"
-        )
+            if st.session_state.get(f"{category}_{block['section']}_{idx}") == "Yes"
+)
         category_scores[category] = yes_count
     
     for category in grouped_questions:
