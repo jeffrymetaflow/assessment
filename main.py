@@ -319,7 +319,7 @@ with st.sidebar:
 
 # Export session as downloadable JSON
 session_data = {k: v for k, v in st.session_state.items() if not k.startswith('_')}
-json_str = json.dumps(session_data)
+json_str = json.dumps(session_data, default=str)
 st.sidebar.download_button(
     label="💾 Export Session",
     data=json_str,
