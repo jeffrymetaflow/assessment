@@ -315,7 +315,8 @@ if st.button("📄 Generate PDF Summary"):
 
     # Finalize PDF
     pdf_buffer = BytesIO()
-    pdf.output(pdf_buffer)
+    pdf_output = pdf.output(dest="S").encode("latin1")
+    pdf_buffer.write(pdf_output)
     pdf_buffer.seek(0)
     st.download_button(
         label="📥 Download PDF",
