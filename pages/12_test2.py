@@ -452,7 +452,7 @@ if submitted:
             "Total Questions": total
         })
   
-if submitted:
+if submitted: 
     # Calculate percentages for each section
     percentages = {
         section: round((score * 100), 1) for section, score in section_scores.items()
