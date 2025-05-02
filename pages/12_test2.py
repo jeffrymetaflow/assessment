@@ -8,7 +8,7 @@ import hashlib
 questionnaire = [
     {
         "category": "Identity",
-        "section": "Survival, Ad-Hoc, Manual Legacy",
+        "section": "Survival",
         "questions": [
             "Does your organization maintain an inventory of all authorized and unauthorized devices connected to your network?",
             "Do you have an inventory of all authorized and unauthorized software within your organization?",
@@ -18,7 +18,7 @@ questionnaire = [
     },
     {
         "category": "Identity",
-        "section": "Awareness, measured, semi-automated",
+        "section": "Awareness",
         "questions": [
             "Have you implemented multi-factor authentication (MFA) for accessing sensitive systems and data?",
             "Is there a process in place to grant and revoke user access based on job roles and responsibilities?",
@@ -28,7 +28,7 @@ questionnaire = [
     },
     {
         "category": "Identity",
-        "section": "Committed, Continuous Improvement, Redundant",
+        "section": "Committed",
         "questions": [
             "Is there a process for promptly deactivating accounts for employees who leave your organization?",
             "Do you use automated account provisioning and deprovisioning for user accounts?",
@@ -38,7 +38,7 @@ questionnaire = [
     },
     {
         "category": "Identity",
-        "section": "Service Aligned/Standardization/High Availability",
+        "section": "Service Aligned",
         "questions": [
             "Is there a process for reviewing and addressing accounts with excessive privileges?",
             "Do you maintain logs of user access and authorization activities?",
@@ -48,7 +48,7 @@ questionnaire = [
     },
     {
         "category": "Identity",
-        "section": "Business Partnership/Innovation Optimized",
+        "section": "Innovation Optimized",
         "questions": [
             "Does your organization conduct security awareness training for employees?",
             "Have you established an incident response plan that includes identity and access management considerations?",
@@ -58,7 +58,7 @@ questionnaire = [
     },
     {
         "category": "Protect",
-        "section": "Survival, Ad-Hoc, Manual Legacy",
+        "section": "Survival",
         "questions": [
             "Do you have a documented information security policy",
             "Is there a process for classifying data ancd information assets based on sensitivity?",
@@ -68,7 +68,7 @@ questionnaire = [
     },
     {
         "category": "Protect",
-        "section": "Awareness, measured, semi-automated",
+        "section": "Awareness",
         "questions": [
             "Is there an established process for secure software development and code review?",
             "Have you implemented network segmentation to isolate critical systems and data from less secure areas?",
@@ -78,7 +78,7 @@ questionnaire = [
     },
     {
         "category": "Protect",
-        "section": "Committed, Continuous Improvement, Redundant",
+        "section": "Committed",
         "questions": [
             "Is there a process for monitoring and responding to cybersecurity threats and incidents?",
             "Do you use encryption to protect sensitive data in transit and at rest?",
@@ -88,7 +88,7 @@ questionnaire = [
     },
     {
         "category": "Protect",
-        "section": "Service Aligned/Standardization/High Availability",
+        "section": "Service Aligned",
         "questions": [
             "Have you established secure configurations for your hardware and software?",
             "Do you conduct regular security awareness training for employees?",
@@ -98,7 +98,7 @@ questionnaire = [
     },
     {
         "category": "Protect",
-        "section": "Business Partnership/Innovation Optimized",
+        "section": "Innovation Optimized",
         "questions": [
             "Is there a data backup and recovery plan in place, and are backups regularly tested?",
             "Do you have a secure mobile device management (MDM) solution for company-owned and BYOD devices?",
@@ -108,7 +108,7 @@ questionnaire = [
     },
     {
         "category": "Detect",
-        "section": "Survival, Ad-Hoc, Manual Legacy",
+        "section": "Survival",
         "questions": [
             "Do you have a dedicated team responsible for monitoring and detecting cybersecurity threats?",
             "Is there a process in place to continuously monitor network traffic for unusual or suspicious activities?",
@@ -118,7 +118,7 @@ questionnaire = [
     },
     {
         "category": "Detect",
-        "section": "Awareness, measured, semi-automated",
+        "section": "Awareness",
         "questions": [
             "Do you regularly review and analyze security logs to detect potential threats?",
             "Is there a documented incident detection and reporting process in your organization?",
@@ -128,7 +128,7 @@ questionnaire = [
     },
     {
         "category": "Detect",
-        "section": "Committed, Continuous Improvement, Redundant",
+        "section": "Committed",
         "questions": [
             "Do you use vulnerability scanning tools to identify weaknesses in your systems and applications?",
             "Have you implemented file integrity monitoring (FIM) to detect unauthorized changes to critical files?",
@@ -138,7 +138,7 @@ questionnaire = [
     },
     {
         "category": "Detect",
-        "section": "Service Aligned/Standardization/High Availability",
+        "section": "Service Aligned",
         "questions": [
             "Is there a process for monitoring email traffic for phishing attempts and malicious attachments?",
             "Have you implemented endpoint detection and response (EDR) solutions on your devices?",
@@ -148,7 +148,7 @@ questionnaire = [
     },
     {
         "category": "Detect",
-        "section": "Business Partnership/Innovation Optimized",
+        "section": "Innovation Optimized",
         "questions": [
             "Is there a process for correlating and prioritizing security alerts based on risk?",
             "Do you conduct regular tabletop exercises to test your incident detection and response capabilities?",
@@ -158,7 +158,7 @@ questionnaire = [
     },
     {
         "category": "Respond",
-        "section": "Survival, Ad-Hoc, Manual Legacy",
+        "section": "Survival",
         "questions": [
             "Do you have an incident response plan place?",
             "Is there a dedicated incident response team ora clearly defined incident response role within your organization?",
@@ -168,7 +168,7 @@ questionnaire = [
     },
     {
         "category": "Respond",
-        "section": "Awareness, measured, semi-automated",
+        "section": "Awareness",
         "questions": [
             "Do you have predefined communication procedures for internal and external stakeholders during an incident?",
             "Have you identified and established contact information for key incident response contacts, both internal and external?",
@@ -178,7 +178,7 @@ questionnaire = [
     },
     {
         "category": "Respond",
-        "section": "Committed, Continuous Improvement, Redundant",
+        "section": "Committed",
         "questions": [
             "Is there a process for isolating and containing affected systems or networks during an incident?",
             "Have you established a procedure for collecting and analyzing forensic evidence to determine the scope and impact of an incident?",
@@ -188,7 +188,7 @@ questionnaire = [
     },
     {
         "category": "Respond",
-        "section": "Service Aligned/Standardization/High Availability",
+        "section": "Service Aligned",
         "questions": [
             "Is there a process for notifying affected individuals or organizations in compliance with data breach notification laws?",
             "Do you have predefined incident response playbooks for common incident types?",
@@ -198,7 +198,7 @@ questionnaire = [
     },
     {
         "category": "Respond",
-        "section": "Business Partnership/Innovation Optimized",
+        "section": "Innovation Optimized",
         "questions": [
             "Is there a documented process for providing executive management and relevant stakeholders with incident status updates?",
             "Do you maintain a record of past incidents and the actions taken to resolve them?",
@@ -208,7 +208,7 @@ questionnaire = [
     },
     {
         "category": "Recover",
-        "section": "Survival, Ad-Hoc, Manual Legacy",
+        "section": "Survival",
         "questions": [
             "Do you have a documented business continuity and disaster recovery (BC/DR) plan in place?",
             "Is there a dedicated BC/DR team or a clearly defined BC/DR role within your organization?",
@@ -218,7 +218,7 @@ questionnaire = [
     },
     {
         "category": "Recover",
-        "section": "Awareness, measured, semi-automated",
+        "section": "Awareness",
         "questions": [
             "Have you established recovery time objectives (RTOs) and recovery point objectives (RPOs) for key systems and data?",
             "Is there a process for testing and validating backups to ensure they can be restored successfully?",
@@ -228,7 +228,7 @@ questionnaire = [
     },
     {
         "category": "Recover",
-        "section": "Committed, Continuous Improvement, Redundant",
+        "section": "Committed",
         "questions": [
             "Have you identified and documented alternative IT infrastructure and facilities for use during recovery?",
             "Is there a process for notifying employees and stakeholders about recovery procedures and expectations?",
@@ -238,7 +238,7 @@ questionnaire = [
     },
     {
         "category": "Recover",
-        "section": "Service Aligned/Standardization/High Availability",
+        "section": "Service Aligned",
         "questions": [
             "Have you established a process for restoring user access and privileges in a secure manner?",
             "Is there a procedure for conducting a post-incident assessment to identify areas for recovery process improvement?",
@@ -248,7 +248,7 @@ questionnaire = [
     },
     {
         "category": "Recover",
-        "section": "Business Partnership/Innovation Optimized",
+        "section": "Innovation Optimized",
         "questions": [
             "Have you identified and documented legal and regulatory reporting requirements related to recovery?",
             "Is there a process for communicating recovery progress and status updates to internal and external stakeholders?",
@@ -258,7 +258,7 @@ questionnaire = [
     },
     {
         "category": "CIS Controls",
-        "section": "Survival, Ad-Hoc, Manual Legacy",
+        "section": "Survival",
         "questions": [
             "Have you established and documented an inventory of authorized and unauthorized devices on your network?",
             "Is there a process in place to actively manage and control the use of administrative privileges?",
@@ -268,7 +268,7 @@ questionnaire = [
     },
     {
         "category": "CIS Controls",
-        "section": "Awareness, measured, semi-automated",
+        "section": "Awareness",
         "questions": [
             "Is there a process for continuous vulnerability assessment and remediation?",
             "Do you restrict and monitor the use of PowerShell, command-line tools, and other scripting languages?",
@@ -278,7 +278,7 @@ questionnaire = [
     },
     {
         "category": "CIS Controls",
-        "section": "Committed, Continuous Improvement, Redundant",
+        "section": "Committed",
         "questions": [
             "Do you actively monitor and analyze network traffic for signs of malicious activities?",
             "Have you established an incident response plan that includes roles, responsibilities, and communication procedures?",
@@ -288,7 +288,7 @@ questionnaire = [
     },
     {
         "category": "CIS Controls",
-        "section": "Service Aligned/Standardization/High Availability",
+        "section": "Service Aligned",
         "questions": [
             "Have you implemented secure email and web browsing practices and technologies?",
             "Is there a process for securely configuring and managing mobile devices used in your organization?",
@@ -298,7 +298,7 @@ questionnaire = [
     },
     {
         "category": "CIS Controls",
-        "section": "Business Partnership/Innovation Optimized",
+        "section": "Innovation Optimized",
         "questions": [
             "Have you established a secure software development lifecycle (SDLC) process?",
             "Is there a process for securely configuring and monitoring cloud resources?",
