@@ -4,6 +4,8 @@ import pandas as pd
 from itertools import groupby
 import hashlib
 from utils.bootstrap import page_bootstrap
+from utils.session_state import initialize_session
+initialize_session()
 
 # ---------- Sidebar Navigation ----------
 st.set_page_config(page_title="Cybersecurity Assessment", layout="wide")
