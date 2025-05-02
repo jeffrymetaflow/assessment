@@ -250,3 +250,39 @@ if "cybersecurity_scores" in st.session_state and st.session_state["cybersecurit
 else:
     st.info("No cybersecurity scores available yet.")
     
+# Save PDF and provide download button
+    # Export and embed all visuals using .write_image()
+    if 'fig' in locals():
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmpfile:
+            fig.write_image(tmpfile.name)
+            pdf.image(tmpfile.name, w=180)
+            os.unlink(tmpfile.name)
+
+    if 'fig_bar' in locals():
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmpfile:
+            fig_bar.write_image(tmpfile.name)
+            pdf.image(tmpfile.name, w=180)
+            os.unlink(tmpfile.name)
+
+    if 'df_assess' in locals():
+        import matplotlib.pyplot as plt
+        fig2, ax = plt.subplots()
+        df_assess.set_index("Category").plot(kind='bar', ax=ax, legend=False)
+        ax.set_title("Assessment Highlights")
+        ax.set_ylabel("Yes Count")
+        tmpfile = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+        fig2.savefig(tmpfile.name)
+        plt.close(fig2)
+        pdf.image(tmpfile.name, w=180)
+        os.unlink(tmpfile.name)
+
+    # Finalize and save PDF
+    pdf_buffer = BytesIO()
+    pdf.output(pdf_buffer)
+    pdf_buffer.seek(0)
+    st.download_button(
+        label="📥 Download PDF",
+        data=pdf_buffer,
+        file_name="itrm_summary.pdf",
+        mime="application/pdf"
+    )
