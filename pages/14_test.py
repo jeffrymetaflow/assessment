@@ -37,20 +37,20 @@ if section == "🧠 Overview Summary":
 
 st.markdown(summary) 
 
-    # Default values for section_scores if form hasn't been submitted
-    default_section_scores = {
-        "Identity": 0.5,
-        "Protect": 0.5,
-        "Detect": 0.5,
-        "Respond": 0.5,
-        "Recover": 0.5
-    }
+# Default values for section_scores if form hasn't been submitted
+default_section_scores = {
+    "Identity": 0.5,
+    "Protect": 0.5,
+    "Detect": 0.5,
+    "Respond": 0.5,
+    "Recover": 0.5
+}
 
-    # Use session state if the form has already been submitted
-    section_scores = st.session_state.get("section_scores", default_section_scores)
+# Use session state if the form has already been submitted
+section_scores = st.session_state.get("section_scores", default_section_scores)
 
-    # Render the charts
-    render_charts(section_scores)
+# Render the charts
+render_charts(section_scores)
 
 # ---------- Inputs Setup ----------
 elif section == "⚙️ Inputs":
