@@ -420,13 +420,6 @@ if submitted:
     - **Below 50%**: Low maturity — ad-hoc or siloed
     """)
 
-# Scoring and Results
-# Group questions by category
-grouped_questions = {
-    category: [q for block in blocks for q in block["questions"]]
-    for category, blocks in groupby(questionnaire, key=lambda x: x["category"])
-}
-
 if submitted:
     st.write("### Category Scores")
     st.write(category_percentages)
