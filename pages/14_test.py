@@ -22,9 +22,10 @@ if section == "🧠 Overview Summary":
     st.title("🧠 CS Assessment Summary")
 
     summary = f"""
-
-  
+ 
 st.markdown(summary)     
+    
+**Client Name:** {client_name or '<Client>'}
 
     ## Strategy Overview
     - Optimize Cybersecurity environments
@@ -36,8 +37,6 @@ st.markdown(summary)
     2. Develop Strategic Roadmap
     3. Integrate Technologies
     """
-    
-**Client Name:** {client_name or '<Client>'}
 
 # ---------- Inputs Setup ----------
 elif section == "⚙️ Inputs":
