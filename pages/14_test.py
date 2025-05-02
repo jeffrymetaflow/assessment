@@ -346,10 +346,6 @@ questionnaire = [
     }
 ]
 
-# ---------- Inputs Setup ----------
-if section == "⚙️ Inputs Setup":
-    st.title("⚙️ Inputs Setup")
-
 # Display title
 st.title("\U0001F9E0 Cybersecurity Maturity Assessment Tool")
 st.markdown("""
