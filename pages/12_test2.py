@@ -357,6 +357,10 @@ if submitted:
         # Count "Yes" responses for the category
         # Initialize category scores
         category_scores = {category: 0 for category in ["CIS Controls", "Detect", "Identity", "Protect", "Recover", "Respond"]}
+
+        categories = ["CIS Controls", "Detect", "Identity", "Protect", "Recover", "Respond"]
+        category_totals = {category: 0 for category in categories}
+        category_scores = {category: 0 for category in categories}
         
         # Iterate through st.session_state keys
         for key, value in st.session_state.items():
@@ -366,7 +370,9 @@ if submitted:
                 if len(parts) >= 2:  # Ensure the key has at least "Category_Section_UniqueIdentifier"
                     category = parts[0]  # The first part is the category
                     if category in category_scores:
-                        category_scores[category] += 1
+                        category_totals[category] += 1  # Increment total questions
+                        if value == "Yes":
+                            category_scores[category] += 1  # Increment "Yes" count
 
 # Debug: Print the updated category scores
 st.write("Updated Category Scores:", category_scores)
