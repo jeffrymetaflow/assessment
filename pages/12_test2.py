@@ -353,6 +353,8 @@ if submitted:
     st.session_state["category_totals"] = category_totals
     st.write(section_scores)
     st.write(category_scores)
+    st.write("### Category Scores")
+    st.write(category_percentages)
     
     for block in questionnaire:
         category = block["category"]
@@ -380,8 +382,7 @@ if submitted:
                         if value == "Yes":
                             category_scores[category] += 1  # Increment "Yes" count
 
-# Debug: Print the updated category scores
-st.write("Updated Category Scores:", category_scores)
+
 # Calculate percentages for each category
 category_percentages = {
     cat: round((category_scores[cat] / category_totals[cat]) * 100, 1) if category_totals[cat] > 0 else 0
@@ -426,8 +427,6 @@ if submitted:
     """)
 
 if submitted:
-    st.write("### Category Scores")
-    st.write(category_percentages)
 
     # Initialize score_data as an empty list
     score_data = []
