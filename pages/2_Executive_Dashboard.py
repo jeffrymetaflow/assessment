@@ -250,25 +250,3 @@ if "cybersecurity_scores" in st.session_state and st.session_state["cybersecurit
 else:
     st.info("No cybersecurity scores available yet.")
     
-# --- Assessment Answers Summary ---
-st.markdown("---")
-st.markdown("## \U0001F4CB Assessment Highlights")
-if "assessment_answers" in st.session_state and st.session_state["assessment_answers"]:
-    answer_summary = {k.split("_")[0]: 0 for k in st.session_state["assessment_answers"]}
-    for k, v in st.session_state["assessment_answers"].items():
-        category = k.split("_")[0]
-        if v == "Yes":
-            answer_summary[category] += 1
-    df_assess = pd.DataFrame(list(answer_summary.items()), columns=["Category", "Yes Count"])
-    st.bar_chart(df_assess.set_index("Category"))
-else:
-    st.info("No assessment responses found.")
-
-# --- Component Mapping Overview ---
-st.markdown("---")
-st.markdown("## \U0001F527 Component Mapping Overview")
-if "component_mapping" in st.session_state and st.session_state["component_mapping"]:
-    df_map = pd.DataFrame.from_dict(st.session_state["component_mapping"], orient='index')
-    st.dataframe(df_map)
-else:
-    st.info("No component mapping data available.")
