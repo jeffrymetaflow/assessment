@@ -54,7 +54,7 @@ if not st.session_state.started:
 
     if st.button("🚀 Start Assessment"):
         st.session_state.started = True
-        st.experimental_rerun()
+        st.rerun()
     st.stop()
 
 # --- INIT CONTROLLER ---
