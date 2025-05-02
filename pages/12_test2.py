@@ -500,7 +500,10 @@ if submitted:
         if category:
             totals[category] += len(section["questions"])
             for q in section["questions"]:
-                if st.session_state.get(q) == "Yes":
+                # Reconstruct the unique key for each question
+                hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
+                unique_key = f"{category}_{section_title}_{hashed_q}"  # Match earlier key structure
+                if st.session_state.get(unique_key) == "Yes":  # Use the unique key to check the response
                     maturity_buckets[category] += 1
     
     # Calculate percentages
