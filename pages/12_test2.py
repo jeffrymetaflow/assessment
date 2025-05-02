@@ -374,23 +374,6 @@ if submitted:
                         if value == "Yes":
                             category_scores[category] += 1  # Increment "Yes" count
 
-    category_scores = {}
-    category_totals = {}
-    
-    for section in questionnaire:
-        category = section["section"].split(" - ")[0].strip()
-        if category not in category_scores:
-            category_scores[category] = 0
-            category_totals[category] = 0
-        for q in section["questions"]:
-            category_totals[category] += 1
-            if st.session_state.get(q) == "Yes":
-                category_scores[category] += 1
-    
-    category_percentages = {
-        k: round((category_scores[k] / category_totals[k]) * 100, 1) if category_totals[k] > 0 else 0
-        for k in category_scores
-
 # Debug: Print the updated category scores
 st.write("Updated Category Scores:", category_scores)
 # Calculate percentages for each category
