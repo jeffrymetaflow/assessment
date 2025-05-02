@@ -231,7 +231,7 @@ if "cybersecurity_scores" in st.session_state and st.session_state["cybersecurit
     df_cyber.index.name = "Control"
     df_cyber.reset_index(inplace=True)
     df_cyber["Score"] = df_cyber["Score"].astype(float)
-    fig_heat = px.bar(
+    fig_bar = px.bar(
         df_cyber.sort_values(by="Score", ascending=True),
         x="Score",
         y="Control",
@@ -241,7 +241,7 @@ if "cybersecurity_scores" in st.session_state and st.session_state["cybersecurit
         title="Cybersecurity Control Risk Scores",
         height=400
     )
-    st.plotly_chart(fig_heat, use_container_width=True)
+    st.plotly_chart(fig_bar, use_container_width=True)
 else:
     st.info("No cybersecurity scores available yet.")
     
