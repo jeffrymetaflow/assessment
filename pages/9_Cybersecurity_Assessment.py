@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from itertools import groupby
 import hashlib
+from utils.bootstrap import page_bootstrap
 
 # Full Cybersecurity Maturity Assessment Questions
 questionnaire = [
@@ -307,6 +308,26 @@ questionnaire = [
         ]
     }
 ]
+
+# ---------- Sidebar Navigation ----------
+st.set_page_config(page_title="Cybersecurity Assessment", layout="wide")
+st.sidebar.title("Navigation")
+section = st.sidebar.radio("Go to", [
+    "🧠 Overview Summary",
+    "⚙️ Inputs",
+    ])
+
+client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
+
+page_bootstrap(current_page="Cybersecurity_Assessment")  
+
+# ---------- Inputs Setup ----------
+if section == "⚙️ 🧠 Overview Summary":
+    st.title("⚙️ Inputs Setup")
+
+# ---------- Inputs Setup ----------
+if section == "⚙️ Inputs Setup":
+    st.title("⚙️ Inputs Setup")
 
 # Display title
 st.title("\U0001F9E0 Cybersecurity Maturity Assessment Tool")
