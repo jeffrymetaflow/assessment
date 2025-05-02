@@ -5,6 +5,43 @@ from itertools import groupby
 import hashlib
 from utils.bootstrap import page_bootstrap
 
+# ---------- Sidebar Navigation ----------
+st.set_page_config(page_title="Cybersecurity Assessment", layout="wide")
+st.sidebar.title("Navigation")
+section = st.sidebar.radio("Go to", [
+    "🧠 Overview Summary",
+    "⚙️ Inputs",
+    ])
+
+client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
+
+page_bootstrap(current_page="Cybersecurity_Assessment")  
+
+# ---------- Overview Summary ----------
+elif section == "🧠 Overview Summary":
+    st.title("🧠 CS Assessment Summary")
+
+    summary = f"""
+    
+st.markdown(summary)     
+    
+**Client Name:** {client_name or '<Client>'}
+
+## Strategy Overview
+- Optimize hybrid IT environments
+- Improve cybersecurity maturity
+- Define action steps to move from "no" to "yes"
+
+## Cybersecurity Next Steps
+1. Conduct Workshops
+2. Develop Strategic Roadmap
+3. Integrate Technologies
+"""
+
+# ---------- Inputs Setup ----------
+if section == "⚙️ Inputs":
+    st.title("⚙️ Inputs")
+
 # Full Cybersecurity Maturity Assessment Questions
 questionnaire = [
     {
@@ -308,43 +345,6 @@ questionnaire = [
         ]
     }
 ]
-
-# ---------- Sidebar Navigation ----------
-st.set_page_config(page_title="Cybersecurity Assessment", layout="wide")
-st.sidebar.title("Navigation")
-section = st.sidebar.radio("Go to", [
-    "🧠 Overview Summary",
-    "⚙️ Inputs",
-    ])
-
-client_name = st.sidebar.text_input("Client Name", placeholder="e.g., Acme Corp")
-
-page_bootstrap(current_page="Cybersecurity_Assessment")  
-
-# ---------- Overview Summary ----------
-elif section == "🧠 Overview Summary":
-    st.title("🧠 CS Assessment Summary")
-
-    summary = f"""
-    
-st.markdown(summary)     
-    
-**Client Name:** {client_name or '<Client>'}
-
-## Strategy Overview
-- Optimize hybrid IT environments
-- Improve cybersecurity maturity
-- Define action steps to move from "no" to "yes"
-
-## Cybersecurity Next Steps
-1. Conduct Workshops
-2. Develop Strategic Roadmap
-3. Integrate Technologies
-"""
-
-# ---------- Inputs Setup ----------
-if section == "⚙️ 🧠 Overview Summary":
-    st.title("⚙️ Inputs Setup")
 
 # ---------- Inputs Setup ----------
 if section == "⚙️ Inputs Setup":
