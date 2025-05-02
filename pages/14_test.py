@@ -536,7 +536,7 @@ elif section == "⚙️ Inputs":
     if submitted:
         def render_charts(section_scores):    
         # --- Maturity Scoring + Visualization ---
-        st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
+            st.markdown("## \U0001F4CA Cybersecurity Maturity Summary")
         
          # Aggregate scores
         maturity_buckets = {
