@@ -212,16 +212,50 @@ if "forecast_df" in st.session_state and "forecast_categories" in st.session_sta
 else:
     st.info("No forecast data available. Please complete the Forecast module.")
 
-# --- Roadmap Integration ---
+# --- Inferred Strategic Recommendations ---
 st.markdown("---")
-st.markdown("## \U0001F6A7 Strategic Roadmap Summary")
-if "strategic_roadmap" in st.session_state and st.session_state["strategic_roadmap"]:
-    for area, actions in st.session_state["strategic_roadmap"].items():
-        st.markdown(f"**{area}**")
-        for action in actions:
-            st.write(f"• {action}")
+st.markdown("## 🧭 Inferred Strategic Focus Areas")
+
+recommendations = []
+
+# 1. Cybersecurity Gaps
+if "cybersecurity_scores" in st.session_state:
+    df_cyber = pd.DataFrame.from_dict(st.session_state["cybersecurity_scores"], orient="index", columns=["Score"])
+    weakest = df_cyber.sort_values("Score").head(2).index.tolist()
+    for control in weakest:
+        recommendations.append(f"Enhance cybersecurity control: **{control}**")
+
+# 2. Assessment Gaps
+if "assessment_answers" in st.session_state:
+    low_sections = {}
+    for k, v in st.session_state["assessment_answers"].items():
+        section = k.split("_")[0]
+        if v == "No":
+            low_sections[section] = low_sections.get(section, 0) + 1
+    for section, count in sorted(low_sections.items(), key=lambda x: -x[1])[:2]:
+        recommendations.append(f"Address maturity issues in **{section}**")
+
+# 3. Top Spend Areas
+if "component_mapping" in st.session_state:
+    df_comp = pd.DataFrame.from_dict(st.session_state["component_mapping"], orient="index")
+    if "Spend" in df_comp.columns:
+        top_spend = df_comp.groupby("Category")["Spend"].sum().sort_values(ascending=False).head(1)
+        for cat in top_spend.index:
+            recommendations.append(f"Evaluate optimization opportunities in high-spend area: **{cat}**")
+
+# 4. Business Impact
+if "category_revenue_impact" in st.session_state:
+    impact = st.session_state["category_revenue_impact"]
+    if isinstance(impact, dict):
+        top_area = max(impact, key=impact.get)
+        recommendations.append(f"Ensure resilience in high revenue-impact category: **{top_area}**")
+
+# Render
+if recommendations:
+    for rec in recommendations:
+        st.markdown(f"✅ {rec}")
 else:
-    st.info("No roadmap data found. Please complete the Strategic Roadmap module.")
+    st.info("No strategic insights currently inferred. Please complete assessments or mappings.")
 
 # --- Cybersecurity Heatmap ---
 st.markdown("---")
