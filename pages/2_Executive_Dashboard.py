@@ -250,22 +250,59 @@ if "cybersecurity_scores" in st.session_state and st.session_state["cybersecurit
 else:
     st.info("No cybersecurity scores available yet.")
     
-# Save PDF and provide download button
-    # Export and embed all visuals using .write_image()
+# --- PDF Export ---
+st.markdown("---")
+st.markdown("## 📄 Export Summary Report")
+
+from io import BytesIO
+from fpdf import FPDF
+import tempfile
+import os
+import matplotlib.pyplot as plt
+
+if st.button("📄 Generate PDF Summary"):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.set_title("ITRM Executive Summary")
+
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(200, 10, txt="ITRM Executive Summary", ln=True, align="C")
+    pdf.set_font("Arial", size=12)
+    pdf.ln(10)
+
+    # Strategic Recommendations
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(200, 10, txt="Strategic Focus Areas:", ln=True)
+    pdf.set_font("Arial", size=12)
+    for rec in recommendations:
+        pdf.multi_cell(0, 10, f"- {rec}")
+
+    # Cybersecurity Scores
+    if 'df_cyber' in locals():
+        pdf.ln(5)
+        pdf.set_font("Arial", 'B', 14)
+        pdf.cell(200, 10, txt="Cybersecurity Control Scores:", ln=True)
+        pdf.set_font("Arial", size=12)
+        for _, row in df_cyber.iterrows():
+            pdf.cell(0, 10, f"{row['Control']}: {row['Score']}", ln=True)
+
+    # Forecast Chart
     if 'fig' in locals():
         with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmpfile:
             fig.write_image(tmpfile.name)
             pdf.image(tmpfile.name, w=180)
             os.unlink(tmpfile.name)
 
+    # Cybersecurity Chart
     if 'fig_bar' in locals():
         with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmpfile:
             fig_bar.write_image(tmpfile.name)
             pdf.image(tmpfile.name, w=180)
             os.unlink(tmpfile.name)
 
+    # Assessment Highlights Chart
     if 'df_assess' in locals():
-        import matplotlib.pyplot as plt
         fig2, ax = plt.subplots()
         df_assess.set_index("Category").plot(kind='bar', ax=ax, legend=False)
         ax.set_title("Assessment Highlights")
@@ -276,7 +313,7 @@ else:
         pdf.image(tmpfile.name, w=180)
         os.unlink(tmpfile.name)
 
-    # Finalize and save PDF
+    # Finalize PDF
     pdf_buffer = BytesIO()
     pdf.output(pdf_buffer)
     pdf_buffer.seek(0)
@@ -286,3 +323,4 @@ else:
         file_name="itrm_summary.pdf",
         mime="application/pdf"
     )
+
