@@ -168,13 +168,19 @@ if st.button("📤 Export ROI Summary as PDF"):
     ))
 
     # 💾 Save and offer download
-    pdf_output_path = "/mnt/data/ITRM_ROI_Summary_Report.pdf"
-    pdf.output(pdf_output_path)
-
-    with open(pdf_output_path, "rb") as f:
-        st.download_button(
-            label="📥 Download ROI Summary PDF",
-            data=f,
-            file_name="ITRM_ROI_Summary_Report.pdf",
-            mime="application/pdf"
-        )
+    import io
+    
+    # Output to in-memory buffer instead of file system
+    pdf_buffer = io.BytesIO()
+    pdf.output(pdf_buffer)
+    pdf_buffer.seek(0)
+    
+    st.download_button(
+        label="📥 Download ROI Summary PDF",
+        data=pdf_buffer,
+        file_name="ITRM_ROI_Summary_Report.pdf",
+        mime="application/pdf"
+    )
+                file_name="ITRM_ROI_Summary_Report.pdf",
+                mime="application/pdf"
+            )
