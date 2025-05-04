@@ -16,16 +16,60 @@ st.markdown("""
 Use this page to read or download the official instruction manual for the ITRM platform. This guide walks through each module in the application and explains how to use the tool to its fullest potential.
 """)
 
-# Inline PDF Viewer
-pdf_path = "assets/ITRM Instruction Manual.pdf"
+# --- 📖 Hardcoded Instruction Content ---
+st.subheader("🧩 Module Overview")
 
-def show_pdf(file_path):
-    with open(file_path, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode("utf-8")
-    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="850px" type="application/pdf"></iframe>'
-    st.markdown(pdf_display, unsafe_allow_html=True)
+st.markdown("""
+### 🔹 1. Component Mapping  
+Define your IT environment, assign risk and maturity, and link to business impact.  
+**Inputs**: Infra components, maturity, risk, criticality  
+**Outputs**: Inventory, Spend by Category, Roadmap
 
-show_pdf(pdf_path)
+### 🔹 2. Executive Dashboard  
+Quickly visualize IT spend, risk exposure, and ROI trends.  
+**Inputs**: Revenue, IT spend  
+**Outputs**: Charts (ITRM, Revenue at Risk), KPIs
+
+### 🔹 3. Forecast & Sensitivity Simulator  
+Project spend trends and test budget levers by category.  
+**Inputs**: Growth %, spend categories  
+**Outputs**: 3-Year Forecast, Sensitivity Table
+
+### 🔹 4. ITRM Financial Calculator  
+Run simulations to optimize IT value vs. cost.  
+**Inputs**: Baseline & optimized spend  
+**Outputs**: ROI, Payback, Savings
+
+### 🔹 5. Architecture Optimization  
+Visualize architecture and run optimization suggestions.  
+**Inputs**: Visio upload or component list  
+**Outputs**: AI Roadmap, Heatmap, Timeline
+
+### 🔹 6. IT Maturity Assessment  
+Score maturity by domain using yes/no answers.  
+**Inputs**: Assessment responses  
+**Outputs**: Maturity scores, action items
+
+### 🔹 7. Cybersecurity Assessment  
+Evaluate security across CIS/NIST controls.  
+**Inputs**: Yes/No by domain (Protect, Detect, etc.)  
+**Outputs**: Cyber Scorecard, Recommendations
+
+### 🔹 8. Strategic Roadmap  
+Align projects to business priorities over time.  
+**Inputs**: Maturity scores, IT goals  
+**Outputs**: Timeline by Quarter, Milestone Checklist
+
+### 🔹 9. Benchmarking  
+Compare IT maturity and spend to peers.  
+**Inputs**: Industry, org size, persona  
+**Outputs**: Persona profiles, peer visuals
+
+### 🔹 10. AI Recommendations  
+Use AI to guide decisions or suggest vendors/tools.  
+**Inputs**: Natural language questions  
+**Outputs**: AI insights, strategy ideas, guidance
+""")
 
 # Download button
 with open(pdf_path, "rb") as pdf_file:
