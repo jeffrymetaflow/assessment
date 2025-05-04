@@ -58,18 +58,16 @@ input_template = {
 }
 df_template = pd.DataFrame(input_template)
 
-# Convert to Excel for download
-excel_buffer = io.BytesIO()
-with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
-    df_template.to_excel(writer, index=False, sheet_name="ITRM Inputs")
-excel_buffer.seek(0)
+csv_buffer = io.StringIO()
+df_template.to_csv(csv_buffer, index=False)
+csv_data = csv_buffer.getvalue()
 
-# Streamlit download button
+# Download button for CSV
 st.download_button(
-    label="📥 Download ITRM Input Template (Excel)",
-    data=excel_buffer,
-    file_name="ITRM_Input_Template.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    label="📥 Download ITRM Input Template (CSV)",
+    data=csv_data,
+    file_name="ITRM_Input_Template.csv",
+    mime="text/csv"
 )
 
 if st.button("✅ Submit ITRM Inputs"):
