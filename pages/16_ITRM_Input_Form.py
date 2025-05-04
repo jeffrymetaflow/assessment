@@ -10,6 +10,7 @@ from utils.session_state import initialize_session
 initialize_session()
 from utils.auth import enforce_login
 enforce_login()
+from datetime import date
 
 st.title("📝 ITRM Session Input Form")
 
