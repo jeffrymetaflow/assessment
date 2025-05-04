@@ -19,12 +19,6 @@ st.title("📈 ITRM ROI Summary")
 
 page_bootstrap(current_page="ROI Summary")  # Or "Risk Model", etc.
 
-st.subheader("Client & Assessment Info")
-client_name = st.text_input("Client Name", "ACME Corp")
-assessment_date = st.date_input("Assessment Date", value=date.today())
-analyst_name = st.text_input("ITRM Analyst", "Your Name")
-assessment_scope = st.text_input("Assessment Scope", "Full IT Environment")
-
 # Pull shared values
 client_name = st.session_state.get("client_name", "ACME Corp")
 assessment_date = st.session_state.get("assessment_date", date.today())
