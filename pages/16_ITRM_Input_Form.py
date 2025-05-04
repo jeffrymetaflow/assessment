@@ -60,7 +60,7 @@ df_template = pd.DataFrame(input_template)
 
 # Convert to Excel for download
 excel_buffer = io.BytesIO()
-with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
+with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
     df_template.to_excel(writer, index=False, sheet_name="ITRM Inputs")
 excel_buffer.seek(0)
 
