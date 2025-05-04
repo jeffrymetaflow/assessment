@@ -4,6 +4,8 @@ import base64
 st.set_page_config(page_title="📘 ITRM Help Guide", layout="wide")
 st.title("📘 ITRM Platform Instruction Manual")
 
+page_bootstrap(current_page="Benchmarking Personas")  # Or "Risk Model", etc.
+
 st.markdown("""
 Use this page to read or download the official instruction manual for the ITRM platform. This guide walks through each module in the application and explains how to use the tool to its fullest potential.
 """)
