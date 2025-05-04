@@ -13,7 +13,7 @@ st.title("📘 ITRM Platform Instruction Manual")
 page_bootstrap(current_page="Help Guide")  # Or "Risk Model", etc.
 
 st.markdown("""
-Use this page to read or download the official instruction manual for the ITRM platform. This guide walks through each module in the application and explains how to use the tool to its fullest potential.
+Use this page to read the official instruction manual for the ITRM platform. This guide walks through each module in the application and explains how to use the tool to its fullest potential.
 """)
 
 # --- 📖 Hardcoded Instruction Content ---
@@ -71,11 +71,5 @@ Use AI to guide decisions or suggest vendors/tools.
 **Outputs**: AI insights, strategy ideas, guidance
 """)
 
-with open("assets/ITRM Instruction Manual.pdf", "rb") as pdf_file:
-    st.download_button(
-        label="📥 Download ITRM Instruction Manual (PDF)",
-        data=pdf_file,
-        file_name="ITRM_Instruction_Manual.pdf",
-        mime="application/pdf"
-    )
+
 )
