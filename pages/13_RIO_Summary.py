@@ -87,3 +87,72 @@ st.markdown("""
 - Reassess spend categories in 6 months  
 - Align IT maturity with cross-department digital transformation goals
 """)
+
+# Function to sanitize text
+def clean_text(text):
+    return text.replace("→", "->").replace("↓", "down ").replace("↑", "up ")
+
+# Add button to trigger PDF export
+if st.button("📤 Export ROI Summary as PDF"):
+    pdf = PDF()
+    pdf.add_page()
+
+    # Fill in values from session or default
+    client_name = st.session_state.get("client_name", "ACME Corp")
+    assessment_date = str(st.session_state.get("assessment_date", date.today()))
+    analyst_name = st.session_state.get("analyst_name", "Your Name")
+    assessment_scope = st.session_state.get("assessment_scope", "Full IT Environment")
+    roi_multiple = st.session_state.get("roi_multiple", "4.7x")
+    payback_period = st.session_state.get("payback_period", "<6 months")
+    estimated_value = st.session_state.get("estimated_value", "$6.5M")
+
+    # Sections
+    pdf.chapter_title("Client & Assessment Info")
+    pdf.chapter_body(clean_text(
+        f"Client Name: {client_name}\nAssessment Date: {assessment_date}\nAnalyst: {analyst_name}\nAssessment Scope: {assessment_scope}"
+    ))
+
+    pdf.chapter_title("Financial Impact Summary")
+    pdf.chapter_body(clean_text(
+        "Total Annual IT Spend: $12.4M -> $10.8M (down 12.9%)\n"
+        "Cloud Cost Growth (3-Year): 23% CAGR -> 12% CAGR\n"
+        "Total Forecasted IT Cost Optimization: $2.7M over 3 years"
+    ))
+
+    pdf.chapter_title("Risk Reduction Simulation")
+    pdf.chapter_body(clean_text(
+        "Cybersecurity: Medium-High -> Low-Medium\n"
+        "DR/BC Maturity: 42% -> 81%\n"
+        "AIOps/Performance Incidents: 11/year -> 3/year\n"
+        "Simulated Revenue at Risk Reduced: $3.4M -> $1.1M"
+    ))
+
+    pdf.chapter_title("Strategic Maturity Gains")
+    pdf.chapter_body(clean_text(
+        "IT Strategy Alignment: 2.1 -> 4.2 (6 months)\n"
+        "Cyber Maturity: 2.3 -> 4.0 (9 months)\n"
+        "Financial Planning Accuracy: 56% -> 90% (3 months)"
+    ))
+
+    pdf.chapter_title("ROI Dashboard Snapshot")
+    pdf.chapter_body(clean_text(
+        f"3-Year ROI Multiple: {roi_multiple}\nPayback Period: {payback_period}\nTotal Estimated Value Realized: {estimated_value}"
+    ))
+
+    pdf.chapter_title("Next Steps")
+    pdf.chapter_body(clean_text(
+        "- Implement AI-assisted Roadmap Execution (Q3)\n"
+        "- Reassess spend categories in 6 months\n"
+        "- Align IT maturity with cross-department digital transformation goals"
+    ))
+
+    # Save and offer download
+    pdf_output_path = "/mnt/data/ITRM_ROI_Summary_Report.pdf"
+    pdf.output(pdf_output_path)
+    with open(pdf_output_path, "rb") as f:
+        st.download_button(
+            label="📥 Download ROI Summary PDF",
+            data=f,
+            file_name="ITRM_ROI_Summary_Report.pdf",
+            mime="application/pdf"
+        )
