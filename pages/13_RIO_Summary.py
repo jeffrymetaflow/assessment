@@ -168,18 +168,18 @@ if st.button("📤 Export ROI Summary as PDF"):
         "- Align IT maturity with cross-department digital transformation goals"
     ))
 
-    # 💾 Save and offer download
-    # Output to in-memory buffer instead of file system
-    pdf_buffer = io.BytesIO()
-    pdf.output(pdf_buffer)
-    pdf_buffer.seek(0)
-    
-    st.download_button(
-        label="📥 Download ROI Summary PDF",
-        data=pdf_buffer,
-        file_name="ITRM_ROI_Summary_Report.pdf",
-        mime="application/pdf"
-    )
+# 💾 Save and offer download
+# Output to in-memory buffer instead of file system
+pdf_buffer = io.BytesIO()
+pdf.output(pdf_buffer)
+pdf_buffer.seek(0)
+
+st.download_button(
+    label="📥 Download ROI Summary PDF",
+    data=pdf_buffer,
+    file_name="ITRM_ROI_Summary_Report.pdf",
+    mime="application/pdf"
+)
                 file_name="ITRM_ROI_Summary_Report.pdf",
                 mime="application/pdf"
             )
