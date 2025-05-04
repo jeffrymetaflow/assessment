@@ -71,11 +71,13 @@ Use AI to guide decisions or suggest vendors/tools.
 **Outputs**: AI insights, strategy ideas, guidance
 """)
 
-# Download button
-with open(pdf_path, "rb") as pdf_file:
+# --- 📥 Download PDF ---
+with open("assets/ITRM Instruction Manual.pdf", "rb") as pdf_file:
     st.download_button(
-        label="📥 Download ITRM Instruction Manual (PDF)",
+        label="📥 Download Full PDF Guide",
         data=pdf_file,
         file_name="ITRM_Instruction_Manual.pdf",
+        mime="application/pdf"
+    )
         mime="application/pdf"
     )
