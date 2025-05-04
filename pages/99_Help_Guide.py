@@ -71,5 +71,3 @@ Use AI to guide decisions or suggest vendors/tools.
 **Outputs**: AI insights, strategy ideas, guidance
 """)
 
-
-)
