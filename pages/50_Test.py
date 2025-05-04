@@ -1,6 +1,12 @@
 import streamlit as st
 import requests
 from openai import OpenAI
+from utils.bootstrap import page_bootstrap
+from utils.session_state import initialize_session
+initialize_session()
+from utils.auth import enforce_login
+enforce_login()
+
 
 st.set_page_config(page_title="🔌 API Key Test: OpenAI & Tavily", layout="wide")
 st.title("🔌 Test Your API Keys: OpenAI & Tavily")
