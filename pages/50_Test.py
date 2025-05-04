@@ -1,23 +1,24 @@
 import streamlit as st
-import openai
 import requests
+from openai import OpenAI
 
 st.set_page_config(page_title="🔌 API Key Test: OpenAI & Tavily", layout="wide")
 st.title("🔌 Test Your API Keys: OpenAI & Tavily")
 
 # Load secrets
-openai.api_key = st.secrets.get("openai_api_key")
+openai_key = st.secrets.get("openai_api_key")
 tavily_key = st.secrets.get("tavily_api_key")
 
 # --- Test OpenAI ---
 st.subheader("🤖 OpenAI Test")
-if openai.api_key:
+if openai_key:
     try:
-        response = openai.ChatCompletion.create(
+        client = OpenAI(api_key=openai_key)
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": "Say hello from OpenAI."}]
         )
-        message = response["choices"][0]["message"]["content"]
+        message = response.choices[0].message.content
         st.success("OpenAI connected successfully!")
         st.info(f"Response: {message}")
     except Exception as e:
