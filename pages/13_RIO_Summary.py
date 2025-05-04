@@ -92,11 +92,6 @@ st.markdown("""
 def clean_text(text):
     return text.replace("→", "->").replace("↓", "down ").replace("↑", "up ")
 
-# Add button to trigger PDF export
-if st.button("📤 Export ROI Summary as PDF"):
-    pdf = PDF()
-    pdf.add_page()
-
 # ✅ Define safe PDF class using built-in Helvetica font
 class PDF(FPDF):
     def header(self):
