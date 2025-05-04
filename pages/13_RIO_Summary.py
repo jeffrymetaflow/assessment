@@ -17,6 +17,8 @@ enforce_login()
 st.set_page_config(page_title="📈 ITRM ROI Summary", layout="wide")
 st.title("📈 ITRM ROI Summary")
 
+page_bootstrap(current_page="ROI Summary")  # Or "Risk Model", etc.
+
 st.subheader("Client & Assessment Info")
 client_name = st.text_input("Client Name", "ACME Corp")
 assessment_date = st.date_input("Assessment Date", value=date.today())
