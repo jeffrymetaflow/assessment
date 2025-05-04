@@ -1,6 +1,18 @@
 import streamlit as st
 import pandas as pd
 from datetime import date
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+from io import BytesIO
+from fpdf import FPDF
+import uuid
+import numpy as np
+from utils.bootstrap import page_bootstrap
+from utils.session_state import initialize_session
+initialize_session()
+from utils.auth import enforce_login
+enforce_login()
 
 st.set_page_config(page_title="📈 ITRM ROI Summary", layout="wide")
 st.title("📈 ITRM ROI Summary")
