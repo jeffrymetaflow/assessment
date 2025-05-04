@@ -13,6 +13,8 @@ enforce_login()
 
 st.title("📝 ITRM Session Input Form")
 
+page_bootstrap(current_page="Benchmarking Personas")  # Or "Risk Model", etc.
+
 st.header("Required Inputs")
 client_name = st.text_input("Client Name", "")
 assessment_date = st.date_input("Assessment Date", value=date.today())
