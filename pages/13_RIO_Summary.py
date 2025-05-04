@@ -110,9 +110,12 @@ def clean_text(text):
     return text.replace("→", "->").replace("↓", "down ").replace("↑", "up ")
 
 if st.button("📤 Export ROI Summary as PDF"):
+    roi_multiple = st.session_state.get("roi_multiple", "4.7x")
+    payback_period = st.session_state.get("payback_period", "<6 months")
+    estimated_value = st.session_state.get("estimated_value", "$6.5M")
+
     pdf = PDF()
     pdf.add_page()
-
     pdf.chapter_title("Client & Assessment Info")
     pdf.chapter_body(clean_text(
         f"Client Name: {client_name}\nAssessment Date: {assessment_date}\nAnalyst: {analyst_name}\nAssessment Scope: {assessment_scope}"
