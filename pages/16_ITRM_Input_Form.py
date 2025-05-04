@@ -13,7 +13,7 @@ enforce_login()
 
 st.title("📝 ITRM Session Input Form")
 
-page_bootstrap(current_page="Benchmarking Personas")  # Or "Risk Model", etc.
+page_bootstrap(current_page="ITRM Session Input Form")  # Or "Risk Model", etc.
 
 st.header("Required Inputs")
 client_name = st.text_input("Client Name", "")
