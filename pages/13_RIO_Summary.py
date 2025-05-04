@@ -13,6 +13,7 @@ from utils.session_state import initialize_session
 initialize_session()
 from utils.auth import enforce_login
 enforce_login()
+import io
 
 st.set_page_config(page_title="📈 ITRM ROI Summary", layout="wide")
 st.title("📈 ITRM ROI Summary")
@@ -168,8 +169,6 @@ if st.button("📤 Export ROI Summary as PDF"):
     ))
 
     # 💾 Save and offer download
-    import io
-    
     # Output to in-memory buffer instead of file system
     pdf_buffer = io.BytesIO()
     pdf.output(pdf_buffer)
