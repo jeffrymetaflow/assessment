@@ -55,7 +55,7 @@ if not st.session_state.started:
     > Click below to begin your journey.
     """)
 
-    if st.button("🚀 Start Assessment"):
+    if st.button("🚀 Start Session"):
         st.session_state.started = True
         st.rerun()
     st.stop()
