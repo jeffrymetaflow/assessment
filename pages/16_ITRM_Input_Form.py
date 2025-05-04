@@ -38,6 +38,39 @@ component_maturity_scores = st.text_area("Component Maturity Scores (e.g., NetAp
 component_risk_flags = st.text_area("Component Risk Flags (e.g., NetApp:False, AWS:True)", "")
 criticality_score = st.text_area("Criticality Scores (e.g., NetApp:High, AWS:Medium)", "")
 
+# Create a blank input template DataFrame
+input_template = {
+    "Input Name": [
+        "client_name", "assessment_date", "analyst_name", "assessment_scope",
+        "baseline_revenue", "it_expense", "architecture_components",
+        "hardware_expense", "software_expense", "cybersecurity_expense",
+        "maintenance_expense", "telecom_expense", "personnel_expense", "bcdr_expense",
+        "component_maturity_scores", "component_risk_flags", "criticality_score"
+    ],
+    "Example Value": [
+        "ACME Corp", "2025-05-04", "Jane Doe", "Full IT Environment",
+        "150000000", "12000000", "AWS EC2, NetApp, VMware",
+        "2500000", "1800000", "1400000",
+        "900000", "700000", "4000000", "800000",
+        "NetApp:4, AWS:3", "NetApp:False, AWS:True", "NetApp:High, AWS:Medium"
+    ]
+}
+df_template = pd.DataFrame(input_template)
+
+# Convert to Excel for download
+excel_buffer = io.BytesIO()
+with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
+    df_template.to_excel(writer, index=False, sheet_name="ITRM Inputs")
+excel_buffer.seek(0)
+
+# Streamlit download button
+st.download_button(
+    label="📥 Download ITRM Input Template (Excel)",
+    data=excel_buffer,
+    file_name="ITRM_Input_Template.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+
 if st.button("✅ Submit ITRM Inputs"):
     st.session_state.update({
         "client_name": client_name,
