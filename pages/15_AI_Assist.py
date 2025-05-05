@@ -54,6 +54,14 @@ session_state = {
     "Revenue": 100_000_000
 }
 
+# --- Sidebar Context Awareness ---
+st.sidebar.subheader("\U0001F464 Consultant Context")
+user_role = st.sidebar.selectbox("Your Role", ["CIO", "IT Ops", "Finance Lead", "Security Officer"])
+user_goal = st.sidebar.selectbox("Primary Goal", ["Optimize Costs", "Improve Resilience", "Modernize IT", "Enhance Security"])
+
+def contextualize(prompt):
+    return f"You are advising a {user_role} focused on {user_goal}. {prompt}"
+
 # --- Sample Simulated Actions ---
 def adjust_category_forecast(prompt):
     for cat in session_state:
@@ -80,12 +88,22 @@ def show_risk_insight(prompt):
 def optimize_margin(prompt):
     return "To improve margin by 2%, consider reducing Personnel and Maintenance by 5% each."
 
+def architecture_gap_analysis(prompt):
+    return "Compared to hybrid cloud best practices, you may have an over-concentration in on-prem hardware with limited containerization or automation."
+
+def tool_roi_justification(prompt):
+    return "Switching to Rubrik from Commvault could reduce backup windows by 40% and lower TCO by 15% over 3 years."
+
 # --- Extend classifier fallback logic ---
 def fallback_classifier(prompt):
     fallback_keywords = ["compare", "alternative", "better than", "replace", "options", "suggest"]
     for keyword in fallback_keywords:
         if keyword in prompt.lower():
             return "analyze_product"
+    if "roi" in prompt.lower() or "value of" in prompt.lower():
+        return "tool_roi"
+    if "architecture gap" in prompt.lower() or "best practice" in prompt.lower():
+        return "arch_gap"
     return "unknown"
 
 # --- Prompt Input ---
@@ -96,6 +114,8 @@ if st.button("Submit"):
     action = classify_intent(user_prompt)
     if action == "unknown":
         action = fallback_classifier(user_prompt)
+
+    full_prompt = contextualize(user_prompt)
 
     if action == "adjust_category_forecast":
         response = adjust_category_forecast(user_prompt)
@@ -108,7 +128,7 @@ if st.button("Submit"):
     elif action == "optimize_margin":
         response = optimize_margin(user_prompt)
     elif action == "analyze_product":
-        raw_response = query_langchain_product_agent(user_prompt)
+        raw_response = query_langchain_product_agent(full_prompt)
         if "Dell" in raw_response and "NetApp" in raw_response:
             st.markdown("### Product Comparison Table")
             st.table({
@@ -128,10 +148,15 @@ if st.button("Submit"):
                     "Slightly lower"
                 ]
             })
-
         response = raw_response + "\n\nFeel free to ask: 'Which is better for hybrid workloads?' or 'Compare with Pure Storage'"
-    
-        st.success(response)
+    elif action == "tool_roi":
+        response = tool_roi_justification(full_prompt)
+    elif action == "arch_gap":
+        response = architecture_gap_analysis(full_prompt)
+    else:
+        response = "I'm not sure how to help with that yet. Try asking about your budget, risk, or tools."
+
+    st.success(response)
 
 # --- Debug Info (optional) ---
 with st.expander("\U0001F527 Simulated Data State"):
