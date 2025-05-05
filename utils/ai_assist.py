@@ -1,6 +1,8 @@
 import openai
 import os
 import pandas as pd
+import streamlit as st
+openai_key = st.secrets["openai"]["api_key"]
 from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
