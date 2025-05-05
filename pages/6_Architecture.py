@@ -75,6 +75,15 @@ if 'controller' not in st.session_state:
 if "components" not in st.session_state:
     st.session_state.components = []  # Initialize it as an empty list
 
+controller = st.session_state.controller
+components = controller.get_components()
+
+if components:
+    df = pd.DataFrame(components)
+    st.dataframe(df)  # or continue building graph, tables, charts from df
+else:
+    st.warning("No components loaded. Please upload them on the Main page.")
+
 # --- Tabs ---
 tabs = st.tabs(["Component Mapping", "Architecture Diagram", "External Import"])
 
