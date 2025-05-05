@@ -20,8 +20,7 @@ def ai_assist_overlay(context=None):
         st.error(f"Missing secret key: {e}")
         return
 
-    os.environ["TAVILY_API_KEY"] = tavily_key
-   
+     
 # --- LangChain Agent ---
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=openai_key)
 search_tool = TavilySearchResults()
