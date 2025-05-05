@@ -72,6 +72,9 @@ def initialize_state():
 if 'controller' not in st.session_state:
     st.session_state.controller = None  # Or initialize it with the appropriate value
 
+if "components" not in st.session_state:
+    st.session_state.components = []  # Initialize it as an empty list
+
 # --- Tabs ---
 tabs = st.tabs(["Component Mapping", "Architecture Diagram", "External Import"])
 
