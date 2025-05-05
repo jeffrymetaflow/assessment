@@ -168,10 +168,20 @@ if st.button("Submit"):
     })
     df = df.sort_values("Spend", ascending=False)
 
-    fig, ax = plt.subplots()
-    ax.barh(df["Category"], df["Spend"], color="skyblue")
-    ax.set_xlabel("Spend ($)")
-    ax.set_title("IT Budget Allocation by Category")
+    fig, ax1 = plt.subplots()
+    ax1.barh(df["Category"], df["Spend"], color="skyblue", label="Spend")
+    ax1.set_xlabel("Spend ($)")
+    ax1.set_title("IT Budget Allocation with Revenue Ratio")
+
+    ax2 = ax1.twiny()
+    total_spend = df["Spend"].sum()
+    revenue = session_state["Revenue"]
+    ratio = total_spend / revenue * 100
+    ax2.axvline(x=ratio, color='red', linestyle='--', label=f"IT/Revenue Ratio: {ratio:.2f}%")
+    ax2.set_xlim(ax1.get_xlim())
+    ax2.set_xticks([])
+
+    ax1.legend(loc="lower right")
     st.pyplot(fig)
 
 # --- Debug Info (optional) ---
