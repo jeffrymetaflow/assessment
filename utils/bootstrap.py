@@ -1,6 +1,6 @@
 # utils/bootstrap.py
 import streamlit as st
-from utils.ai_assist import ai_assist_overlay
+from utils.ai_assist import handle_ai_consultation
 
 def ai_assist_overlay(user_prompt, session_state, role="CIO", goal="Optimize Costs"):
     return handle_ai_consultation(user_prompt, session_state, role, goal)
