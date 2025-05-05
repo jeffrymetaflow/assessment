@@ -186,7 +186,7 @@ with tabs[1]:
 
         G = nx.Graph()
         for _, row in df.iterrows():
-            G.add_node(row['Name'], category=row['Category'], spend=row['Spend'], revenue = row['Revenue at Risk ($)'] if use_dashboard_risk else row['Revenue Impact %'], risk=row['Risk Score'])
+            G.add_node(row['Name'], category=row['Category'], spend=row['Spend'], revenue = row['Revenue at Risk ($)'] if use_dashboard_risk else row['Revenue Impact %'])
 
         for edge in st.session_state.edges:
             G.add_edge(*edge)
