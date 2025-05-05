@@ -20,7 +20,7 @@ split_docs = splitter.split_documents(all_docs)
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 
-embedding_model = OpenAIEmbeddings(openai_api_key=st.secrets["openai_api_key"])
+embedding_model = OpenAIEmbeddings(openai_api_key=st.secrets["openai"]["api_key"])
 vectorstore = FAISS.from_documents(split_docs, embedding_model)
 
 # Step 4: Save to disk for reuse (optional)
