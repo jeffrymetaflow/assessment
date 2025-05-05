@@ -24,7 +24,7 @@ from langchain.vectorstores import FAISS
 if "openai" not in st.secrets or "api_key" not in st.secrets["openai"]:
     raise KeyError("OpenAI API key is missing. Please configure it in the Streamlit secrets.")
 
-embedding_model = OpenAIEmbeddingsopenai_key = st.secrets.get("openai_api_key") or st.secrets.get("openai", {}).get("api_key")
+embedding_model = OpenAIEmbeddings(openai_key = st.secrets.get("openai_api_key") or st.secrets.get("openai", {}).get("api_key")
 vectorstore = FAISS.from_documents(split_docs, embedding_model)
 
 # Step 4: Save to disk for reuse (optional)
