@@ -20,6 +20,10 @@ split_docs = splitter.split_documents(all_docs)
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 
+# Add error handling for missing API key
+if "openai" not in st.secrets or "api_key" not in st.secrets["openai"]:
+    raise KeyError("OpenAI API key is missing. Please configure it in the Streamlit secrets.")
+
 embedding_model = OpenAIEmbeddings(openai_api_key=st.secrets["openai"]["api_key"])
 vectorstore = FAISS.from_documents(split_docs, embedding_model)
 
