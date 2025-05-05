@@ -8,16 +8,12 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 from PIL import Image
 import pytesseract
-
 from utils.intent_classifier import classify_intent
 from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
-
-from controller.controller import ITRMController
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
-initialize_session()
 from utils.auth import enforce_login
 enforce_login()
 
@@ -39,20 +35,6 @@ def get_vendor_replacement_suggestion(component_name, category):
 
     return result
 
-# --- Sample Component Metadata for AI Scoring ---
-def enrich_component_metadata(component):
-    metadata = {
-        "name": component["Name"],
-        "category": component["Category"],
-        "spend": component["Spend"],
-        "revenue_impact": component["Revenue Impact %"],
-        "risk_score": component["Risk Score"],
-        "lifespan": 3,  # placeholder in years
-        "alternatives": ["AltA", "AltB"],  # placeholder
-        "vendor": "VendorX",  # placeholder
-    }
-    return metadata
-
 # --- AI Scoring Logic ---
 def score_component(metadata, weight_revenue=0.4, weight_risk=0.4, weight_cost=0.2):
     revenue_score = metadata["revenue_impact"] / 100
@@ -70,10 +52,6 @@ def score_component(metadata, weight_revenue=0.4, weight_risk=0.4, weight_cost=0
         color = "#FFCDD2"  # light red
     return score, recommendation, color
 
-# --- Controller Initialization ---
-if "controller" not in st.session_state:
-    st.session_state.controller = ITRMController()
-
 def initialize_state():
     if "components" not in st.session_state:
         st.session_state.components = []
@@ -82,7 +60,7 @@ def initialize_state():
     if 'key' not in st.session_state:
         st.session_state['key'] = 'default_value'
 
-initialize_state()
+initialize_session()
 controller = st.session_state.controller
 
 st.set_page_config(page_title="IT Architecture to Financial Mapping", layout="wide")
