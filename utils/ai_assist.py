@@ -11,9 +11,10 @@ from langchain.tools import Tool
 from utils.intent_classifier import classify_intent
 
 # --- Load API Keys ---
-openai_key = os.environ.get("OPENAI_API_KEY")
-tavily_key = os.environ.get("TAVILY_API_KEY")
-os.environ["TAVILY_API_KEY"] = tavily_key or ""
+openai_key = st.secrets["openai"]["api_key"]
+if not openai_key:
+    raise ValueError("OpenAI API key is missing from Streamlit secrets.")
+tavily_key = st.secrets["tavily"]["api_key"]
 
 # --- LangChain Agent ---
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=openai_key)
