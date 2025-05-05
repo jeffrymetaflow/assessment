@@ -44,17 +44,20 @@ def query_langchain_product_agent(prompt):
     except Exception as e:
         return f"Error fetching product info: {str(e)}"
 
-# --- Placeholder Simulated State (would be tied to real modules later) ---
-session_state = {
-    "Hardware": 320000,
-    "Software": 280000,
-    "Personnel": 500000,
-    "Maintenance": 160000,
-    "Telecom": 120000,
-    "Cybersecurity": 220000,
-    "BC/DR": 140000,
-    "Revenue": 100_000_000
-}
+# --- Use Actual App Session State ---
+if "revenue" not in st.session_state:
+    st.warning("Revenue not found in session state. Please complete the project setup on the main page.")
+    st.stop()
+
+categories = ["Hardware", "Software", "Personnel", "Maintenance", "Telecom", "Cybersecurity", "BC/DR"]
+
+session_state = {cat: 0 for cat in categories}
+for component in st.session_state.get("components", []):
+    cat = component.get("Category")
+    spend = component.get("Spend", 0)
+    if cat in session_state:
+        session_state[cat] += spend
+session_state["Revenue"] = st.session_state.get("revenue", 100_000_000)
 
 # --- Sidebar Context Awareness ---
 st.sidebar.subheader("\U0001F464 Consultant Context")
@@ -185,5 +188,5 @@ if st.button("Submit"):
     st.pyplot(fig)
 
 # --- Debug Info (optional) ---
-with st.expander("\U0001F527 Simulated Data State"):
+with st.expander("\U0001F527 Session Data Snapshot"):
     st.write(session_state)
