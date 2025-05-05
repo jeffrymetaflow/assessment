@@ -1,46 +1,49 @@
-import streamlit as st
-# Step 1: Load module content and metadata
 import os
-import glob
-from langchain.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-
-# Adjust as needed to match your repo structure
-code_paths = glob.glob("src/**/*.py", recursive=True)
-all_docs = []
-for path in code_paths:
-    loader = TextLoader(path, encoding='utf-8')
-    all_docs.extend(loader.load())
-
-# Step 2: Split text into chunks
-splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-split_docs = splitter.split_documents(all_docs)
-
-# Step 3: Create vector store
-from langchain.embeddings.openai import OpenAIEmbeddings
+import streamlit as st
+import pandas as pd
+from typing import List
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.vectorstores import FAISS
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.schema import Document
+from langchain.chains import RetrievalQA
 
-# Add error handling for missing API key
-if "openai" not in st.secrets or "api_key" not in st.secrets["openai"]:
+# --- Load API Key Safely ---
+openai_key = st.secrets.get("openai_api_key") or st.secrets.get("openai", {}).get("api_key")
+if not openai_key:
     raise KeyError("OpenAI API key is missing. Please configure it in the Streamlit secrets.")
 
-embedding_model = OpenAIEmbeddings(openai_key = st.secrets.get("openai_api_key") or st.secrets.get("openai", {}).get("api_key"))
-vectorstore = FAISS.from_documents(split_docs, embedding_model)
+# --- Embed and Store ---
+embedding_model = OpenAIEmbeddings(openai_api_key=openai_key)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=150)
 
-# Step 4: Save to disk for reuse (optional)
-vectorstore.save_local("vector_index")
+VECTOR_INDEX_PATH = "vector_store/faiss_index"
 
-# Step 5: Build retriever
-doc_retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+# --- Initialize vector store (in-memory or persisted) ---
+def build_vector_index(docs: List[str], save_path: str = VECTOR_INDEX_PATH):
+    chunks = text_splitter.create_documents(docs)
+    vectorstore = FAISS.from_documents(chunks, embedding_model)
+    vectorstore.save_local(save_path)
+    return vectorstore
 
-# Step 6: Add retrieval to Smart Consultant agent (in ai_assist.py)
-from langchain.chains import RetrievalQA
-retrieval_chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    retriever=doc_retriever,
-    return_source_documents=True
-)
+# --- Load vector index ---
+def load_vector_index(path: str = VECTOR_INDEX_PATH):
+    return FAISS.load_local(path, embeddings=embedding_model, allow_dangerous_deserialization=True)
 
-def answer_with_code_context(prompt):
-    result = retrieval_chain(prompt)
-    return result['result']
+# --- Ask AI with context from indexed code/doc chunks ---
+def answer_with_code_context(query: str):
+    if not os.path.exists(VECTOR_INDEX_PATH):
+        return "Vector index not found. Please build it first from your code or documentation."
+    
+    vectorstore = load_vector_index()
+    retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+    qa = RetrievalQA.from_chain_type(llm=ChatOpenAI(temperature=0, api_key=openai_key), chain_type="stuff", retriever=retriever)
+    return qa.run(query)
+
+# --- Utility to preview what was indexed ---
+def preview_indexed_docs(path: str = VECTOR_INDEX_PATH):
+    if not os.path.exists(path):
+        return []
+    vectorstore = load_vector_index()
+    return vectorstore.docstore._dict.values()
+
