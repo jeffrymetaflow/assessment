@@ -319,6 +319,20 @@ if st.session_state.components:
     )
     st.plotly_chart(gantt_fig, use_container_width=True)
 
+st.markdown("## 🧠 AI-Powered Roadmap Recommendations")
+
+if st.button("Get Recommendations"):
+    if "components" not in st.session_state:
+        st.warning("No components loaded. Please define architecture components first.")
+    else:
+        systems = get_unique_systems(st.session_state["components"])
+        recommendations = generate_ai_recommendations(st.session_state["components"], systems)
+        st.subheader("🔍 Recommendations")
+        for system, recs in recommendations.items():
+            st.markdown(f"### {system}")
+            for r in recs:
+                st.markdown(f"- {r}")
+
 # --- Simulation Tab ---
 st.subheader("🧪 Simulation Mode: Live Feed Preview")
 st.markdown("Use this simulator to preview how real-time architecture updates might flow into the system from an external AIOps or CMDB API.")
