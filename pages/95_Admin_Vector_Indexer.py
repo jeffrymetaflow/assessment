@@ -1,6 +1,8 @@
 import streamlit as st
 import os
 from utils.vector_index import build_vector_index, preview_indexed_docs
+from utils.auth import enforce_login
+enforce_login()
 
 st.set_page_config(page_title="Vector Index Admin", layout="wide")
 st.title("🧠 Admin: Vector Index Builder")
