@@ -181,9 +181,9 @@ def safe_score_row(row):
 
 # --- Architecture Diagram Tab ---
 with tabs[1]:
-    if st.session_state.components:
-        st.subheader("\U0001F4D0 Architecture Dependency Map")
-        df = pd.DataFrame(st.session_state.components)
+        components = controller.get_components()
+        if components:
+            df = pd.DataFrame(components)
 
         G = nx.Graph()
         for _, row in df.iterrows():
