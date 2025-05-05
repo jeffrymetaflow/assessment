@@ -179,11 +179,10 @@ def safe_score_row(row):
     else:
         st.info("Add components using the form above to get started.")
 
-# --- Architecture Diagram Tab ---
 with tabs[1]:
-        components = controller.get_components()
-        if components:
-            df = pd.DataFrame(components)
+    components = controller.get_components()
+    if components:
+        df = pd.DataFrame(components)
 
         G = nx.Graph()
         for _, row in df.iterrows():
