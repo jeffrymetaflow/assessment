@@ -101,14 +101,21 @@ def tool_roi_justification(prompt):
 
 # --- Extend classifier fallback logic ---
 def fallback_classifier(prompt):
-    fallback_keywords = ["compare", "alternative", "better than", "replace", "options", "suggest"]
-    for keyword in fallback_keywords:
-        if keyword in prompt.lower():
-            return "analyze_product"
-    if "roi" in prompt.lower() or "value of" in prompt.lower():
+    prompt_lower = prompt.lower()
+    if any(k in prompt_lower for k in ["compare", "alternative", "better than", "replace", "options", "suggest"]):
+        return "analyze_product"
+    elif any(k in prompt_lower for k in ["roi", "value of", "justification", "return on investment"]):
         return "tool_roi"
-    if "architecture gap" in prompt.lower() or "best practice" in prompt.lower():
+    elif any(k in prompt_lower for k in ["architecture", "best practice", "design gap", "blueprint"]):
         return "arch_gap"
+    elif any(k in prompt_lower for k in ["it spend", "how much", "summary", "ratio"]):
+        return "report_summary"
+    elif any(k in prompt_lower for k in ["cut", "reduce", "increase", "adjust", "budget change"]):
+        return "adjust_category_forecast"
+    elif any(k in prompt_lower for k in ["risk", "vulnerability", "protection"]):
+        return "show_risk_insight"
+    elif any(k in prompt_lower for k in ["margin", "profit", "efficiency"]):
+        return "optimize_margin"
     return "unknown"
 
 # --- Prompt Input ---
@@ -119,6 +126,8 @@ if st.button("Submit"):
     action = classify_intent(user_prompt)
     if action == "unknown":
         action = fallback_classifier(user_prompt)
+
+    st.info(f"Detected Action: {action}")  # Debugging output
 
     full_prompt = contextualize(user_prompt)
 
