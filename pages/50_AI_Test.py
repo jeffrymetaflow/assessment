@@ -51,3 +51,7 @@ if tavily_key:
         st.error(f"Tavily connection failed: {e}")
 else:
     st.warning("No Tavily API key found in secrets.")
+
+from openai import OpenAI
+client = OpenAI(api_key="your-key")
+client.embeddings.create(input=["hello world"], model="text-embedding-ada-002")
