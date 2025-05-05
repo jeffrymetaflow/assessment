@@ -140,13 +140,13 @@ with tabs[0]:
         st.subheader("📋 Component Mapping Table")
         st.dataframe(df)
 
-        def safe_score_row(row):
-            try:
-                enriched = enrich_component_metadata(row.to_dict())
-                return pd.Series(score_component(enriched))
-            except Exception as e:
-                st.warning(f"Error scoring row {row.get('Name', '')}: {e}")
-                return pd.Series([None, "❌ Error", "#FFFFFF"])
+def safe_score_row(row):
+    try:
+        enriched = enrich_component_metadata(row.to_dict())
+        return pd.Series(score_component(enriched))
+    except Exception as e:
+        st.warning(f"Error scoring row {row.get('Name', '')}: {e}")
+        return pd.Series([None, "❌ Error", "#FFFFFF"])
         
         # Updated scoring with fallback
         cat_df[["AI Score", "Recommendation", "Color"]] = cat_df.apply(safe_score_row, axis=1)
