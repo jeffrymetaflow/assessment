@@ -12,10 +12,8 @@ from utils.intent_classifier import classify_intent
 
 # --- Load API Keys ---
 # --- Overlay Entry Point ---
-def ai_assist_overlay(context=None):
-    try:
-        openai_key = st.secrets["openai_api_key"]
-        tavily_key = st.secrets["tavily_api_key"]
+openai_key = st.secrets.get("openai_api_key") or st.secrets.get("openai", {}).get("api_key")
+tavily_key = st.secrets["tavily_api_key"]
     except KeyError as e:
         st.error(f"Missing secret key: {e}")
         return
