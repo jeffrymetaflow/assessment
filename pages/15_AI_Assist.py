@@ -14,7 +14,7 @@ from utils.session_state import initialize_session
 initialize_session()
 from utils.auth import enforce_login
 enforce_login()
-from utils.vector_index import answer_with_code_context
+from utils.vector_index import answer_with_code_context, preview_indexed_docs
 
 st.set_page_config(page_title="ITRM AI Assistant", layout="wide")
 st.title("\U0001F916 ITRM Conversational AI Assistant")
@@ -208,3 +208,14 @@ if st.session_state.chat_history:
 
 with st.expander("\U0001F527 Session Data Snapshot"):
     st.write(session_state)
+
+st.subheader("🧠 Ask About App Logic or Architecture")
+
+code_query = st.text_input("Ask something about how the app works (e.g., 'How is risk calculated?')")
+
+if st.button("Ask App Logic AI"):
+    if code_query:
+        response = answer_with_code_context(code_query)
+        st.markdown(f"**Consultant (with code context):** {response}")
+    else:
+        st.warning("Please enter a question.")
