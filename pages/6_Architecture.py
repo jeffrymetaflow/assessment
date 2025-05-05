@@ -179,16 +179,37 @@ def safe_score_row(row):
     else:
         st.info("Add components using the form above to get started.")
 
+# --- Architecture Diagram Tab ---
 with tabs[1]:
     components = controller.get_components()
     if components:
         df = pd.DataFrame(components)
 
+        # Try to enrich with "Revenue at Risk ($)" from Executive Dashboard
+        use_dashboard_risk = False
+        if "category_spend_summary" in st.session_state and "category_revenue_impact" in st.session_state:
+            try:
+                cat_summary = st.session_state["category_spend_summary"].copy()
+                impact_map = st.session_state["category_revenue_impact"]
+                cat_summary["Revenue Impact %"] = cat_summary["Category"].map(impact_map)
+                cat_summary["Revenue at Risk ($)"] = cat_summary["Spend"] * (cat_summary["Revenue Impact %"] / 100)
+                df = df.merge(cat_summary[["Category", "Revenue at Risk ($)"]], on="Category", how="left")
+                use_dashboard_risk = True
+            except Exception as e:
+                st.warning(f"Could not apply executive summary risk overlay: {e}")
+
         G = nx.Graph()
         for _, row in df.iterrows():
-            G.add_node(row['Name'], category=row['Category'], spend=row['Spend'], revenue = row['Revenue at Risk ($)'] if use_dashboard_risk else row['Revenue Impact %'])
+            revenue_val = row["Revenue at Risk ($)"] if use_dashboard_risk else row["Revenue Impact %"]
+            G.add_node(
+                row["Name"],
+                category=row["Category"],
+                spend=row["Spend"],
+                revenue=revenue_val,
+                risk=row["Risk Score"]
+            )
 
-        for edge in st.session_state.edges:
+        for edge in st.session_state.get("edges", []):
             G.add_edge(*edge)
 
         pos = nx.spring_layout(G, seed=42)
@@ -199,7 +220,11 @@ with tabs[1]:
             node_x.append(x)
             node_y.append(y)
             attr = G.nodes[node]
-            node_text.append(f"{node}<br>Category: {attr['category']}<br>Spend: ${attr['spend']:,}<br>Revenue Support: {attr['revenue']}%<br>Risk: {attr['risk']}")
+            rev_label = f"${attr['revenue']:,.0f}" if use_dashboard_risk else f"{attr['revenue']}%"
+            node_text.append(
+                f"{node}<br>Category: {attr['category']}<br>Spend: ${attr['spend']:,}"
+                f"<br>Revenue: {rev_label}<br>Risk: {attr['risk']}"
+            )
 
         edge_x, edge_y = [], []
         for edge in G.edges():
@@ -214,16 +239,16 @@ with tabs[1]:
             x=node_x, y=node_y,
             mode='markers+text',
             textposition="top center",
-            marker=dict(size=20, color=df['Risk Score'], colorscale='YlOrRd', showscale=True, colorbar=dict(title="Risk")),
-            text=df['Name'], hovertext=node_text, hoverinfo='text'))
+            marker=dict(size=20, color=df["Risk Score"], colorscale='YlOrRd', showscale=True, colorbar=dict(title="Risk")),
+            text=df["Name"], hovertext=node_text, hoverinfo='text'))
 
         fig.update_layout(title="\U0001F5FA️ Visual Architecture Layout", showlegend=False, height=600, margin=dict(l=20, r=20, t=40, b=20))
         st.plotly_chart(fig, use_container_width=True)
 
-        st.subheader("\U0001F4B0 Financial Summary")
+        st.subheader("💰 Financial Summary")
         col1, col2, col3 = st.columns(3)
         col1.metric("Total IT Spend", f"${df['Spend'].sum():,.0f}")
-        col2.metric("Avg. Revenue Supported", f"{df['Revenue Impact %'].mean():.1f}%")
+        col2.metric("Total Revenue at Risk", f"${df['Revenue at Risk ($)'].sum():,.0f}" if use_dashboard_risk else "—")
         col3.metric("Avg. Risk Score", f"{df['Risk Score'].mean():.1f}")
     else:
         st.info("Add components in the first tab to generate an architecture diagram.")
