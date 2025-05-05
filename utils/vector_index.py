@@ -49,3 +49,10 @@ def preview_indexed_docs(path: str = VECTOR_INDEX_PATH):
     vectorstore = load_vector_index()
     return vectorstore.docstore._dict.values()
 
+# --- New: Get system-level component groups ---
+def get_components_by_system(system_name: str, components: List[dict]):
+    return [comp for comp in components if comp.get("System") == system_name]
+
+# --- New: Return system names from components ---
+def get_unique_systems(components: List[dict]):
+    return sorted(set(comp.get("System") for comp in components if "System" in comp and comp["System"]))
