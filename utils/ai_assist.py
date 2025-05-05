@@ -1,138 +1,192 @@
 import streamlit as st
 import openai
 import os
+import pandas as pd
+import matplotlib.pyplot as plt
 from utils.intent_classifier import classify_intent
 from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
-import matplotlib.pyplot as plt
+from langchain_core.callbacks.manager import CallbackManagerForToolRun
+from utils.session_state import initialize_session
+initialize_session()
+from utils.auth import enforce_login
+enforce_login()
 
-# --- Overlay Entry Point ---
-def ai_assist_overlay(context=None):
-    try:
-        openai_key = st.secrets["openai_api_key"]
-        tavily_key = st.secrets["tavily_api_key"]
-    except KeyError as e:
-        st.error(f"Missing secret key: {e}")
-        return
+st.set_page_config(page_title="ITRM AI Assistant", layout="wide")
+st.title("\U0001F916 ITRM Conversational AI Assistant")
 
-    os.environ["TAVILY_API_KEY"] = tavily_key
-    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=openai_key)
-    search_tool = TavilySearchResults()
-    agent = initialize_agent(
-        tools=[search_tool],
-        llm=llm,
-        agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-        verbose=False,
-        handle_parsing_errors=True
-    )
+# --- Load API Keys with Fallback ---
+try:
+    openai_key = st.secrets["openai_api_key"]
+    tavily_key = st.secrets["tavily_api_key"]
+except KeyError as e:
+    st.error(f"Missing secret key: {e}")
+    st.stop()
 
-    st.markdown("### 🤖 Ask Me Anything")
+# --- Set environment variable for Tavily ---
+os.environ["TAVILY_API_KEY"] = tavily_key
 
-    # Context awareness display
-    if context:
-        st.info("**Context:** " + ", ".join([f"{k}: {v}" for k, v in context.items() if v]))
-
-    st.session_state.setdefault("conversation_history", [])
-
-    user_prompt = st.text_input("What's your question or command?", key="ai_input")
-
-    if st.button("Submit", key="ai_submit") and user_prompt:
-        action = classify_intent(user_prompt)
-
-        if "increase cybersecurity" in user_prompt.lower():
-            st.session_state["Cybersecurity"] = st.session_state.get("Cybersecurity", 200000) * 1.10
-            st.success("🔒 Cybersecurity budget increased by 10%.")
-            return
-
-        try:
-            context_prefix = (
-    "You are a strategic assistant for an IT Revenue Management (ITRM) platform. "
-    "Your job is to guide users through budgeting decisions, category forecasting, IT-to-revenue ratio analysis, "
-    "and strategic optimization across Cybersecurity, BC/DR, Hardware, Software, and Personnel. "
-    "Do not answer like a personal finance assistant. Focus on enterprise-level IT planning."
+# --- Initialize LangChain Web Agent ---
+llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=openai_key)
+search_tool = TavilySearchResults()
+agent = initialize_agent(
+    tools=[search_tool],
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=False,
+    handle_parsing_errors=True
 )
 
-            response = agent.run(f"""{context_prefix}
+def query_langchain_product_agent(prompt):
+    try:
+        return agent.run(prompt)
+    except Exception as e:
+        return f"Error fetching product info: {str(e)}"
 
-{user_prompt}""")
-            st.session_state.conversation_history.append({"user": user_prompt, "ai": response})
-            st.success(response)
-        except Exception as e:
-            st.error(f"AI Error: {e}")
+# --- Use Actual App Session State ---
+if "revenue" not in st.session_state:
+    st.warning("Revenue not found in session state. Please complete the project setup on the main page.")
+    st.stop()
 
-    # --- Grouping remainder in a main container (avoids nested expander issues) ---
-    with st.container():
+categories = ["Hardware", "Software", "Personnel", "Maintenance", "Telecom", "Cybersecurity", "BC/DR"]
 
-        # Conversation History (Flat Display - avoids nested expanders)
-        if st.session_state.conversation_history:
-            st.markdown("### 🧾 Conversation History")
-            for turn in st.session_state.conversation_history:
-                st.markdown(f"**You:** {turn['user']}")
-                if "ai" in turn:
-                    st.markdown(f"**AI:** {turn['ai']}")
+session_state = {cat: 0 for cat in categories}
+for component in st.session_state.get("components", []):
+    cat = component.get("Category")
+    spend = component.get("Spend", 0)
+    if cat in session_state:
+        session_state[cat] += spend
+session_state["Revenue"] = st.session_state.get("revenue", 100_000_000)
 
-        # User journaling
-        st.markdown("### 📝 Notes & Takeaways")
-        notes = st.text_area("What do you want to remember?", key="journal_notes")
-        if st.button("💾 Save Note"):
-            st.session_state.setdefault("journal_log", []).append(notes)
-            st.success("Note saved.")
+# --- Sidebar Context Awareness ---
+st.sidebar.subheader("\U0001F464 Consultant Context")
+user_role = st.sidebar.selectbox("Your Role", ["CIO", "IT Ops", "Finance Lead", "Security Officer"])
+user_goal = st.sidebar.selectbox("Primary Goal", ["Optimize Costs", "Improve Resilience", "Modernize IT", "Enhance Security"])
 
-        if "journal_log" in st.session_state:
-            st.markdown("### 🗂️ Past Notes")
-            for i, note in enumerate(st.session_state.journal_log[::-1]):
-                st.markdown(f"**{len(st.session_state.journal_log)-i}.** {note}")
+def contextualize(prompt):
+    return f"You are advising a {user_role} focused on {user_goal}. {prompt}"
 
-        # Real-time control input
-        st.markdown("### ⚙️ Adjust IT Category Spend")
-        category = st.selectbox("Category to adjust", ["Cybersecurity", "BC/DR", "Hardware", "Personnel", "Software", "Telecom"], key="cat_select")
-        adjustment = st.slider("Adjustment (%)", -50, 50, 10, key="adjustment_slider")
-        if st.button("🔧 Apply Adjustment", key="adjust_apply"):
-            current_val = st.session_state.get(category, 100000)
-            st.session_state[category] = current_val * (1 + adjustment / 100)
-            st.success(f"{category} adjusted by {adjustment}% → ${st.session_state[category]:,.0f}")
+# --- Sample Simulated Actions ---
+def adjust_category_forecast(prompt):
+    for cat in session_state:
+        if cat.lower() in prompt.lower():
+            if "increase" in prompt:
+                session_state[cat] *= 1.10
+                return f"Increased {cat} budget by 10%. New value: ${session_state[cat]:,.0f}"
+            elif "decrease" in prompt:
+                session_state[cat] *= 0.90
+                return f"Decreased {cat} budget by 10%. New value: ${session_state[cat]:,.0f}"
+    return "Which category would you like to adjust?"
 
-        # Strategic Summary Generation
-        if st.button("🧠 Summarize My Strategy", key="summarize_btn"):
-            summary_prompt = f"""
-            Provide a concise strategic recommendation summary based on:
-            - Revenue: {st.session_state.get('revenue')}
-            - IT Expense: {st.session_state.get('it_expense')}
-            - Cybersecurity Spend: {st.session_state.get('Cybersecurity')}
-            - BC/DR: {st.session_state.get('BC/DR')}
-            - Growth Rates: {st.session_state.get('revenue_growth')} / {st.session_state.get('expense_growth')}
-            """
-            try:
-                summary = agent.run(summary_prompt)
-                st.success(summary)
-            except Exception as e:
-                st.error(f"AI Summary Error: {e}")
+def report_summary(prompt):
+    total_spend = sum([v for k, v in session_state.items() if k != "Revenue"])
+    ratio = total_spend / session_state["Revenue"] * 100
+    return f"Total IT Spend: ${total_spend:,.0f}\nIT-to-Revenue Ratio: {ratio:.2f}%"
 
-        # Scenario Simulation
-        st.markdown("### 🔮 Simulate Future Scenario")
-        sim_category = st.selectbox("Which category would you like to simulate?", ["Cybersecurity", "BC/DR", "Hardware", "Personnel", "Software", "Telecom"], key="sim_category")
-        sim_growth = st.slider("Growth Impact (%)", -50, 100, 15, step=5, key="sim_growth")
-        sim_years = st.slider("Years to Project", 1, 5, 3, key="sim_years")
+def recommend_action(prompt):
+    return "You could reduce Telecom and Maintenance by 15% to save money without significantly increasing risk."
 
-        if st.button("📈 Run Simulation", key="run_simulation"):
-            base_val = st.session_state.get(sim_category, 100000)
-            projected = [base_val * ((1 + sim_growth / 100) ** year) for year in range(sim_years)]
-            result_str = "\n".join([f"Year {i+1}: ${val:,.0f}" for i, val in enumerate(projected)])
-            st.success(f"Projected {sim_category} Spend over {sim_years} years with {sim_growth}% growth:\n\n{result_str}")
+def show_risk_insight(prompt):
+    return "Cybersecurity and BC/DR protect 43% of revenue with a combined ROPR of 5.3x."
 
-            # Chart visualization
-            st.markdown("### 📊 Simulation Chart")
-            fig, ax = plt.subplots()
-            ax.plot([f"Year {i+1}" for i in range(sim_years)], projected, marker='o')
-            ax.set_title(f"{sim_category} Spend Simulation")
-            ax.set_ylabel("Spend ($)")
-            ax.set_xlabel("Year")
-            st.pyplot(fig)
+def optimize_margin(prompt):
+    return "To improve margin by 2%, consider reducing Personnel and Maintenance by 5% each."
 
-        # Prompt suggestions
-        st.markdown("### 💡 Suggested Prompts:")
-        st.markdown("- What’s my IT-to-Revenue ratio?")
-        st.markdown("- Where am I overspending?")
-        st.markdown("- Suggest categories to consolidate")
-        st.markdown("- Simulate what happens if BC/DR grows 30% over 3 years")
+def architecture_gap_analysis(prompt):
+    return "Compared to hybrid cloud best practices, you may have an over-concentration in on-prem hardware with limited containerization or automation."
+
+def tool_roi_justification(prompt):
+    return "Switching to Rubrik from Commvault could reduce backup windows by 40% and lower TCO by 15% over 3 years."
+
+# --- Extend classifier fallback logic ---
+def fallback_classifier(prompt):
+    fallback_keywords = ["compare", "alternative", "better than", "replace", "options", "suggest"]
+    for keyword in fallback_keywords:
+        if keyword in prompt.lower():
+            return "analyze_product"
+    if "roi" in prompt.lower() or "value of" in prompt.lower():
+        return "tool_roi"
+    if "architecture gap" in prompt.lower() or "best practice" in prompt.lower():
+        return "arch_gap"
+    return "unknown"
+
+# --- Prompt Input ---
+st.subheader("\U0001F4AC Ask me anything about your IT strategy")
+user_prompt = st.text_input("Type your question or command:", "What is my current IT spend?")
+
+if st.button("Submit"):
+    action = classify_intent(user_prompt)
+    if action == "unknown":
+        action = fallback_classifier(user_prompt)
+
+    full_prompt = contextualize(user_prompt)
+
+    if action == "adjust_category_forecast":
+        response = adjust_category_forecast(user_prompt)
+    elif action == "report_summary":
+        response = report_summary(user_prompt)
+    elif action == "recommend_action":
+        response = recommend_action(user_prompt)
+    elif action == "show_risk_insight":
+        response = show_risk_insight(user_prompt)
+    elif action == "optimize_margin":
+        response = optimize_margin(user_prompt)
+    elif action == "analyze_product":
+        raw_response = query_langchain_product_agent(full_prompt)
+        if "Dell" in raw_response and "NetApp" in raw_response:
+            st.markdown("### Product Comparison Table")
+            st.table({
+                "Feature": ["Focus", "Top Product", "Performance", "Pricing", "Gartner Rating"],
+                "NetApp": [
+                    "Data infrastructure & cloud",
+                    "AFF series",
+                    "Exceptional speed, cutting-edge flash",
+                    "Higher cost",
+                    "Slightly higher"
+                ],
+                "Dell EMC": [
+                    "PCs, servers, storage",
+                    "PowerMax",
+                    "Ultra-low latency, high IOPS",
+                    "More competitive",
+                    "Slightly lower"
+                ]
+            })
+        response = raw_response + "\n\nFeel free to ask: 'Which is better for hybrid workloads?' or 'Compare with Pure Storage'"
+    elif action == "tool_roi":
+        response = tool_roi_justification(full_prompt)
+    elif action == "arch_gap":
+        response = architecture_gap_analysis(full_prompt)
+    else:
+        response = "I'm not sure how to help with that yet. Try asking about your budget, risk, or tools."
+
+    st.success(response)
+
+    # --- Visual Summary Chart ---
+    st.subheader("\U0001F4CA Budget Overview Chart")
+    df = pd.DataFrame({
+        "Category": [k for k in session_state if k != "Revenue"],
+        "Spend": [v for k, v in session_state.items() if k != "Revenue"]
+    })
+    df = df.sort_values("Spend", ascending=False)
+
+    fig, ax1 = plt.subplots()
+    ax1.barh(df["Category"], df["Spend"], color="skyblue", label="Spend")
+    ax1.set_xlabel("Spend ($)")
+    ax1.set_title("IT Budget Allocation with Revenue Ratio")
+
+    ax2 = ax1.twiny()
+    total_spend = df["Spend"].sum()
+    revenue = session_state["Revenue"]
+    ratio = total_spend / revenue * 100
+    ax2.axvline(x=ratio, color='red', linestyle='--', label=f"IT/Revenue Ratio: {ratio:.2f}%")
+    ax2.set_xlim(ax1.get_xlim())
+    ax2.set_xticks([])
+
+    ax1.legend(loc="lower right")
+    st.pyplot(fig)
+
+# --- Debug Info (optional) ---
+with st.expander("\U0001F527 Session Data Snapshot"):
+    st.write(session_state)
