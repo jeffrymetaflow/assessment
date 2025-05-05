@@ -18,3 +18,4 @@ pytesseract
 pillow
 beautifulsoup4
 kaleido
+seaborn
