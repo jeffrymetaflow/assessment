@@ -21,3 +21,4 @@ kaleido
 seaborn
 transformers
 sentence-transformers
+faiss-cpu
