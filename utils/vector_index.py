@@ -2,6 +2,7 @@ import os
 import streamlit as st
 import pandas as pd
 from typing import List
+from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -15,6 +16,7 @@ if not openai_key:
 
 # --- Embed and Store ---
 embedding_model = OpenAIEmbeddings(openai_api_key=openai_key)
+embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=150)
 
 VECTOR_INDEX_PATH = "vector_store/faiss_index"
