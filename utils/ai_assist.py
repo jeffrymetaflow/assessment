@@ -13,8 +13,6 @@ initialize_session()
 from utils.auth import enforce_login
 enforce_login()
 
-st.set_page_config(page_title="ITRM AI Assistant", layout="wide")
-st.title("\U0001F916 ITRM Conversational AI Assistant")
 
 # --- Load API Keys with Fallback ---
 try:
