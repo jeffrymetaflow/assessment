@@ -87,9 +87,14 @@ else:
 # --- Tabs ---
 tabs = st.tabs(["Component Mapping", "Architecture Diagram", "External Import"])
 
-# --- Component Mapping Tab ---
+# --- Component Mapping Tab --- 
 with tabs[0]:
-    st.header("\U0001F4C8 Define Components")
+    st.header("📊 Define Components")
+
+    controller = st.session_state.controller
+    components = controller.get_components()
+    df = pd.DataFrame(components) if components else pd.DataFrame(columns=["Name", "Category", "Spend", "Revenue Impact %", "Risk Score"])
+
     with st.expander("+ Add IT Component"):
         name = st.text_input("Component Name")
         category = st.selectbox("Category", ["Hardware", "Software", "Personnel", "Maintenance", "Telecom", "Cybersecurity", "BC/DR"])
@@ -98,16 +103,24 @@ with tabs[0]:
         risk_score = st.slider("Risk if Fails (0 = none, 100 = catastrophic)", 0, 100, 50)
 
         if st.button("Add Component"):
-            st.session_state.components.append({
-                "Name": name,
-                "Category": category,
-                "Spend": spend,
-                "Revenue Impact %": revenue_support,
-                "Risk Score": risk_score
-            })
+            if name.strip() == "":
+                st.warning("Component name is required.")
+            elif name in df["Name"].values:
+                st.info(f"Component '{name}' already exists.")
+            else:
+                new_comp = {
+                    "Name": name,
+                    "Category": category,
+                    "Spend": spend,
+                    "Revenue Impact %": revenue_support,
+                    "Risk Score": risk_score
+                }
+                components.append(new_comp)
+                controller.set_components(components)
+                st.success(f"Component '{name}' added.")
 
     with st.expander("+ Add Manual Link Between Components"):
-        component_names = [c["Name"] for c in st.session_state.components]
+        component_names = [c["Name"] for c in controller.get_components()]
         if component_names:
             source = st.selectbox("From Component", component_names, key="src")
             target = st.selectbox("To Component", component_names, key="tgt")
@@ -119,15 +132,15 @@ with tabs[0]:
                     st.warning("Invalid or duplicate link.")
 
     # --- Filter by Category ---
-    if st.session_state.components:
-        df = pd.DataFrame(st.session_state.components)
+    if controller.get_components():
+        df = pd.DataFrame(controller.get_components())
         category_filter = st.multiselect("Filter by Category", df["Category"].unique().tolist(), default=df["Category"].unique().tolist())
         df = df[df["Category"].isin(category_filter)]
 
-        st.subheader("\U0001F4CA Component Mapping Table")
+        st.subheader("📋 Component Mapping Table")
         st.dataframe(df)
 
-        st.subheader("\U0001F52C Detailed Category Breakdown with Scores")
+        st.subheader("🧠 Detailed Category Breakdown with Scores")
         categories = df["Category"].unique()
         for cat in categories:
             cat_df = df[df["Category"] == cat]
@@ -136,10 +149,10 @@ with tabs[0]:
                 lambda row: pd.Series(score_component(enrich_component_metadata(row.to_dict()))), axis=1
             )
             cat_df["Suggested Action"] = cat_df["Recommendation"].apply(lambda rec: (
-    "Maintain current configuration" if "Healthy" in rec else
-    "Flag for quarterly review" if "Monitor" in rec else
-    "Review for vendor alternatives / consolidation opportunities"
-))
+                "Maintain current configuration" if "Healthy" in rec else
+                "Flag for quarterly review" if "Monitor" in rec else
+                "Review for vendor alternatives / consolidation opportunities"
+            ))
             with st.expander(f"{cat} - {len(cat_df)} Components"):
                 def highlight_row(row):
                     return ['background-color: {}'.format(row['Color']) if col == 'AI Score' else '' for col in row.index]
