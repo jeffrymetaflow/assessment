@@ -13,7 +13,7 @@ from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from utils.bootstrap import page_bootstrap
-from utils.system_utils import get_unique_systems, get_components_by_system
+from utils.component_utils import get_unique_systems, get_components_by_system
 from utils.session_state import initialize_session
 from utils.auth import enforce_login
 enforce_login()
