@@ -1,6 +1,8 @@
 import streamlit as st
 import openai
 import os
+import pandas as pd
+import matplotlib.pyplot as plt
 from utils.intent_classifier import classify_intent
 from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
@@ -157,6 +159,20 @@ if st.button("Submit"):
         response = "I'm not sure how to help with that yet. Try asking about your budget, risk, or tools."
 
     st.success(response)
+
+    # --- Visual Summary Chart ---
+    st.subheader("\U0001F4CA Budget Overview Chart")
+    df = pd.DataFrame({
+        "Category": [k for k in session_state if k != "Revenue"],
+        "Spend": [v for k, v in session_state.items() if k != "Revenue"]
+    })
+    df = df.sort_values("Spend", ascending=False)
+
+    fig, ax = plt.subplots()
+    ax.barh(df["Category"], df["Spend"], color="skyblue")
+    ax.set_xlabel("Spend ($)")
+    ax.set_title("IT Budget Allocation by Category")
+    st.pyplot(fig)
 
 # --- Debug Info (optional) ---
 with st.expander("\U0001F527 Simulated Data State"):
