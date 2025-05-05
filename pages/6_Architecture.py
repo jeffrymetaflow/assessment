@@ -60,6 +60,9 @@ def initialize_state():
     if 'key' not in st.session_state:
         st.session_state['key'] = 'default_value'
 
+if 'controller' not in st.session_state:
+    st.session_state.controller = None  # Or initialize it with the appropriate value
+
 initialize_session()
 controller = st.session_state.controller
 
