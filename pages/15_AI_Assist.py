@@ -3,6 +3,7 @@ import openai
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 import hashlib
 from utils.intent_classifier import classify_intent
 from langchain.agents import initialize_agent, AgentType
@@ -31,13 +32,38 @@ os.environ["TAVILY_API_KEY"] = tavily_key
 # --- Initialize LangChain Web Agent ---
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=openai_key)
 search_tool = TavilySearchResults()
+
+# 🔍 Enhanced tool for app logic awareness using live module summaries
+def fetch_module_summary(prompt: str, run_manager: CallbackManagerForToolRun = None):
+    components = st.session_state.get("components", [])
+    if not components:
+        return "No component data found to analyze."
+
+    df = pd.DataFrame(components)
+    summary = []
+    summary.append(f"You have {len(df)} components across {df['Category'].nunique()} categories.")
+    summary.append("Top categories by spend:")
+    top = df.groupby("Category")["Spend"].sum().sort_values(ascending=False).head(5)
+    for cat, val in top.items():
+        summary.append(f"- {cat}: ${val:,.0f}")
+    return "\n".join(summary)
+
+from langchain.tools import Tool
+module_summary_tool = Tool(
+    name="AppModuleSummary",
+    func=fetch_module_summary,
+    description="Provides insight into the internal application module architecture and logic."
+)
+
 agent = initialize_agent(
-    tools=[search_tool],
+    tools=[search_tool, module_summary_tool],
     llm=llm,
     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
     verbose=False,
     handle_parsing_errors=True
 )
+
+# --- Remaining logic unchanged below ---
 
 def query_langchain_product_agent(prompt):
     try:
@@ -45,7 +71,6 @@ def query_langchain_product_agent(prompt):
     except Exception as e:
         return f"Error fetching product info: {str(e)}"
 
-# --- Use Actual App Session State ---
 if "revenue" not in st.session_state:
     st.warning("Revenue not found in session state. Please complete the project setup on the main page.")
     st.stop()
@@ -60,7 +85,6 @@ for component in st.session_state.get("components", []):
         session_state[cat] += spend
 session_state["Revenue"] = st.session_state.get("revenue", 100_000_000)
 
-# --- Sidebar Context Awareness ---
 st.sidebar.subheader("\U0001F464 Consultant Context")
 user_role = st.sidebar.selectbox("Your Role", ["CIO", "IT Ops", "Finance Lead", "Security Officer"])
 user_goal = st.sidebar.selectbox("Primary Goal", ["Optimize Costs", "Improve Resilience", "Modernize IT", "Enhance Security"])
@@ -68,7 +92,6 @@ user_goal = st.sidebar.selectbox("Primary Goal", ["Optimize Costs", "Improve Res
 def contextualize(prompt):
     return f"You are advising a {user_role} focused on {user_goal}. {prompt}"
 
-# --- Sample Simulated Actions ---
 def adjust_category_forecast(prompt):
     for cat in session_state:
         if cat.lower() in prompt.lower():
@@ -100,7 +123,6 @@ def architecture_gap_analysis(prompt):
 def tool_roi_justification(prompt):
     return "Switching to Rubrik from Commvault could reduce backup windows by 40% and lower TCO by 15% over 3 years."
 
-# --- Extend classifier fallback logic ---
 def fallback_classifier(prompt):
     prompt_lower = prompt.lower()
     if any(k in prompt_lower for k in ["compare", "alternative", "better than", "replace", "options", "suggest"]):
@@ -119,7 +141,6 @@ def fallback_classifier(prompt):
         return "optimize_margin"
     return "unknown"
 
-# --- Chat History ---
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
@@ -155,37 +176,34 @@ if submitted:
 
     st.session_state.chat_history.append((user_prompt, response))
 
-# --- Display Chat History ---
 for i, (user, bot) in enumerate(reversed(st.session_state.chat_history)):
     st.markdown(f"**You:** {user}")
     st.markdown(f"**Consultant:** {bot}")
     st.markdown("---")
 
-# --- Visual Summary Chart ---
 if st.session_state.chat_history:
-    st.subheader("\U0001F4CA Budget Overview Chart")
+    st.subheader("\U0001F4CA Budget Overview Heatmap")
     df = pd.DataFrame({
         "Category": [k for k in session_state if k != "Revenue"],
         "Spend": [v for k, v in session_state.items() if k != "Revenue"]
-    })
-    df = df.sort_values("Spend", ascending=False)
+    }).sort_values("Spend", ascending=False)
 
-    fig, ax1 = plt.subplots()
-    ax1.barh(df["Category"], df["Spend"], color="skyblue", label="Spend")
-    ax1.set_xlabel("Spend ($)")
-    ax1.set_title("IT Budget Allocation with Revenue Ratio")
+    df["IT/Revenue %"] = df["Spend"] / session_state["Revenue"] * 100
+    df.set_index("Category", inplace=True)
 
-    ax2 = ax1.twiny()
-    total_spend = df["Spend"].sum()
-    revenue = session_state["Revenue"]
-    ratio = total_spend / revenue * 100
-    ax2.axvline(x=ratio, color='red', linestyle='--', label=f"IT/Revenue Ratio: {ratio:.2f}%")
-    ax2.set_xlim(ax1.get_xlim())
-    ax2.set_xticks([])
-
-    ax1.legend(loc="lower right")
+    fig, ax = plt.subplots(figsize=(8, 5))
+    sns.heatmap(df[["Spend"]], annot=True, fmt=".0f", cmap="YlGnBu", linewidths=0.5, ax=ax)
+    ax.set_title("Category-Level IT Spend Heatmap")
     st.pyplot(fig)
 
-# --- Debug Info (optional) ---
+    st.subheader("\U0001F4C8 IT-to-Revenue Ratio by Category")
+    fig2, ax2 = plt.subplots()
+    df["IT/Revenue %"].plot(kind="bar", color="skyblue", ax=ax2)
+    ax2.axhline(y=df["IT/Revenue %"].mean(), color='red', linestyle='--', label=f"Average: {df['IT/Revenue %'].mean():.2f}%")
+    ax2.set_ylabel("% of Revenue")
+    ax2.set_title("Spending Efficiency per Category")
+    ax2.legend()
+    st.pyplot(fig2)
+
 with st.expander("\U0001F527 Session Data Snapshot"):
     st.write(session_state)
