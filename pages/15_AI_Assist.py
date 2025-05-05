@@ -3,6 +3,7 @@ import openai
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+import hashlib
 from utils.intent_classifier import classify_intent
 from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
@@ -118,19 +119,21 @@ def fallback_classifier(prompt):
         return "optimize_margin"
     return "unknown"
 
-# --- Prompt Input ---
-st.subheader("\U0001F4AC Ask me anything about your IT strategy")
-user_prompt = st.text_input("Type your question or command:", "What is my current IT spend?")
+# --- Chat History ---
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
-if st.button("Submit"):
+st.subheader("\U0001F4AC Ask your Smart IT Consultant")
+with st.form("chat_form"):
+    user_prompt = st.text_input("Your question or command:", "What is my current IT spend?")
+    submitted = st.form_submit_button("Ask")
+
+if submitted:
     action = classify_intent(user_prompt)
     if action == "unknown":
         action = fallback_classifier(user_prompt)
 
-    st.info(f"Detected Action: {action}")  # Debugging output
-
     full_prompt = contextualize(user_prompt)
-
     if action == "adjust_category_forecast":
         response = adjust_category_forecast(user_prompt)
     elif action == "report_summary":
@@ -142,27 +145,7 @@ if st.button("Submit"):
     elif action == "optimize_margin":
         response = optimize_margin(user_prompt)
     elif action == "analyze_product":
-        raw_response = query_langchain_product_agent(full_prompt)
-        if "Dell" in raw_response and "NetApp" in raw_response:
-            st.markdown("### Product Comparison Table")
-            st.table({
-                "Feature": ["Focus", "Top Product", "Performance", "Pricing", "Gartner Rating"],
-                "NetApp": [
-                    "Data infrastructure & cloud",
-                    "AFF series",
-                    "Exceptional speed, cutting-edge flash",
-                    "Higher cost",
-                    "Slightly higher"
-                ],
-                "Dell EMC": [
-                    "PCs, servers, storage",
-                    "PowerMax",
-                    "Ultra-low latency, high IOPS",
-                    "More competitive",
-                    "Slightly lower"
-                ]
-            })
-        response = raw_response + "\n\nFeel free to ask: 'Which is better for hybrid workloads?' or 'Compare with Pure Storage'"
+        response = query_langchain_product_agent(full_prompt)
     elif action == "tool_roi":
         response = tool_roi_justification(full_prompt)
     elif action == "arch_gap":
@@ -170,9 +153,16 @@ if st.button("Submit"):
     else:
         response = "I'm not sure how to help with that yet. Try asking about your budget, risk, or tools."
 
-    st.success(response)
+    st.session_state.chat_history.append((user_prompt, response))
 
-    # --- Visual Summary Chart ---
+# --- Display Chat History ---
+for i, (user, bot) in enumerate(reversed(st.session_state.chat_history)):
+    st.markdown(f"**You:** {user}")
+    st.markdown(f"**Consultant:** {bot}")
+    st.markdown("---")
+
+# --- Visual Summary Chart ---
+if st.session_state.chat_history:
     st.subheader("\U0001F4CA Budget Overview Chart")
     df = pd.DataFrame({
         "Category": [k for k in session_state if k != "Revenue"],
