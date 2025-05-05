@@ -27,6 +27,28 @@ st.title("\U0001F5FA️ IT Architecture - Financial Impact Mapper")
 page_bootstrap(current_page="Architecture")
 
 
+def generate_ai_recommendations(components: List[dict], systems: List[str]) -> dict:
+    recommendations = {}
+    for system in systems:
+        comps = get_components_by_system(system, components)
+        comp_names = [comp.get("Name", "Unnamed") for comp in comps]
+        system_summary = ", ".join(comp_names)
+
+        prompt = (
+            f"I'm working on improving an IT system named '{system}' composed of components: {system_summary}.\n"
+            f"What architecture or modernization recommendations would you suggest for this system based on common patterns, performance improvements, and IT best practices?"
+        )
+
+        try:
+            ai_response = answer_with_code_context(prompt)
+        except Exception as e:
+            ai_response = f"⚠️ Error calling AI: {e}"
+
+        recommendations[system] = [ai_response]
+
+    return recommendations
+
+
 # --- AI Agent: Vendor Alternative Suggestion ---
 def get_vendor_replacement_suggestion(component_name, category):
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3, openai_api_key=st.secrets["openai_api_key"])
