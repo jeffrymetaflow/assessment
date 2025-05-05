@@ -11,7 +11,9 @@ def page_bootstrap(current_page="Overview"):
         "current_page": current_page,
         "revenue": st.session_state.get("revenue"),
         "it_expense": st.session_state.get("it_expense"),
-        "components_loaded": len(st.session_state.controller.components) if "controller" in st.session_state else 0,
+        "components_loaded": len(st.session_state.controller.components) 
+                     if "controller" in st.session_state and st.session_state.controller is not None 
+                     else 0,
         "revenue_growth": st.session_state.get("revenue_growth"),
         "expense_growth": st.session_state.get("expense_growth"),
     }
