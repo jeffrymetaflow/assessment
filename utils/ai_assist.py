@@ -1,138 +1,129 @@
-import streamlit as st
 import openai
 import os
-from utils.intent_classifier import classify_intent
+import pandas as pd
+import streamlit as st
 from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
-import matplotlib.pyplot as plt
+from langchain_core.callbacks.manager import CallbackManagerForToolRun
+from langchain.tools import Tool
+from utils.intent_classifier import classify_intent
+from utils.vector_index import answer_with_code_context
 
-# --- Overlay Entry Point ---
-def ai_assist_overlay(context=None):
-    try:
-        openai_key = st.secrets["openai_api_key"]
-        tavily_key = st.secrets["tavily_api_key"]
-    except KeyError as e:
-        st.error(f"Missing secret key: {e}")
-        return
+# --- Load API Keys ---
+openai_key = st.secrets["openai_api_key"]
+tavily_key = st.secrets["tavily_api_key"]
+os.environ["TAVILY_API_KEY"] = tavily_key or ""
 
-    os.environ["TAVILY_API_KEY"] = tavily_key
-    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=openai_key)
-    search_tool = TavilySearchResults()
-    agent = initialize_agent(
-        tools=[search_tool],
-        llm=llm,
-        agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-        verbose=False,
-        handle_parsing_errors=True
-    )
+# --- LangChain Agent ---
+llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=openai_key)
+search_tool = TavilySearchResults()
 
-    st.markdown("### 🤖 Ask Me Anything")
+def fetch_module_summary(prompt: str, run_manager: CallbackManagerForToolRun = None):
+    import streamlit as st
+    components = st.session_state.get("components", [])
+    if not components:
+        return "No component data found to analyze."
+    df = pd.DataFrame(components)
+    summary = [f"You have {len(df)} components across {df['Category'].nunique()} categories."]
+    top = df.groupby("Category")["Spend"].sum().sort_values(ascending=False).head(5)
+    summary.append("Top categories by spend:")
+    for cat, val in top.items():
+        summary.append(f"- {cat}: ${val:,.0f}")
+    return "\n".join(summary)
 
-    # Context awareness display
-    if context:
-        st.info("**Context:** " + ", ".join([f"{k}: {v}" for k, v in context.items() if v]))
-
-    st.session_state.setdefault("conversation_history", [])
-
-    user_prompt = st.text_input("What's your question or command?", key="ai_input")
-
-    if st.button("Submit", key="ai_submit") and user_prompt:
-        action = classify_intent(user_prompt)
-
-        if "increase cybersecurity" in user_prompt.lower():
-            st.session_state["Cybersecurity"] = st.session_state.get("Cybersecurity", 200000) * 1.10
-            st.success("🔒 Cybersecurity budget increased by 10%.")
-            return
-
-        try:
-            context_prefix = (
-    "You are a strategic assistant for an IT Revenue Management (ITRM) platform. "
-    "Your job is to guide users through budgeting decisions, category forecasting, IT-to-revenue ratio analysis, "
-    "and strategic optimization across Cybersecurity, BC/DR, Hardware, Software, and Personnel. "
-    "Do not answer like a personal finance assistant. Focus on enterprise-level IT planning."
+module_summary_tool = Tool(
+    name="AppModuleSummary",
+    func=fetch_module_summary,
+    description="Provides insight into the internal application module architecture and logic."
 )
 
-            response = agent.run(f"""{context_prefix}
+agent = initialize_agent(
+    tools=[search_tool, module_summary_tool],
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=False,
+    handle_parsing_errors=True
+)
 
-{user_prompt}""")
-            st.session_state.conversation_history.append({"user": user_prompt, "ai": response})
-            st.success(response)
-        except Exception as e:
-            st.error(f"AI Error: {e}")
+# --- AI Logic Functions ---
+def adjust_category_forecast(prompt, session_state):
+    for cat in session_state:
+        if cat.lower() in prompt.lower():
+            if "increase" in prompt:
+                session_state[cat] *= 1.10
+                return f"Increased {cat} budget by 10%. New value: ${session_state[cat]:,.0f}"
+            elif "decrease" in prompt:
+                session_state[cat] *= 0.90
+                return f"Decreased {cat} budget by 10%. New value: ${session_state[cat]:,.0f}"
+    return "Which category would you like to adjust?"
 
-    # --- Grouping remainder in a main container (avoids nested expander issues) ---
-    with st.container():
+def report_summary(prompt, session_state):
+    total_spend = sum([v for k, v in session_state.items() if k != "Revenue"])
+    ratio = total_spend / session_state["Revenue"] * 100
+    return f"Total IT Spend: ${total_spend:,.0f}\nIT-to-Revenue Ratio: {ratio:.2f}%"
 
-        # Conversation History (Flat Display - avoids nested expanders)
-        if st.session_state.conversation_history:
-            st.markdown("### 🧾 Conversation History")
-            for turn in st.session_state.conversation_history:
-                st.markdown(f"**You:** {turn['user']}")
-                if "ai" in turn:
-                    st.markdown(f"**AI:** {turn['ai']}")
+def recommend_action(prompt):
+    return "You could reduce Telecom and Maintenance by 15% to save money without significantly increasing risk."
 
-        # User journaling
-        st.markdown("### 📝 Notes & Takeaways")
-        notes = st.text_area("What do you want to remember?", key="journal_notes")
-        if st.button("💾 Save Note"):
-            st.session_state.setdefault("journal_log", []).append(notes)
-            st.success("Note saved.")
+def show_risk_insight(prompt):
+    return "Cybersecurity and BC/DR protect 43% of revenue with a combined ROPR of 5.3x."
 
-        if "journal_log" in st.session_state:
-            st.markdown("### 🗂️ Past Notes")
-            for i, note in enumerate(st.session_state.journal_log[::-1]):
-                st.markdown(f"**{len(st.session_state.journal_log)-i}.** {note}")
+def optimize_margin(prompt):
+    return "To improve margin by 2%, consider reducing Personnel and Maintenance by 5% each."
 
-        # Real-time control input
-        st.markdown("### ⚙️ Adjust IT Category Spend")
-        category = st.selectbox("Category to adjust", ["Cybersecurity", "BC/DR", "Hardware", "Personnel", "Software", "Telecom"], key="cat_select")
-        adjustment = st.slider("Adjustment (%)", -50, 50, 10, key="adjustment_slider")
-        if st.button("🔧 Apply Adjustment", key="adjust_apply"):
-            current_val = st.session_state.get(category, 100000)
-            st.session_state[category] = current_val * (1 + adjustment / 100)
-            st.success(f"{category} adjusted by {adjustment}% → ${st.session_state[category]:,.0f}")
+def architecture_gap_analysis(prompt):
+    return "Compared to hybrid cloud best practices, you may have an over-concentration in on-prem hardware with limited containerization or automation."
 
-        # Strategic Summary Generation
-        if st.button("🧠 Summarize My Strategy", key="summarize_btn"):
-            summary_prompt = f"""
-            Provide a concise strategic recommendation summary based on:
-            - Revenue: {st.session_state.get('revenue')}
-            - IT Expense: {st.session_state.get('it_expense')}
-            - Cybersecurity Spend: {st.session_state.get('Cybersecurity')}
-            - BC/DR: {st.session_state.get('BC/DR')}
-            - Growth Rates: {st.session_state.get('revenue_growth')} / {st.session_state.get('expense_growth')}
-            """
-            try:
-                summary = agent.run(summary_prompt)
-                st.success(summary)
-            except Exception as e:
-                st.error(f"AI Summary Error: {e}")
+def tool_roi_justification(prompt):
+    return "Switching to Rubrik from Commvault could reduce backup windows by 40% and lower TCO by 15% over 3 years."
 
-        # Scenario Simulation
-        st.markdown("### 🔮 Simulate Future Scenario")
-        sim_category = st.selectbox("Which category would you like to simulate?", ["Cybersecurity", "BC/DR", "Hardware", "Personnel", "Software", "Telecom"], key="sim_category")
-        sim_growth = st.slider("Growth Impact (%)", -50, 100, 15, step=5, key="sim_growth")
-        sim_years = st.slider("Years to Project", 1, 5, 3, key="sim_years")
+def query_langchain_product_agent(prompt):
+    try:
+        return agent.run(prompt)
+    except Exception as e:
+        return f"Error fetching product info: {str(e)}"
 
-        if st.button("📈 Run Simulation", key="run_simulation"):
-            base_val = st.session_state.get(sim_category, 100000)
-            projected = [base_val * ((1 + sim_growth / 100) ** year) for year in range(sim_years)]
-            result_str = "\n".join([f"Year {i+1}: ${val:,.0f}" for i, val in enumerate(projected)])
-            st.success(f"Projected {sim_category} Spend over {sim_years} years with {sim_growth}% growth:\n\n{result_str}")
+def fallback_classifier(prompt):
+    prompt_lower = prompt.lower()
+    if any(k in prompt_lower for k in ["compare", "alternative", "better than", "replace", "options", "suggest"]):
+        return "analyze_product"
+    elif any(k in prompt_lower for k in ["roi", "value of", "justification", "return on investment"]):
+        return "tool_roi"
+    elif any(k in prompt_lower for k in ["architecture", "best practice", "design gap", "blueprint"]):
+        return "arch_gap"
+    elif any(k in prompt_lower for k in ["it spend", "how much", "summary", "ratio"]):
+        return "report_summary"
+    elif any(k in prompt_lower for k in ["cut", "reduce", "increase", "adjust", "budget change"]):
+        return "adjust_category_forecast"
+    elif any(k in prompt_lower for k in ["risk", "vulnerability", "protection"]):
+        return "show_risk_insight"
+    elif any(k in prompt_lower for k in ["margin", "profit", "efficiency"]):
+        return "optimize_margin"
+    return "unknown"
 
-            # Chart visualization
-            st.markdown("### 📊 Simulation Chart")
-            fig, ax = plt.subplots()
-            ax.plot([f"Year {i+1}" for i in range(sim_years)], projected, marker='o')
-            ax.set_title(f"{sim_category} Spend Simulation")
-            ax.set_ylabel("Spend ($)")
-            ax.set_xlabel("Year")
-            st.pyplot(fig)
+# --- Central AI Assist Dispatch Function ---
+def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimize Costs"):
+    intent = classify_intent(user_prompt)
+    if intent == "unknown":
+        intent = fallback_classifier(user_prompt)
+    full_prompt = f"You are advising a {role} focused on {goal}. {user_prompt}"
 
-        # Prompt suggestions
-        st.markdown("### 💡 Suggested Prompts:")
-        st.markdown("- What’s my IT-to-Revenue ratio?")
-        st.markdown("- Where am I overspending?")
-        st.markdown("- Suggest categories to consolidate")
-        st.markdown("- Simulate what happens if BC/DR grows 30% over 3 years")
+    if intent == "adjust_category_forecast":
+        return adjust_category_forecast(user_prompt, session_state)
+    elif intent == "report_summary":
+        return report_summary(user_prompt, session_state)
+    elif intent == "recommend_action":
+        return recommend_action(user_prompt)
+    elif intent == "show_risk_insight":
+        return show_risk_insight(user_prompt)
+    elif intent == "optimize_margin":
+        return optimize_margin(user_prompt)
+    elif intent == "analyze_product":
+        return query_langchain_product_agent(full_prompt)
+    elif intent == "tool_roi":
+        return tool_roi_justification(full_prompt)
+    elif intent == "arch_gap":
+        return architecture_gap_analysis(full_prompt)
+    else:
+        return "I'm not sure how to help with that yet. Try asking about your budget, risk, or tools."

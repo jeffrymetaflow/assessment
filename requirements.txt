@@ -18,3 +18,7 @@ pytesseract
 pillow
 beautifulsoup4
 kaleido
+seaborn
+transformers
+sentence-transformers
+faiss-cpu

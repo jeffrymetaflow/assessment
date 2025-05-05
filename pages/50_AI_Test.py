@@ -51,3 +51,4 @@ if tavily_key:
         st.error(f"Tavily connection failed: {e}")
 else:
     st.warning("No Tavily API key found in secrets.")
+
