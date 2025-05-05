@@ -69,3 +69,11 @@ def require_component_data(func):
             init_session_state_from_components(st.session_state.controller)
         return func(*args, **kwargs)
     return wrapper
+
+from typing import List
+
+def get_components_by_system(system_name: str, components: List[dict]):
+    return [comp for comp in components if comp.get("System") == system_name]
+
+def get_unique_systems(components: List[dict]):
+    return sorted(set(comp.get("System") for comp in components if "System" in comp and comp["System"]))
