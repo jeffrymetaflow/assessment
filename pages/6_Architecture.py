@@ -17,6 +17,15 @@ from utils.session_state import initialize_session
 from utils.auth import enforce_login
 enforce_login()
 
+initialize_session()
+controller = st.session_state.controller
+
+st.set_page_config(page_title="IT Architecture to Financial Mapping", layout="wide")
+st.title("\U0001F5FA️ IT Architecture - Financial Impact Mapper")
+
+page_bootstrap(current_page="Architecture")
+
+
 # --- AI Agent: Vendor Alternative Suggestion ---
 def get_vendor_replacement_suggestion(component_name, category):
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3, openai_api_key=st.secrets["openai_api_key"])
@@ -62,14 +71,6 @@ def initialize_state():
 
 if 'controller' not in st.session_state:
     st.session_state.controller = None  # Or initialize it with the appropriate value
-
-initialize_session()
-controller = st.session_state.controller
-
-st.set_page_config(page_title="IT Architecture to Financial Mapping", layout="wide")
-st.title("\U0001F5FA️ IT Architecture - Financial Impact Mapper")
-
-page_bootstrap(current_page="Architecture")
 
 # --- Tabs ---
 tabs = st.tabs(["Component Mapping", "Architecture Diagram", "External Import"])
