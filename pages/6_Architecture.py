@@ -84,6 +84,14 @@ if components:
 else:
     st.warning("No components loaded. Please upload them on the Main page.")
 
+def initialize_architecture_state():
+    if "components" not in st.session_state:
+        st.session_state.components = []
+    if "edges" not in st.session_state:
+        st.session_state.edges = []
+
+initialize_architecture_state()
+
 # --- Tabs ---
 tabs = st.tabs(["Component Mapping", "Architecture Diagram", "External Import"])
 
