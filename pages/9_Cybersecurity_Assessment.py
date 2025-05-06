@@ -673,7 +673,7 @@ elif section == "⚙️ Inputs":
         st.dataframe(cat_df.style.applymap(color_score, subset=["Score (%)"]))
     
 
-# ---------- Overview Summary ----------
+# ---------- AI Recommendations ----------
 elif section == "✅ AI Recommendations":
     st.title("✅ Cybersecurity Assessment AI Recommendations")
     
