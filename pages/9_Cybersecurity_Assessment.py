@@ -676,6 +676,7 @@ elif section == "⚙️ Inputs":
 # ---------- Overview Summary ----------
 if section == "✅ AI Recommendations":
     st.title("✅ Cybersecurity Assessment AI Recommendations")
+    
     if submitted:
         
         # --- AI-Driven Recommendations ---
