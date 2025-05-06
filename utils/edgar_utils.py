@@ -1,6 +1,7 @@
 from sec_edgar_downloader import Downloader
 from utils.ai_assist import answer_with_code_context  # ✅ clean, refactored
 import os
+import re
 
 def fetch_latest_10k_text(ticker: str) -> str:
     """
@@ -29,3 +30,32 @@ def fetch_latest_10k_text(ticker: str) -> str:
         return "No 10-K filing found for the given ticker."
     except Exception as e:
         return f"Error fetching 10-K filing: {str(e)}"
+
+
+def fetch_revenue_from_edgar(ticker: str) -> str:
+    """
+    Fetches the total annual revenue from the latest 10-K filing for the given ticker symbol.
+
+    Args:
+        ticker (str): The stock ticker symbol.
+
+    Returns:
+        str: The total annual revenue reported in the filing, or an error message if it cannot be retrieved.
+    """
+    try:
+        # Step 1: Fetch the latest 10-K filing text
+        filing_content = fetch_latest_10k_text(ticker)
+        if not filing_content:
+            return "No 10-K filing found or unable to fetch content."
+
+        # Step 2: Use regex to extract revenue information
+        # Example pattern to match revenue-related phrases and extract the amount
+        revenue_pattern = r"(?i)(?:total\s+revenue|net\s+sales)\s*[:\s$]*([\d,]+)"
+        match = re.search(revenue_pattern, filing_content)
+        if match:
+            revenue = match.group(1).replace(",", "")  # Remove commas for a clean number
+            return f"Total Revenue: ${revenue}"
+        else:
+            return "Revenue information could not be found in the 10-K filing."
+    except Exception as e:
+        return f"Error fetching revenue: {str(e)}"
