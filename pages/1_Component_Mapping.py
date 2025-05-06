@@ -23,14 +23,17 @@ st.title("🧩 Component Mapping & Master Inputs")
 st.subheader("💼 Organization Financial Inputs")
 
 # Safely pull project revenue and convert to float
-project_revenue = st.session_state.get("project_revenue", 5_000_000)
+def parse_revenue(value):
+    try:
+        cleaned = str(value).replace("$", "").replace(",", "")
+        return float(cleaned)
+    except:
+        return 5_000_000.0
 
-# Try converting in case it's formatted like "$40,000,000"
-try:
-    cleaned = str(project_revenue).replace("$", "").replace(",", "")
-    initial_revenue = float(cleaned)
-except Exception:
-    initial_revenue = 5_000_000.0
+# Prioritize "revenue" key set by main input
+initial_revenue = parse_revenue(
+    st.session_state.get("revenue", st.session_state.get("project_revenue", 5_000_000))
+)
 
 # Ensure the default value and step are the same type (float)
 updated_revenue = st.number_input("Total Revenue ($)", value=initial_revenue, step=100000.0)
