@@ -110,56 +110,56 @@ with st.expander("💵 Project Revenue", expanded=True):
         except:
             st.warning("⚠️ Please enter a valid numeric revenue amount.")
 
-    # SEC-based revenue lookup
-    st.caption("You can also try to auto-fetch revenue from SEC EDGAR by entering a public company's ticker symbol.")
-    ticker = st.text_input("Optional: Company Ticker Symbol (e.g., AAPL, MSFT)", key="sec_ticker")
-    
-    if st.button("🔍 Try Auto-Fetch from SEC EDGAR"):
-        if not ticker:
-            st.warning("Please enter a public company ticker symbol.")
-        else:
-            with st.spinner(f"Fetching 10-K filing for {ticker.upper()}..."):
-                result = fetch_revenue_from_edgar(ticker)
-                st.write("📄 Extracted Revenue:")
-                st.write(result)
-                st.session_state["project_revenue"] = result
+# SEC-based revenue lookup
+st.caption("You can also try to auto-fetch revenue from SEC EDGAR by entering a public company's ticker symbol.")
+ticker = st.text_input("Optional: Company Ticker Symbol (e.g., AAPL, MSFT)", key="sec_ticker")
 
-    # Auto-fetch button
-    if st.session_state.get("client_name"):
-        revenue_button_label = f"🔍 Try Auto-Fetch for “{st.session_state['client_name']}”"
+if st.button("🔍 Try Auto-Fetch from SEC EDGAR"):
+    if not ticker:
+        st.warning("Please enter a public company ticker symbol.")
     else:
-        revenue_button_label = "🔍 Try Auto-Fetch (Enter company name first)"
-        fetch_button = st.button(revenue_button_label, key="revenue_fetch_button")
-        
-        st.caption("Hint: Use a publicly traded company name (e.g., 'Cisco', 'Salesforce') for best results.")
-       
-        if fetch_button:
-            try:
-                import requests
-                from bs4 import BeautifulSoup
+        with st.spinner(f"Fetching 10-K filing for {ticker.upper()}..."):
+            result = fetch_revenue_from_edgar(ticker)
+            st.write("📄 Extracted Revenue:")
+            st.write(result)
+            st.session_state["project_revenue"] = result
+
+# Auto-fetch button
+if st.session_state.get("client_name"):
+    revenue_button_label = f"🔍 Try Auto-Fetch for “{st.session_state['client_name']}”"
+else:
+    revenue_button_label = "🔍 Try Auto-Fetch (Enter company name first)"
+    fetch_button = st.button(revenue_button_label, key="revenue_fetch_button")
     
-                client_name = st.session_state.get ("client_name", "")
-                if not client_name: 
-                    st.warning ("Client name is not set. Please enter a client name first.")
-                    st.stop ()
-                
-                query = f"{client_name} annual revenue site:craft.co"
-                url = f"https://www.google.com/search?q={query}"
-                headers = {"User-Agent": "Mozilla/5.0"}
-                response = requests.get(url, headers=headers)
-                soup = BeautifulSoup(response.text, "html.parser")
-                text = soup.get_text()
-    
-                import re
-                match = re.search(r"\$[\d,]+[MBT]?", text)
-                if match:
-                    st.session_state["project_revenue"] = match.group(0)
-                    st.success(f"Auto-fetched estimated revenue: {match.group(0)}")
-                else:
-                    st.warning("Could not extract revenue. Please enter it manually.")
-    
-            except Exception as e:
-                st.warning(f"Error fetching revenue: {e}")
+    st.caption("Hint: Use a publicly traded company name (e.g., 'Cisco', 'Salesforce') for best results.")
+   
+    if fetch_button:
+        try:
+            import requests
+            from bs4 import BeautifulSoup
+
+            client_name = st.session_state.get ("client_name", "")
+            if not client_name: 
+                st.warning ("Client name is not set. Please enter a client name first.")
+                st.stop ()
+            
+            query = f"{client_name} annual revenue site:craft.co"
+            url = f"https://www.google.com/search?q={query}"
+            headers = {"User-Agent": "Mozilla/5.0"}
+            response = requests.get(url, headers=headers)
+            soup = BeautifulSoup(response.text, "html.parser")
+            text = soup.get_text()
+
+            import re
+            match = re.search(r"\$[\d,]+[MBT]?", text)
+            if match:
+                st.session_state["project_revenue"] = match.group(0)
+                st.success(f"Auto-fetched estimated revenue: {match.group(0)}")
+            else:
+                st.warning("Could not extract revenue. Please enter it manually.")
+
+        except Exception as e:
+            st.warning(f"Error fetching revenue: {e}")
     
     # --- COMPONENT UPLOAD ---
     st.markdown("### 📥 Upload Components")
