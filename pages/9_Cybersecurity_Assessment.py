@@ -75,8 +75,43 @@ if section == "🧠 Overview Summary":
     # Use session state if the form has already been submitted
     section_scores = st.session_state.get("section_scores", default_section_scores)
 
-       # Render the charts
+    # Render the charts
     render_charts(section_scores)
+
+if submitted:
+    
+    # --- AI-Driven Recommendations ---
+    st.header("🧠 AI Recommendations by Category")
+    st.session_state["cyber_maturity_recommendations"] = []
+
+    for _, row in cat_df.iterrows():
+        category = row["Category"]
+        score = row["Score (%)"]
+
+        if score < 50:
+            with st.spinner(f"Generating recommendation for {category}..."):
+                rec = generate_maturity_recommendation(category)
+            st.markdown(f"❌ *{category}* is low maturity.\n\n🔧 **AI Suggestion:** {rec}")
+            st.session_state["cyber_maturity_recommendations"].append({
+                "category": category,
+                "score": score,
+                "recommendation": rec
+            })
+        elif score < 80:
+            st.markdown(f"⚠️ *{category}* is moderately mature. Focus on policy, consolidation, and governance.")
+            st.session_state["cyber_maturity_recommendations"].append({
+                "category": category,
+                "score": score,
+                "recommendation": "Focus on policy, consolidation, and governance."
+            })
+        else:
+            st.markdown(f"✅ *{category}* is highly mature. Maintain and enhance automation.")
+            st.session_state["cyber_maturity_recommendations"].append({
+                "category": category,
+                "score": score,
+                "recommendation": "Maintain and enhance automation."
+            })   
+
 
 # ---------- Inputs Setup ----------
 elif section == "⚙️ Inputs":
@@ -670,7 +705,6 @@ elif section == "⚙️ Inputs":
         st.pyplot(fig2)
         st.dataframe(cat_df.style.applymap(color_score, subset=["Score (%)"]))
     
-    
-
+ 
 
 
