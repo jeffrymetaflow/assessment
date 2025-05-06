@@ -8,6 +8,7 @@ from langchain.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 from langchain.chains import RetrievalQA
+from utils.vector_index import answer_with_code_context
 
 # --- Load API Key Safely ---
 openai_key = st.secrets.get("openai_api_key") or st.secrets.get("openai", {}).get("api_key")
@@ -56,3 +57,18 @@ def get_components_by_system(system_name: str, components: List[dict]):
 # --- New: Return system names from components ---
 def get_unique_systems(components: List[dict]):
     return sorted(set(comp.get("System") for comp in components if "System" in comp and comp["System"]))
+
+def fetch_revenue_from_edgar(ticker: str) -> str:
+    filing = fetch_latest_10k_text(ticker)
+    if not filing:
+        return "❌ Could not retrieve 10-K filing."
+
+    # Limit size for OpenAI
+    excerpt = filing[:3000]
+
+    prompt = (
+        f"The following text is from a company's 10-K filing:\n\n{excerpt}\n\n"
+        f"What is the total annual revenue reported in this filing? Return only the dollar figure."
+    )
+
+    return answer_with_code_context(prompt)
