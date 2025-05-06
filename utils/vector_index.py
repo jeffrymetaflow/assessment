@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import pandas as pd
 from typing import List
-from langchain.embeddings import HuggingFaceEmbeddings
+
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
