@@ -30,7 +30,7 @@ def init_session_state_from_components(controller):
     st.session_state.average_risk = df["Risk Score"].mean()
 
     # Revenue (if controller provides it, else default)
-    st.session_state.revenue = getattr(controller, "revenue", 5_000_000)
+    st.session_state.revenue = controller.get_revenue()
 
     # Expenses by Category ID (mapped to name)
     expense_by_category = df.groupby("Category")["Spend"].sum().to_dict()
