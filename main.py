@@ -109,19 +109,19 @@ with st.expander("💵 Project Revenue", expanded=True):
         except:
             st.warning("⚠️ Please enter a valid numeric revenue amount.")
 
-# SEC-based revenue lookup
-st.caption("You can also try to auto-fetch revenue from SEC EDGAR by entering a public company's ticker symbol.")
-ticker = st.text_input("Optional: Company Ticker Symbol (e.g., AAPL, MSFT)", key="sec_ticker")
-
-if st.button("🔍 Try Auto-Fetch from SEC EDGAR"):
-    if not ticker:
-        st.warning("Please enter a public company ticker symbol.")
-    else:
-        with st.spinner(f"Fetching 10-K filing for {ticker.upper()}..."):
-            result = fetch_revenue_from_edgar(ticker)
-            st.write("📄 Extracted Revenue:")
-            st.write(result)
-            st.session_state["project_revenue"] = result
+    # SEC-based revenue lookup
+    st.caption("You can also try to auto-fetch revenue from SEC EDGAR by entering a public company's ticker symbol.")
+    ticker = st.text_input("Optional: Company Ticker Symbol (e.g., AAPL, MSFT)", key="sec_ticker")
+    
+    if st.button("🔍 Try Auto-Fetch from SEC EDGAR"):
+        if not ticker:
+            st.warning("Please enter a public company ticker symbol.")
+        else:
+            with st.spinner(f"Fetching 10-K filing for {ticker.upper()}..."):
+                result = fetch_revenue_from_edgar(ticker)
+                st.write("📄 Extracted Revenue:")
+                st.write(result)
+                st.session_state["project_revenue"] = result
 
     # Auto-fetch button
     if st.session_state.get("client_name"):
