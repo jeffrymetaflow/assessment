@@ -54,7 +54,7 @@ def answer_with_code_context(query: str):
         vectorstore = load_vector_index()
         retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
         qa = RetrievalQA.from_chain_type(
-            llm=ChatOpenAI(temperature=0, api_key=openai_key),
+            llm=ChatOpenAI(temperature=0, api_key=st.secrets["openai_api_key"]),
             chain_type="stuff",
             retriever=retriever
         )
