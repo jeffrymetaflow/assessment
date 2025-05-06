@@ -148,3 +148,4 @@ def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimiz
     prompt = (
         f"The following text is from a company's 10-K filing:\n\n{excerpt}\n\n"
         f"What is the total annual revenue reported in this filing? Return only the dollar figure."
+)
