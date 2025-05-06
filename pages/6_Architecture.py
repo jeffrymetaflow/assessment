@@ -33,6 +33,15 @@ st.title("\U0001F5FA️ IT Architecture - Financial Impact Mapper")
 
 page_bootstrap(current_page="Architecture")
 
+# Ensure controller exists
+if "controller" not in st.session_state:
+    st.session_state.controller = {}
+
+controller = st.session_state.controller
+
+# Now safe to use controller
+st.write("Architecture Page Loaded")
+
 
 def generate_ai_recommendations(components: List[dict], systems: List[str]) -> dict:
     recommendations = {}
