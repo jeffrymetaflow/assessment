@@ -108,8 +108,6 @@ class ITRMController:
         return {cat: sum(vals)/len(vals) for cat, vals in category_map.items()}
 
 
-class ITRMController:
-    def __init__(self, revenue=5_000_000):
-        self.revenue = revenue
+
     
 
