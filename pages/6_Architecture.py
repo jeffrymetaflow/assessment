@@ -22,6 +22,11 @@ from utils.vector_index import answer_with_code_context
 
 from typing import List
 
+st.set_page_config(page_title="IT Architecture to Financial Mapping", layout="wide")
+st.title("\U0001F5FA️ IT Architecture - Financial Impact Mapper")
+
+page_bootstrap(current_page="Architecture")
+
 # Ensure controller exists
 if "controller" not in st.session_state:
     st.session_state.controller = {}
@@ -35,10 +40,6 @@ st.write("Architecture Page Loaded")
 initialize_session()
 controller = st.session_state.controller
 
-st.set_page_config(page_title="IT Architecture to Financial Mapping", layout="wide")
-st.title("\U0001F5FA️ IT Architecture - Financial Impact Mapper")
-
-page_bootstrap(current_page="Architecture")
 
 def generate_ai_recommendations(components: List[dict], systems: List[str]) -> dict:
     recommendations = {}
