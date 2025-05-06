@@ -11,12 +11,13 @@ initialize_session()
 from utils.auth import enforce_login
 enforce_login()
 
+st.set_page_config(page_title="Strategic Roadmap", layout="wide")
+st.title("📊 Strategic_Roadmap")
+
 # Authenticate and initialize
 page_bootstrap(current_page="Strategic Roadmap")
 enforce_login()
 
-st.set_page_config(page_title="Strategic Roadmap", layout="wide")
-st.title("📊 Strategic_Roadmap")
 st.markdown("""
 ### Strategic Roadmap
 Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
