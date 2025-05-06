@@ -11,77 +11,52 @@ initialize_session()
 from utils.auth import enforce_login
 enforce_login()
 
-st.set_page_config(page_title="Strategic_Roadmap", layout="wide")
-st.title("📈 Strategic_Roadmap")
+# Authenticate and initialize
+page_bootstrap(current_page="Strategic Roadmap")
+enforce_login()
 
-section = "🧭 Strategic Roadmap"  # Define the variable
+st.set_page_config(page_title="Strategic Roadmap", layout="wide")
+st.title("📊 Strategic_Roadmap")
+st.markdown("""
+### Strategic Roadmap
+Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
+""")
 
-page_bootstrap(current_page="Strategic Roadmap")  # Or "Risk Model", etc.
+# Pull AI-enriched recommendations
+recommendations = st.session_state.get("it_maturity_recommendations", [])
 
-# Strategic Roadmap Tab
-if section == "🧭 Strategic Roadmap":
-    st.title("🧭 Strategic Roadmap")
-    st.markdown("""
-    Based on your assessment scores and ITRM trajectory, this roadmap offers recommended actions.
-    """)
+if not recommendations:
+    st.warning("⚠️ No recommendations found. Please complete the IT Maturity Assessment first.")
+    st.stop()
 
-    roadmap_items = []
-    checklist = []
+# Assign roadmap phase by category score
+def assign_phase(score):
+    if score < 50:
+        return "Q1"
+    elif score < 80:
+        return "Q2"
+    else:
+        return "Q3"
 
-    if 'it_maturity_scores' in st.session_state:
-        scores = st.session_state.it_maturity_scores
-        for _, row in scores.iterrows():
-            score = row["Score (%)"]
-            cat = row["Category"]
-            if score >= 80:
-                label = "🟢 Maintain and enhance automation"
-                rec = f"🟢 {cat}: Maintain and enhance automation."
-            elif score >= 50:
-                label = "🟡 Standardize and document processes"
-                rec = f"🟡 {cat}: Standardize and document processes."
-            else:
-                label = "🔴 Prioritize investment and leadership support"
-                rec = f"🔴 {cat}: Prioritize investment and leadership support."
-            roadmap_items.append((cat, label))
-            checklist.append(rec)
-
-    if 'cybersecurity_scores' in st.session_state:
-        for control, score in st.session_state.cybersecurity_scores.items():
-            if score >= 4:
-                label = "✅ Sustain mature practices"
-                rec = f"✅ {control}: Sustain mature practices."
-            elif score == 3:
-                label = "⚠️ Refine documentation and training"
-                rec = f"⚠️ {control}: Consider refining documentation and training."
-            else:
-                label = "❌ Prioritize process implementation and governance"
-                rec = f"❌ {control}: Prioritize process implementation and governance."
-            roadmap_items.append((control, label))
-            checklist.append(rec)
-
-    # Ensure both arrays have the same length
-    quarters = ["Q1", "Q2", "Q3", "Q4"] * ((len(roadmap_items) + 3) // 4)
-    quarters = quarters[:len(roadmap_items)]  # Trim to match the length of roadmap_items
-
-    # Create DataFrame with proper alignment
-    timeline_df = pd.DataFrame({
-        "Quarter": quarters,
-        "Action Item": roadmap_items  # Ensure matching lengths
+roadmap_data = []
+for rec in recommendations:
+    if rec["recommendation"]:
+        action = rec["recommendation"]
+    else:
+        action = "Maintain and enhance automation"
+    roadmap_data.append({
+        "Quarter": assign_phase(rec["score"]),
+        "Category": rec["category"],
+        "Action Item": action
     })
 
-    if roadmap_items:
-        st.subheader("📅 Strategic Timeline by Quarter")
-        timeline_df = timeline_df.dropna().reset_index(drop=True)
-        st.dataframe(timeline_df)
+roadmap_df = pd.DataFrame(roadmap_data)
 
-        st.subheader("✅ Progress Tracker")
-        for quarter in ["Q1", "Q2", "Q3", "Q4"]:
-            st.markdown(f"**{quarter}**")
-            for item in timeline_df[timeline_df["Quarter"] == quarter]["Action Item"]:
-                st.checkbox(f"{item[0]} – {item[1]}", key=f"{quarter}_{item[0]}" )
+st.subheader("📅 Strategic Timeline by Quarter")
+st.dataframe(roadmap_df, use_container_width=True)
 
-    if checklist:
-        st.markdown("---")
-        st.subheader("🗒️ Your Strategic Checklist")
-        for item in checklist:
-            st.markdown(f"- [ ] {item}")
+st.subheader("✅ Progress Tracker")
+for quarter in sorted(roadmap_df["Quarter"].unique()):
+    st.markdown(f"#### {quarter}")
+    for _, row in roadmap_df[roadmap_df["Quarter"] == quarter].iterrows():
+        st.checkbox(f"{row['Category']} – {row['Action Item']}", key=f"{row['Category']}_{quarter}")
