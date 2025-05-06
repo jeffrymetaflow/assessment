@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 initialize_session()
+from controller.controller import ITRMController  # still needed for typing or fallback init
 from utils.auth import enforce_login
 enforce_login()
 
@@ -11,6 +12,11 @@ st.set_page_config(page_title="Unified Executive Dashboard", layout="wide")
 st.title("\U0001F4CA Unified Executive Dashboard")
 
 page_bootstrap(current_page="Executive Dashboard")  # Or "Risk Model", etc.
+
+if "controller" not in st.session_state:
+    st.session_state.controller = ITRMController()  # optional safety net, especially if page loads standalone
+
+controller = st.session_state.controller
 
 # --- Sidebar Inputs ---
 st.sidebar.header("\U0001F4B0 High-Level Inputs")
