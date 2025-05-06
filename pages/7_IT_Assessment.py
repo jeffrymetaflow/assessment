@@ -8,110 +8,47 @@ enforce_login()
 
 # Embedded grouped questions JSON (shortened for readability — insert full content below)
 grouped_questions = {
-    "Managed / Automated": [
-        "Failover between sites",
-        "Software Intelligence",
-        "Converged Infrastructure standardization",
-        "Replication",
-        "User Defined Recovery",
-        "•Standard set of OS, MW, DB instances, customization by exception",
-        "Non-Disruptive Upgrades",
-        "Automated Capacity Upgrade",
-        "Dynamic Resource Pools",
-        "Workflow automation encapsulating  best practice availability management",
-        "Capacity Automation Triggers",
-        "Admin assisted provisioning of users privileges",
-        "Federated access to multiple systems",
-        "Customer and business focused, IT service and delivery centric organization, formal governance",
-        "Formal IT management processes/tools/architecture; shared services; aggregated capacity management ",
-        "IT service cost metrics",
-        "Dynamic optimization of IT services; consolidated converged operations IT staff",
-        "Extensive infrastructure monitoring for availability",
-        "Automated failover of resources; always on",
-        "Workload independence and prioritization",
-        "Mulit-Tenancy security enabled",
-        "•Allocations based on cost neutral / cost recovery method (cost center approach)"
+    "Survival / Legacy / Ad-Hoc": [
+        "Infrastructure is manually provisioned with minimal automation.",
+        "Separate physical servers and storage are used for each workload.",
+        "Backups exist but are manual and inconsistently tested.",
+        "No formal incident response process or security oversight.",
+        "Monitoring is siloed or reactive only."
     ],
-    "Awareness, measured, semi-automated": [
-        "Parameters Identified to evaluate each silo ",
-        "Standardized silo hardware",
-        "Standardized Back Up System",
-        "•Limited OS / MW rationalization (multiple OS versions, multiple database versions)",
-        "ITSM governance oversight of tools/scripts",
-        "Centralized authentication (e.g. RADIUS, TACACS+, LDAP, 802.1x)",
-        "Defined IT organization for infrastructure and operations",
-        "Site to Site Replication",
-        "•Cost allocation based on  technology components"
+    "Standardized / Service-Aligned": [
+        "Standard operating environments (SOEs) exist for OS, middleware, and database.",
+        "IT service management (ITSM) processes are documented and partially adopted.",
+        "SLAs and RTO/RPOs are defined for key applications.",
+        "Service request and incident tracking is centralized (e.g. via ITSM tool).",
+        "Network architecture is documented and maintained to reference standards."
     ],
-    "Private x As a Service (xAAS)": [
-        "Single Call Support",
-        "Software Intelligence",
-        "Capacity management meets demand",
-        "Network Roles, flows, and key sequences are continually monitored and measured for performance",
-        "User restoration capabilities",
-        "Shared Pools of Resources"
+    "Virtualized / Cloud-Ready": [
+        "Most workloads are virtualized or containerized.",
+        "Cloud usage (public/private) is governed via policy.",
+        "Infrastructure is provisioned through templates or IaC (e.g., Terraform, CloudFormation).",
+        "Role-based access controls are centrally managed.",
+        "Security patches and updates are deployed on a defined schedule."
     ],
-    "Awareness, measured, semi-automated                                 Consolidated": [
-        "Multiple VMs/Server",
-        "Application not tied to physical infrastructure",
-        "Reporting Identified",
-        "Capacity Planing Capable",
-        "Multi site delivery"
+    "Automated / Observability-Driven": [
+        "Infrastructure provisioning and app deployment are fully automated via CI/CD.",
+        "Centralized observability is in place (e.g., logs, metrics, traces).",
+        "Configuration drift is automatically detected and remediated.",
+        "Automated testing is included in deployment pipelines.",
+        "Automated scaling and self-healing systems are in use."
     ],
-    "Business Partnership/Innovation Optimized": [
-        "Virtualized Pool of Resources",
-        "User defined back up",
-        "•Limited, standard OS images – forced compliance of use, no customization",
-        "User provisioning of defined IT service catalog applications – self service portal",
-        "Orchestration is initiated by user portal",
-        "No E2E service impact from security exposure",
-        "Dynamic optimization of IT services; consolidated converged operations IT staff",
-        "Application resources pooled across multiple data centers",
-        "•Accurate activity based costing (ABC) models"
+    "Business-Aligned / Self-Service": [
+        "Business KPIs are directly tied to IT service metrics and dashboards.",
+        "Users can self-provision services from a defined catalog.",
+        "Cost allocation is activity-based or tagged per service/user/project.",
+        "Cross-functional teams collaborate on IT planning and forecasting.",
+        "IT investment decisions are driven by business value and outcome modeling."
     ],
-    "Committed, Continuous Improvement, Redundant": [
-        "Upgrade Schedule Formalized",
-        "Point in Time Restoration",
-        "•Standardized / rationalized OS to hypervisor supported instances",
-        "Standard templates evolve from analyzing provisioning patterns",
-        "Risks and impact to E2E service must be included for provision, assurance and dialogue services.",
-        "Technology centric organization; investment in IT service desk function and staff",
-        "Configuration/Policy/Capacity management at the SW layer, not HW layer",
-        "•Cost allocation based on necessary bundled infrastructure components (i.e. servers, storage, network)"
-    ],
-    "Committed, Continuous Improvement, Redundant Virtualized": [
-        "Upgrade Roadmap",
-        "Failover capability",
-        "Capacity on Demand",
-        "Financial Metrics identified"
-    ],
-    "Consolidated ": [
-        "Reference architecture standards",
-        "Network sequences or value flows are repeatable",
-        "SLA defined timelines and restoration",
-        "RPO/RTO Defined",
-        "Applications Categorized"
-    ],
-    "Service Aligned/Standardization/High Availability": [
-        "No Single Point of Failure",
-        "Data Deduplication",
-        "•Gold instances of OS, MW, DB for automated provisioning",
-        "Application classification",
-        "Service Level Management "
-    ],
-    "Survival, Ad-Hoc, Manual Legacy ": [
-        "Network consists of routers, switches, LAN/WAN",
-        "Separate, multi-vendor individual servers providing single use/application services per server",
-        "Separate, multi-vendor individual storage providing single use/application services per storage",
-        "Back Up for restoring in case of data center disaster",
-        "Non-uniform custom racks, power connections, and cable management."
-    ],
-    "Virtualized": [
-        "Failover within Silo and Infrastructure",
-        "Converged Infrastructure adoption",
-        "Manufactured HW/CI out of the factory",
-        "Network defined and documented standard sequences and specific transactions between roles",
-        "Network metrics are used effectively to control different flows and sequence variations"
+    "Innovative / Predictive / Autonomous": [
+        "AI/ML is used for predictive capacity planning or anomaly detection.",
+        "Security is integrated into CI/CD pipelines (DevSecOps).",
+        "Cloud cost optimization is automated with policy-based actions.",
+        "Disaster recovery and failover are tested regularly and auto-validated.",
+        "Digital twin or simulation models are used for infrastructure planning."
     ]
 }
 st.set_page_config(page_title="IT Maturity Assessment", layout="wide")
