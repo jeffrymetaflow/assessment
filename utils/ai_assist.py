@@ -118,6 +118,19 @@ def fallback_classifier(prompt):
         return "optimize_margin"
     return "unknown"
 
+def generate_maturity_recommendation(category: str, question_summary: str = "") -> str:
+    """
+    Uses the AI assistant to generate improvement recommendations for a low-maturity category.
+    """
+    prompt = (
+        f"The IT maturity category '{category}' scored low. "
+        f"Recommend practical steps, tools, services, or best practices that could help an organization "
+        f"improve in this area. {question_summary.strip() if question_summary else ''} "
+        f"Focus on changes that could shift this maturity from 'low' to 'moderate' or 'high'."
+    )
+    response = llm.invoke(prompt)
+    return response.content.strip()
+
 # --- Central AI Assist Dispatch Function ---
 def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimize Costs"):
     intent = classify_intent(user_prompt)
