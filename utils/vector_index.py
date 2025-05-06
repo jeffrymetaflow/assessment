@@ -14,10 +14,12 @@ openai_key = st.secrets.get("openai_api_key") or st.secrets.get("openai", {}).ge
 if not openai_key:
     raise KeyError("OpenAI API key is missing. Please configure it in the Streamlit secrets.")
 
-# --- Embed and Store ---
-embedding_model = OpenAIEmbeddings(openai_api_key=openai_key)
-embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=150)
+USE_HUGGINGFACE = False  # Change to True for local dev
+
+if USE_HUGGINGFACE:
+    embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+else:
+    embedding_model = OpenAIEmbeddings(openai_api_key=openai_key)
 
 VECTOR_INDEX_PATH = "vector_store/faiss_index"
 
