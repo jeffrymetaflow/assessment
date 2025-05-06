@@ -129,14 +129,6 @@ def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimiz
         return "I'm not sure how to help with that yet. Try asking about your budget, risk, or tools."
 
 
-def fetch_revenue_from_edgar(ticker: str) -> str:
-    filing = fetch_latest_10k_text(ticker)
-    if not filing:
-        return "❌ Could not retrieve 10-K filing."
-
-    # Limit size for OpenAI
-    excerpt = filing[:3000]
-
     prompt = (
         f"The following text is from a company's 10-K filing:\n\n{excerpt}\n\n"
         f"What is the total annual revenue reported in this filing? Return only the dollar figure."
