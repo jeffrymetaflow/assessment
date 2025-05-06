@@ -107,6 +107,7 @@ if "project_id" in st.session_state:
             try:
                 numeric_revenue = float(revenue_input.replace(",", "").replace("$", ""))
                 st.session_state["revenue"] = numeric_revenue
+                st.session_state.controller.set_revenue(numeric_revenue)
             except:
                 st.warning("⚠️ Please enter a valid numeric revenue amount.")
     
@@ -123,7 +124,7 @@ if "project_id" in st.session_state:
                 st.write("📄 Extracted Revenue:")
                 st.write(result)
                 st.session_state["project_revenue"] = result
-    
+                st.session_state.controller.set_revenue(numeric_revenue)
     # Auto-fetch button
     if st.session_state.get("client_name"):
         revenue_button_label = f"🔍 Try Auto-Fetch for “{st.session_state['client_name']}”"
