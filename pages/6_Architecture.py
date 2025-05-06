@@ -19,7 +19,7 @@ from utils.auth import enforce_login
 enforce_login()
 from utils.component_utils import get_components_by_system
 from utils.vector_index import answer_with_code_context
-
+from utils.controller import ITRMController
 from typing import List
 
 st.set_page_config(page_title="IT Architecture to Financial Mapping", layout="wide")
@@ -29,10 +29,9 @@ page_bootstrap(current_page="Architecture")
 
 # Ensure controller exists
 if "controller" not in st.session_state:
-    st.session_state.controller = {}
+    st.session_state.controller = ITRMController()
 
 controller = st.session_state.controller
-components = controller.get_components()
 
 # Now safe to use controller
 st.write("Architecture Page Loaded")
