@@ -4,6 +4,7 @@ import plotly.express as px
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 initialize_session()
+from utils.ai_assist import generate_maturity_recommendation
 from utils.auth import enforce_login
 enforce_login()
 
@@ -124,18 +125,34 @@ if submitted:
     - **Below 50%**: Low maturity — ad-hoc or siloed
     """)
 
-    # Recommendations Section
-    st.header("🧭 Recommendations by Category")
-    for _, row in score_df.iterrows():
-        score = row["Score (%)"]
-        category = row["Category"]
-        if score >= 80:
-            rec = f"✅ *{category}* is highly mature. Continue optimizing with automation and cross-domain integration."
-        elif score >= 50:
-            rec = f"⚠️ *{category}* shows moderate maturity. Focus on standardization, consolidation, and governance improvements."
-        else:
-            rec = f"❌ *{category}* is low maturity. Prioritize modernization, documentation, and automation."
-        st.markdown(rec)
+# Recommendations Section
+st.header("🧭 Recommendations by Category")
+
+# Clear old recommendations once
+st.session_state["it_maturity_recommendations"] = []
+
+for _, row in score_df.iterrows():
+    score = row["Score (%)"]
+    category = row["Category"]
+
+    if score >= 80:
+        rec = f"✅ *{category}* is highly mature. Continue optimizing with automation and cross-domain integration."
+        rec_text = None
+    elif score < 50:
+        with st.spinner(f"🔍 Generating AI recommendation for {category}..."):
+            rec_text = generate_maturity_recommendation(category)
+        rec = f"❌ *{category}* is low maturity.\n\n🔧 **AI Recommendation:** {rec_text}"
+    else:
+        rec = f"⚠️ *{category}* shows moderate maturity. Focus on standardization, consolidation, and governance improvements."
+        rec_text = None
+
+    st.markdown(rec)
+
+    st.session_state["it_maturity_recommendations"].append({
+        "category": category,
+        "score": score,
+        "recommendation": rec_text
+    })
 
 # ---------------- Admin Tab: Edit Questions ----------------
 st.markdown("---")
