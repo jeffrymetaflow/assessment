@@ -127,10 +127,10 @@ if submitted:
 
 if submitted:
 # Recommendations Section
-st.header("🧭 Recommendations by Category")
+    st.header("🧭 Recommendations by Category")
 
 # Clear old recommendations once
-st.session_state["it_maturity_recommendations"] = []
+    st.session_state["it_maturity_recommendations"] = []
     for _, row in score_df.iterrows():
         score = row["Score (%)"]
         category = row["Category"]
