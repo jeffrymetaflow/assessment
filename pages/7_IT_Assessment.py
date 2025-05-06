@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 initialize_session()
@@ -100,9 +101,20 @@ if submitted:
         .background_gradient(cmap="RdYlGn", subset=["Score (%)"])
 )
 
-    # Bar chart view
-    st.subheader("📈 Bar Chart of Scores")
-    st.bar_chart(score_df.set_index("Category"))
+    st.subheader("📈 Bar Chart of Scores (Color-Coded)")
+    
+    fig = px.bar(
+        score_df,
+        x="Category",
+        y="Score (%)",
+        color="Score (%)",
+        color_continuous_scale="RdYlGn",
+        range_y=[0, 100],
+        text="Score (%)",
+        title="IT Maturity by Category"
+    )
+    fig.update_layout(xaxis_tickangle=-45)
+    st.plotly_chart(fig, use_container_width=True)
 
     
     st.markdown("""
