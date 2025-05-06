@@ -15,6 +15,7 @@ st.sidebar.title("Navigation")
 section = st.sidebar.radio("Go to", [
     "🧠 Overview Summary",
     "⚙️ Inputs",
+    "✅ AI Recommendations",
     ])
 
 # Check if "component_mapping" exists in session state
@@ -672,11 +673,13 @@ elif section == "⚙️ Inputs":
         st.dataframe(cat_df.style.applymap(color_score, subset=["Score (%)"]))
     
 
-
+# ---------- Overview Summary ----------
+if section == "✅ AI Recommendations":
+    st.title("✅ Cybersecurity Assessment AI Recommendations")
     if submitted:
         
         # --- AI-Driven Recommendations ---
-        st.header("🧠 AI Recommendations by Category")
+        st.header("✅ AI Recommendations by Category")
         st.session_state["cyber_maturity_recommendations"] = []
     
         for _, row in cat_df.iterrows():
