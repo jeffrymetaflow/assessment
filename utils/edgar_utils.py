@@ -1,4 +1,5 @@
 from sec_edgar_downloader import Downloader
+from utils.vector_index import answer_with_code_context
 import os
 
 def fetch_latest_10k_text(ticker: str) -> str:
