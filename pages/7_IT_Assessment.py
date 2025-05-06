@@ -125,13 +125,12 @@ if submitted:
     - **Below 50%**: Low maturity — ad-hoc or siloed
     """)
 
+if submitted:
 # Recommendations Section
 st.header("🧭 Recommendations by Category")
 
-if submitted:
 # Clear old recommendations once
 st.session_state["it_maturity_recommendations"] = []
-
     for _, row in score_df.iterrows():
         score = row["Score (%)"]
         category = row["Category"]
