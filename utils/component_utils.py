@@ -77,3 +77,14 @@ def get_components_by_system(system_name: str, components: List[dict]):
 
 def get_unique_systems(components: List[dict]):
     return sorted(set(comp.get("System") for comp in components if "System" in comp and comp["System"]))
+
+class Controller:
+    def __init__(self, components=None, revenue=5_000_000):
+        self.components = components if components else []
+        self.revenue = revenue
+
+    def get_components(self):
+        return self.components
+
+    def set_components(self, components):
+        self.components = components
