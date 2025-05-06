@@ -107,7 +107,7 @@ if "project_id" in st.session_state:
             try:
                 numeric_revenue = float(revenue_input.replace(",", "").replace("$", ""))
                 st.session_state["revenue"] = numeric_revenue
-                st.session_state.controller.set_revenue(numeric_revenue)
+                
             except:
                 st.warning("⚠️ Please enter a valid numeric revenue amount.")
     
