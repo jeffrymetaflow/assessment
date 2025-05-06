@@ -58,6 +58,4 @@ def get_unique_systems(components: List[dict]):
     return sorted(set(comp.get("System") for comp in components if "System" in comp and comp["System"]))
 
 
-    )
 
-    return answer_with_code_context(prompt)
