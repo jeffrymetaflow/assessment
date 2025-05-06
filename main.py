@@ -13,7 +13,7 @@ from utils.session_state import initialize_session
 initialize_session()
 from utils.auth import enforce_login
 enforce_login()
-
+from utils.edgar_utils import fetch_revenue_from_edgar
 
 # ✅ MUST BE FIRST STREAMLIT COMMAND
 st.set_page_config(page_title="ITRM Main Dashboard", layout="wide")
@@ -94,20 +94,34 @@ elif step == "📂 Open Existing Project":
 if "project_id" in st.session_state:
     st.success(f"📁 Active Project: {st.session_state['client_name']} | {st.session_state['project_name']}")
 
-    # --- REVENUE SETUP ---
-    with st.expander("💵 Project Revenue", expanded=True):
-        st.markdown("## 💵 Project Revenue")
-        st.caption("Enter the annual revenue this IT architecture supports. You can type it manually or click auto-fetch:")
-    
-        revenue_input = st.text_input("Annual Revenue (USD)", key="project_revenue")
-    
-        # 🧠 Sync to global 'revenue' state
-        if revenue_input:
-            try:
-                numeric_revenue = float(revenue_input.replace(",", "").replace("$", ""))
-                st.session_state["revenue"] = numeric_revenue
-            except:
-                st.warning("⚠️ Please enter a valid numeric revenue amount.")
+# --- REVENUE SETUP ---
+with st.expander("💵 Project Revenue", expanded=True):
+    st.markdown("## 💵 Project Revenue")
+    st.caption("Enter the annual revenue this IT architecture supports. You can type it manually or click auto-fetch:")
+
+    revenue_input = st.text_input("Annual Revenue (USD)", key="project_revenue")
+
+    # 🧠 Sync to global 'revenue' state
+    if revenue_input:
+        try:
+            numeric_revenue = float(revenue_input.replace(",", "").replace("$", ""))
+            st.session_state["revenue"] = numeric_revenue
+        except:
+            st.warning("⚠️ Please enter a valid numeric revenue amount.")
+
+# SEC-based revenue lookup
+st.caption("You can also try to auto-fetch revenue from SEC EDGAR by entering a public company's ticker symbol.")
+ticker = st.text_input("Optional: Company Ticker Symbol (e.g., AAPL, MSFT)", key="sec_ticker")
+
+if st.button("🔍 Try Auto-Fetch from SEC EDGAR"):
+    if not ticker:
+        st.warning("Please enter a public company ticker symbol.")
+    else:
+        with st.spinner(f"Fetching 10-K filing for {ticker.upper()}..."):
+            result = fetch_revenue_from_edgar(ticker)
+            st.write("📄 Extracted Revenue:")
+            st.write(result)
+            st.session_state["project_revenue"] = result
 
     # Auto-fetch button
     if st.session_state.get("client_name"):
