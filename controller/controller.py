@@ -8,10 +8,7 @@ class ITRMController:
         self.simulation_results = {}
         self.forecast_model = {}
         self.financial_summary = {}
-
-    def __init__(self, revenue=5_000_000):
-        self.revenue = revenue    
-    
+   
     def get_components(self):
             return self.components
 
