@@ -32,6 +32,7 @@ if "controller" not in st.session_state:
     st.session_state.controller = {}
 
 controller = st.session_state.controller
+components = controller.get_components()
 
 # Now safe to use controller
 st.write("Architecture Page Loaded")
