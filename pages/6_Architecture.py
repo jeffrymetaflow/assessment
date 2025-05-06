@@ -18,7 +18,8 @@ from utils.session_state import initialize_session
 from utils.auth import enforce_login
 enforce_login()
 from utils.component_utils import get_components_by_system
-from pages.utils.lang_utils import answer_with_code_context  # Adjust if needed
+from utils.vector_index import answer_with_code_context
+
 from typing import List
 
 
