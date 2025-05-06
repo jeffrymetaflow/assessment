@@ -8,7 +8,6 @@ from langchain.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 from langchain.chains import RetrievalQA
-from utils.vector_index import answer_with_code_context
 
 # --- Load API Key Safely ---
 openai_key = st.secrets.get("openai_api_key") or st.secrets.get("openai", {}).get("api_key")
