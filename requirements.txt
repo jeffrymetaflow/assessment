@@ -22,3 +22,4 @@ seaborn
 transformers
 sentence-transformers
 faiss-cpu
+sec-edgar-downloader
