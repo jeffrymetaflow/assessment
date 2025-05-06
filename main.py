@@ -9,11 +9,12 @@ from io import BytesIO
 from fpdf import FPDF
 from controller.controller import ITRMController
 from utils.bootstrap import page_bootstrap
+from utils.edgar_utils import fetch_revenue_from_edgar
 from utils.session_state import initialize_session
 initialize_session()
 from utils.auth import enforce_login
 enforce_login()
-from utils.edgar_utils import fetch_revenue_from_edgar
+
 
 # ✅ MUST BE FIRST STREAMLIT COMMAND
 st.set_page_config(page_title="ITRM Main Dashboard", layout="wide")
