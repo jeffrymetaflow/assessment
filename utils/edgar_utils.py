@@ -1,5 +1,6 @@
 from sec_edgar_downloader import Downloader
 from utils.ai_assist import answer_with_code_context  # ✅ clean, refactored
+import os
 
 def fetch_latest_10k_text(ticker: str) -> str:
     dl = Downloader()
