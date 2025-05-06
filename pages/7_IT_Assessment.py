@@ -128,6 +128,7 @@ if submitted:
 # Recommendations Section
 st.header("🧭 Recommendations by Category")
 
+if submitted:
 # Clear old recommendations once
 st.session_state["it_maturity_recommendations"] = []
 
