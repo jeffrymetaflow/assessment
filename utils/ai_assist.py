@@ -46,6 +46,22 @@ agent = initialize_agent(
     handle_parsing_errors=True
 )
 
+def answer_with_code_context(query: str):
+    if not openai_key:
+        return "❌ OpenAI API key not configured."
+
+    try:
+        vectorstore = load_vector_index()
+        retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+        qa = RetrievalQA.from_chain_type(
+            llm=ChatOpenAI(temperature=0, api_key=openai_key),
+            chain_type="stuff",
+            retriever=retriever
+        )
+        return qa.run(query)
+    except Exception as e:
+        return f"❌ AI error: {e}"
+
 # --- AI Logic Functions ---
 def adjust_category_forecast(prompt, session_state):
     for cat in session_state:
