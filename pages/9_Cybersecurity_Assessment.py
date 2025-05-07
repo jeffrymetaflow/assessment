@@ -674,7 +674,7 @@ elif section == "⚙️ Inputs":
     
 
 # ---------- AI Recommendations ----------
-submitted = st.session_state.get("cyber_form_submitted", False)
+
 
 if section == "✅ AI Recommendations":
     st.title("✅ Cybersecurity Assessment AI Recommendations")
