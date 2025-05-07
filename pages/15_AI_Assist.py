@@ -10,6 +10,7 @@ from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from langchain_core.callbacks.manager import CallbackManagerForToolRun
+from utils.ai_assist import generate_maturity_recommendation_with_products
 from utils.session_state import initialize_session
 initialize_session()
 from utils.auth import enforce_login
@@ -232,3 +233,16 @@ if st.button("Ask App Logic AI"):
         st.markdown(f"**Consultant (with code context):** {response}")
     else:
         st.warning("Please enter a question.")
+
+
+st.subheader("🧠 Ask for a Category-Specific AI Recommendation")
+category_input = st.text_input("Enter a Cybersecurity or IT category (e.g., 'Identity', 'Endpoint Protection')")
+
+if st.button("🔍 Generate Smart Recommendation") and category_input:
+    with st.spinner(f"Analyzing maturity gap for '{category_input}'..."):
+        result = generate_maturity_recommendation_with_products(category_input)
+
+    st.success("✅ AI Recommendation Generated")
+    st.markdown(f"**📂 Category:** `{category_input}`")
+    st.markdown(f"**🔧 Recommendation:** {result.get('recommendation', 'N/A')}")
+    st.markdown(f"**🛍️ Suggested Products/Services:** {', '.join(result.get('products', [])) or 'N/A'}")
