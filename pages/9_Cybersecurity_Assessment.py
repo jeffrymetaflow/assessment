@@ -676,11 +676,30 @@ elif section == "⚙️ Inputs":
 # ---------- AI Recommendations ----------
 elif section == "✅ AI Recommendations":
     st.title("✅ Cybersecurity Assessment AI Recommendations")
-    
-if submitted:
-    
+
+    if "cyber_maturity_recommendations" in st.session_state:
+        for rec in st.session_state["cyber_maturity_recommendations"]:
+            category = rec["category"]
+            score = rec["score"]
+            suggestion = rec["recommendation"]
+
+            if score < 50:
+                st.markdown(f"❌ *{category}* is low maturity.
+
+🔧 **AI Suggestion:** {suggestion}")
+            elif score < 80:
+                st.markdown(f"⚠️ *{category}* is moderately mature.
+
+🛠️ **Next Step:** {suggestion}")
+            else:
+                st.markdown(f"✅ *{category}* is highly mature.
+
+🧰 **Guidance:** {suggestion}")
+    else:
+        st.warning("⚠️ No AI recommendations found yet. Please complete the cybersecurity maturity assessment first.")... (existing chart rendering logic)
+
     # --- AI-Driven Recommendations ---
-    st.header("✅ AI Recommendations by Category")
+    st.header("🧠 AI Recommendations by Category")
     st.session_state["cyber_maturity_recommendations"] = []
 
     for _, row in cat_df.iterrows():
@@ -709,8 +728,7 @@ if submitted:
                 "category": category,
                 "score": score,
                 "recommendation": "Maintain and enhance automation."
-            })   
-
+            })
 
 
 
