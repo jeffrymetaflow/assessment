@@ -428,9 +428,9 @@ elif section == "⚙️ Inputs":
        
         submitted = st.form_submit_button("Submit")
 
-        if submitted:
-            st.session_state["cyber_form_submitted"] = True
-            st.success("Form submitted!")
+    if submitted:
+        st.session_state["cyber_form_submitted"] = True
+        st.success("Form submitted!")
     
     if submitted:
         st.success("Form submitted!")
