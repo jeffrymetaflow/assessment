@@ -688,7 +688,7 @@ if section == "✅ AI Recommendations":
     # Generate and store AI recommendations if form was submitted
     if submitted and "cyber_maturity_recommendations" not in st.session_state:
         cat_df = st.session_state.get("cyber_category_scores", pd.DataFrame())
-        st.write("DEBUG: cyber_category_scores", cat_df)
+        st.write("DEBUG: cat_df content", cat_df)
         st.session_state["cyber_maturity_recommendations"] = []
 
         if not cat_df.empty:
