@@ -426,7 +426,11 @@ elif section == "⚙️ Inputs":
                     section_scores[block["section"]] = yes_count / len(block["questions"])
        
         submitted = st.form_submit_button("Submit")
-       
+
+        if submitted:
+            st.session_state["cyber_form_submitted"] = True
+            st.success("Form submitted!")
+    
     if submitted:
         st.success("Form submitted!")
         st.session_state["category_scores"] = category_scores
