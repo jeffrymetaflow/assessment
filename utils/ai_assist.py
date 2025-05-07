@@ -131,6 +131,31 @@ def generate_maturity_recommendation(category: str, question_summary: str = "") 
     response = llm.invoke(prompt)
     return response.content.strip()
 
+def generate_maturity_recommendation_with_products(category: str) -> dict:
+    """
+    Uses the AI assistant to generate both a recommendation and a product list for a low-maturity cybersecurity category.
+    Returns a dictionary like: {"recommendation": "...", "products": ["Product1", "Product2"]}
+    """
+    prompt = (
+        f"The cybersecurity category '{category}' scored low in a maturity assessment. "
+        f"Suggest a practical improvement recommendation, and include a list of commercial tools or services "
+        f"that would help an enterprise improve in this area.\n\n"
+        f"Return your response in JSON format:\n"
+        f"{{\"recommendation\": \"...\", \"products\": [\"...\", \"...\"]}}"
+    )
+
+    response = llm.invoke(prompt)
+
+    # Parse and safely return the result
+    try:
+        import json
+        return json.loads(response.content)
+    except Exception:
+        return {
+            "recommendation": response.content.strip(),
+            "products": []
+        }
+
 # --- Central AI Assist Dispatch Function ---
 def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimize Costs"):
     intent = classify_intent(user_prompt)
