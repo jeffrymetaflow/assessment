@@ -24,6 +24,9 @@ else:
 VECTOR_INDEX_PATH = "vector_store/faiss_index"
 
 # --- Initialize vector store (in-memory or persisted) ---
+# --- Initialize the text splitter ---
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+
 def build_vector_index(docs: List[str], save_path: str = VECTOR_INDEX_PATH):
     chunks = text_splitter.create_documents(docs)
     vectorstore = FAISS.from_documents(chunks, embedding_model)
