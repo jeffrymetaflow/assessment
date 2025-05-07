@@ -674,7 +674,32 @@ elif section == "⚙️ Inputs":
     
 
 # ---------- AI Recommendations ----------
+submitted = st.session_state.get("cyber_form_submitted", False)
 
+# Generate and store AI recommendations if form was submitted
+if submitted and "cyber_maturity_recommendations" not in st.session_state:
+    cat_df = st.session_state.get("cyber_category_scores", pd.DataFrame())
+    st.session_state["cyber_maturity_recommendations"] = []
+
+    for _, row in cat_df.iterrows():
+        category = row["Category"]
+        score = row["Score (%)"]
+
+        if score < 80:
+            rec_obj = generate_maturity_recommendation_with_products(category)
+            st.session_state["cyber_maturity_recommendations"].append({
+                "category": category,
+                "score": score,
+                "recommendation": rec_obj.get("recommendation", "No suggestion returned."),
+                "products": rec_obj.get("products", [])
+            })
+        else:
+            st.session_state["cyber_maturity_recommendations"].append({
+                "category": category,
+                "score": score,
+                "recommendation": "Maintain and enhance automation.",
+                "products": []
+            })st.session_state.get("cyber_form_submitted", False)
 
 if section == "✅ AI Recommendations":
     st.title("✅ Cybersecurity Assessment AI Recommendations")
