@@ -24,7 +24,13 @@ Based on your assessment scores and ITRM trajectory, this roadmap offers recomme
 """)
 
 # Pull AI-enriched recommendations
-recommendations = st.session_state.get("it_maturity_recommendations", [])
+recommendations = []
+
+if "it_maturity_recommendations" in st.session_state:
+    recommendations.extend(st.session_state["it_maturity_recommendations"])
+
+if "cyber_maturity_recommendations" in st.session_state:
+    recommendations.extend(st.session_state["cyber_maturity_recommendations"])
 
 if not recommendations:
     st.warning("⚠️ No recommendations found. Please complete the IT Maturity Assessment first.")
