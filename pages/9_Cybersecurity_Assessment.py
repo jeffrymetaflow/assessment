@@ -683,56 +683,56 @@ if section == "✅ AI Recommendations":
 
     submitted = st.session_state.get("cyber_form_submitted", False)
 
-# Generate and store AI recommendations if form was submitted
-if submitted and "cyber_maturity_recommendations" not in st.session_state:
-    cat_df = st.session_state.get("cyber_category_scores", pd.DataFrame())
-    st.session_state["cyber_maturity_recommendations"] = []
+    # Generate and store AI recommendations if form was submitted
+    if submitted and "cyber_maturity_recommendations" not in st.session_state:
+        cat_df = st.session_state.get("cyber_category_scores", pd.DataFrame())
+        st.session_state["cyber_maturity_recommendations"] = []
 
-    for _, row in cat_df.iterrows():
-        category = row["Category"]
-        score = row["Score (%)"]
+        for _, row in cat_df.iterrows():
+            category = row["Category"]
+            score = row["Score (%)"]
 
-        if score < 80:
-            rec_obj = generate_maturity_recommendation_with_products(category)
-            st.session_state["cyber_maturity_recommendations"].append({
-                "category": category,
-                "score": score,
-                "recommendation": rec_obj.get("recommendation", "No suggestion returned."),
-                "products": rec_obj.get("products", [])
-            })
-        else:
-            st.session_state["cyber_maturity_recommendations"].append({
-                "category": category,
-                "score": score,
-                "recommendation": "Maintain and enhance automation.",
-                "products": []
-            })
+            if score < 80:
+                rec_obj = generate_maturity_recommendation_with_products(category)
+                st.session_state["cyber_maturity_recommendations"].append({
+                    "category": category,
+                    "score": score,
+                    "recommendation": rec_obj.get("recommendation", "No suggestion returned."),
+                    "products": rec_obj.get("products", [])
+                })
+            else:
+                st.session_state["cyber_maturity_recommendations"].append({
+                    "category": category,
+                    "score": score,
+                    "recommendation": "Maintain and enhance automation.",
+                    "products": []
+                })
 
-if "cyber_maturity_recommendations" in st.session_state:
-    for rec in st.session_state["cyber_maturity_recommendations"]:
-        category = rec["category"]
-        score = rec["score"]
-        suggestion = rec["recommendation"]
-        products = rec.get("products", [])
+    if "cyber_maturity_recommendations" in st.session_state:
+        for rec in st.session_state["cyber_maturity_recommendations"]:
+            category = rec["category"]
+            score = rec["score"]
+            suggestion = rec["recommendation"]
+            products = rec.get("products", [])
 
-        if score < 50:
-            st.markdown(f"""❌ *{category}* is low maturity.
+            if score < 50:
+                st.markdown(f"""❌ *{category}* is low maturity.
 
 🔧 **AI Suggestion:** {suggestion}
 
 🛍️ **Recommended Products/Services:** {', '.join(products) if products else 'N/A'}""")
-        elif score < 80:
-            st.markdown(f"""⚠️ *{category}* is moderately mature.
+            elif score < 80:
+                st.markdown(f"""⚠️ *{category}* is moderately mature.
 
 🛠️ **Next Step:** {suggestion}
 
 🛍️ **Recommended Products/Services:** {', '.join(products) if products else 'N/A'}""")
-        else:
-            st.markdown(f"""✅ *{category}* is highly mature.
+            else:
+                st.markdown(f"""✅ *{category}* is highly mature.
 
 🧰 **Guidance:** {suggestion}
 
 🛍️ **Recommended Products/Services:** {', '.join(products) if products else 'N/A'}""")
-else:
-    st.warning("⚠️ No AI recommendations found yet. Please complete the cybersecurity maturity assessment first.")
+    else:
+        st.warning("⚠️ No AI recommendations found yet. Please complete the cybersecurity maturity assessment first.")
     
