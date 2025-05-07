@@ -684,19 +684,17 @@ elif section == "✅ AI Recommendations":
             suggestion = rec["recommendation"]
 
             if score < 50:
-                st.markdown(f"❌ *{category}* is low maturity.
-
-🔧 **AI Suggestion:** {suggestion}")
+                st.markdown(f"""❌ *{category}* is low maturity.
+            
+            🔧 **AI Suggestion:** {suggestion}""")
             elif score < 80:
-                st.markdown(f"⚠️ *{category}* is moderately mature.
-
-🛠️ **Next Step:** {suggestion}")
+                st.markdown(f"""⚠️ *{category}* is moderately mature.
+            
+            🛠️ **Next Step:** {suggestion}""")
             else:
-                st.markdown(f"✅ *{category}* is highly mature.
-
-🧰 **Guidance:** {suggestion}")
-    else:
-        st.warning("⚠️ No AI recommendations found yet. Please complete the cybersecurity maturity assessment first.")
+                st.markdown(f"""✅ *{category}* is highly mature.
+            
+            🧰 **Guidance:** {suggestion}""")
 
 
 
