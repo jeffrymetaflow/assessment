@@ -664,9 +664,10 @@ elif section == "⚙️ Inputs":
             "Category": list(category_percentages.keys()),
             "Score (%)": list(category_percentages.values())
         })
-         # Store category scores in session state
+       
+          # Store category scores in session state
         st.session_state["cyber_category_scores"] = cat_df
-        st.write("DEBUG: Category scores saved to session state", st.session_state["cyber_category_scores"])       
+        st.write("DEBUG: Category scores saved to session state", st.session_state["cyber_category_scores"])    
 
         fig2, ax2 = plt.subplots()
         colors2 = [
