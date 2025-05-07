@@ -682,19 +682,32 @@ elif section == "✅ AI Recommendations":
             category = rec["category"]
             score = rec["score"]
             suggestion = rec["recommendation"]
+            products = rec.get("products", [])
 
             if score < 50:
                 st.markdown(f"""❌ *{category}* is low maturity.
-            
-            🔧 **AI Suggestion:** {suggestion}""")
+
+🔧 **AI Suggestion:** {suggestion}
+
+🛍️ **Recommended Products/Services:** {', '.join(products) if products else 'N/A'}""")
             elif score < 80:
                 st.markdown(f"""⚠️ *{category}* is moderately mature.
-            
-            🛠️ **Next Step:** {suggestion}""")
+
+🛠️ **Next Step:** {suggestion}
+
+🛍️ **Recommended Products/Services:** {', '.join(products) if products else 'N/A'}""")
             else:
                 st.markdown(f"""✅ *{category}* is highly mature.
-            
-            🧰 **Guidance:** {suggestion}""")
+
+🧰 **Guidance:** {suggestion}
+
+🛍️ **Recommended Products/Services:** {', '.join(products) if products else 'N/A'}""")
+            else:
+                        st.markdown(f"✅ *{category}* is highly mature.
+
+🧰 **Guidance:** {suggestion}")
+            else:
+                st.warning("⚠️ No AI recommendations found yet. Please complete the cybersecurity maturity assessment first.")
 
 
 
