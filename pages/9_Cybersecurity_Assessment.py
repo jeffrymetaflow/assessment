@@ -702,8 +702,8 @@ elif section == "✅ AI Recommendations":
 🧰 **Guidance:** {suggestion}
 
 🛍️ **Recommended Products/Services:** {', '.join(products) if products else 'N/A'}""")
-    else:
-    st.warning("⚠️ No AI recommendations found yet. Please complete the cybersecurity maturity assessment first.")
+            else:
+            st.warning("⚠️ No AI recommendations found yet. Please complete the cybersecurity maturity assessment first.")
 
 
 
