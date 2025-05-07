@@ -699,7 +699,7 @@ if submitted and "cyber_maturity_recommendations" not in st.session_state:
                 "score": score,
                 "recommendation": "Maintain and enhance automation.",
                 "products": []
- 
+            })
 if section == "✅ AI Recommendations":
     st.title("✅ Cybersecurity Assessment AI Recommendations")
 
