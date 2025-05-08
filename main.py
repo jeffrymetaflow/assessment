@@ -90,16 +90,36 @@ if step == "➕ Start New Client Assessment":
     with st.form("new_project_form", clear_on_submit=True):
         client_name = st.text_input("Client Name")
         project_name = st.text_input("Project / Assessment Name")
+        user_email = st.text_input("Your Email Address")  # ← added
+
         submitted = st.form_submit_button("Start New Project")
 
         if submitted:
-            if client_name and project_name:
+            if client_name and project_name and user_email:
                 st.session_state["client_name"] = client_name
                 st.session_state["project_name"] = project_name
-                st.session_state["project_id"] = str(uuid.uuid4())
+                st.session_state["user_email"] = user_email
+
+                # Create initial project_data payload
+                st.session_state["project_data"] = {
+                    "user_email": user_email,
+                    "project_name": project_name,
+                    "revenue": 0,
+                    "expenses": {},
+                    "architecture": {},
+                    "maturity_score": 0
+                }
+
+                # Also store individual fields for easier access in pages
+                st.session_state["revenue"] = 0
+                st.session_state["expenses"] = {}
+                st.session_state["architecture"] = {}
+                st.session_state["maturity_score"] = 0
+
+                st.success("🧾 New project session created. Navigate to any tab to begin.")
                 st.rerun()
             else:
-                st.error("Please fill in both fields.")
+                st.error("Please fill in all fields including email.")
 
 elif step == "📂 Open Existing Project":
     st.subheader("📂 Load an Existing Project")
