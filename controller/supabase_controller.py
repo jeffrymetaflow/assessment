@@ -63,3 +63,13 @@ def save_session_to_supabase():
         st.error("❌ Failed to save project to Supabase.")
         st.write(e)
         return None
+
+def delete_project_by_id(project_id):
+    """Deletes a project from Supabase by UUID"""
+    try:
+        result = supabase.table("projects").delete().eq("id", project_id).execute()
+        return result
+    except APIError as e:
+        st.error("❌ Failed to delete project.")
+        st.write(e)
+        return None
