@@ -9,7 +9,7 @@ data = {
     "project_name": "Pilot - Walmart",
     "revenue": 1500000,
     "expenses": {"hardware": 400000, "software": 250000},
-    "architecture": {"ERP": ["SAP", "Dell"], "Cloud": ["AWS"]},
+   
     "maturity_score": 0.75
 }
 
