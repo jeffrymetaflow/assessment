@@ -98,3 +98,9 @@ Please rate your cybersecurity maturity against the **NIST Cybersecurity Framewo
         else:
             st.success(f"✅ {control}: Maturity level is sufficient.")
         st.warning("Low maturity. Immediate enhancements are recommended to reduce risk.")
+
+
+from controller.supabase_controller import save_session_to_supabase
+
+if st.button("💾 Save Project to Supabase"):
+    save_session_to_supabase()
