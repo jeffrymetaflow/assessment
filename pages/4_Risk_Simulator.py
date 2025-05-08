@@ -141,3 +141,9 @@ if not sim_df.empty and "Adjusted Risk ($)" in sim_df.columns:
 
 else:
     st.info("No valid simulation data to display.")
+
+
+from controller.supabase_controller import save_session_to_supabase
+
+if st.button("💾 Save Project to Supabase"):
+    save_session_to_supabase()
