@@ -14,7 +14,7 @@ from utils.session_state import initialize_session
 initialize_session()
 from utils.auth import enforce_login
 enforce_login()
-
+from controller.supabase_controller import get_projects_by_email
 
 # ✅ MUST BE FIRST STREAMLIT COMMAND
 st.set_page_config(page_title="ITRM Main Dashboard", layout="wide")
@@ -64,6 +64,19 @@ if not st.session_state.started:
 # --- INIT CONTROLLER ---
 if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
+
+if "project_data" not in st.session_state:
+    email = "jeff@example.com"
+    projects = get_projects_by_email(email)
+    if projects:
+        project = projects[0]  # Later allow selection
+        st.session_state["project_data"] = project
+
+        # Optional: break out fields for convenience
+        st.session_state["revenue"] = project["revenue"]
+        st.session_state["expenses"] = project["expenses"]
+        st.session_state["architecture"] = project["architecture"]
+        st.session_state["maturity_score"] = project["maturity_score"]
 
 controller = st.session_state.controller
 
