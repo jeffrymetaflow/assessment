@@ -174,3 +174,10 @@ if st.button("🗑️ Remove Last Question") and st.session_state.grouped_questi
 
 st.markdown("### Current Questions in Selected Category:")
 st.write(st.session_state.grouped_questions[edited_category])
+
+
+
+from controller.supabase_controller import save_session_to_supabase
+
+if st.button("💾 Save Project to Supabase"):
+    save_session_to_supabase()
