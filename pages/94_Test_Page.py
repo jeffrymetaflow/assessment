@@ -8,8 +8,7 @@ data = {
     "user_email": "jeff@example.com",
     "project_name": "Pilot - Walmart",
     "revenue": 1500000,
-    "maturity_score": 0.75
-}
+  }
 
 try:
     insert_result = supabase.table("projects").insert(data).execute()
