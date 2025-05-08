@@ -87,3 +87,7 @@ if components:
 else:
     st.info("No components added yet. Use the form above to get started.")
 
+from controller.supabase_controller import save_session_to_supabase
+
+if st.button("💾 Save Project to Supabase"):
+    save_session_to_supabase()
