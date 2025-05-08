@@ -406,6 +406,10 @@ if st.sidebar.checkbox("Show session state (dev only)"):
     st.write(st.session_state)
 
 
+from controller.supabase_controller import save_session_to_supabase
+
+if st.button("💾 Save Project to Supabase"):
+    save_session_to_supabase()
 
 
 
