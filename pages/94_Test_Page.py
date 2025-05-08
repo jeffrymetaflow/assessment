@@ -1,6 +1,6 @@
 import streamlit as st
 from utils.supabase_client import supabase
-from supabase.lib.postgrest import APIError
+from postgrest.exceptions import APIError
 
 st.title("🔗 Supabase Test Insert")
 
@@ -18,5 +18,5 @@ try:
     st.success("✅ Insert successful")
     st.json(insert_result.data)
 except APIError as e:
-    st.error("❌ Insert failed")
-    st.json(e.args[0])
+    st.error("❌ Supabase API error occurred")
+    st.json(e.response.json())  # This shows detailed error info
