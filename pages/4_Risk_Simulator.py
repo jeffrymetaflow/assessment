@@ -5,6 +5,7 @@ from utils.session_state import initialize_session
 initialize_session()
 from utils.auth import enforce_login
 enforce_login()
+from utils.bootstrap import page_bootstrap
 
 st.title("💸 Revenue at Risk Simulator")
 
