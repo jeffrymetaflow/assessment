@@ -3,6 +3,19 @@ import streamlit as st
 from utils.ai_assist import handle_ai_consultation
 
 
+def page_bootstrap(current_page="Overview", required_keys=None):
+    # 🚨 Ensure project is loaded
+    if "project_data" not in st.session_state:
+        st.warning("🚫 No project loaded. Please return to the main page.")
+        st.stop()
+
+    # 🚨 Ensure required session keys exist
+    if required_keys:
+        missing = [k for k in required_keys if k not in st.session_state]
+        if missing:
+            st.warning(f"🚫 Missing required session data: {', '.join(missing)}")
+            st.stop()
+
 def ai_assist_overlay(user_prompt, session_state, role="CIO", goal="Optimize Costs"):
     return handle_ai_consultation(user_prompt, session_state, role, goal)
 
