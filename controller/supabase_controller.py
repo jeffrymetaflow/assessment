@@ -1,5 +1,5 @@
 # controller/supabase_controller.py
-
+import streamlit as st
 from utils.supabase_client import supabase
 from postgrest.exceptions import APIError
 from datetime import datetime
