@@ -67,3 +67,9 @@ for quarter in sorted(roadmap_df["Quarter"].unique()):
     st.markdown(f"#### {quarter}")
     for _, row in roadmap_df[roadmap_df["Quarter"] == quarter].iterrows():
         st.checkbox(f"{row['Category']} – {row['Action Item']}", key=f"{row['Category']}_{quarter}")
+
+
+from controller.supabase_controller import save_session_to_supabase
+
+if st.button("💾 Save Project to Supabase"):
+    save_session_to_supabase()
