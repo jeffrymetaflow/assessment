@@ -199,3 +199,8 @@ if st.checkbox("Run Sensitivity Analysis"):
     )
     st.plotly_chart(fig2, use_container_width=True)
 
+
+from controller.supabase_controller import save_session_to_supabase
+
+if st.button("💾 Save Project to Supabase"):
+    save_session_to_supabase()
