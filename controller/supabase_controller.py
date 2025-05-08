@@ -2,6 +2,7 @@
 
 from utils.supabase_client import supabase
 from postgrest.exceptions import APIError
+from datetime import datetime
 
 def save_project(project_data):
     """Insert a new project into Supabase"""
@@ -31,27 +32,29 @@ def update_project_by_id(project_id, updated_data):
         return None
 
 def save_session_to_supabase():
-    """Save current session_state project data to Supabase"""
     if "project_data" not in st.session_state:
         st.warning("⚠️ No project loaded — nothing to save.")
         return None
 
     project_id = st.session_state["project_data"]["id"]
 
-    # Build update payload — customize as needed
     updated_data = {
         "revenue": st.session_state.get("revenue"),
         "expenses": st.session_state.get("expenses"),
         "architecture": st.session_state.get("architecture"),
         "maturity_score": st.session_state.get("maturity_score"),
+        "last_saved": datetime.utcnow().isoformat()  # Set save timestamp
     }
 
     try:
         result = supabase.table("projects").update(updated_data).eq("id", project_id).execute()
-        st.success("✅ Project saved to Supabase.")
+
+        # Update local session copy
+        if result.data:
+            st.session_state["project_data"] = result.data[0]
+            st.success(f"✅ Project saved at {result.data[0]['last_saved']}")
         return result.data[0] if result.data else None
     except APIError as e:
         st.error("❌ Failed to save project to Supabase.")
         st.write(e)
         return None
-
