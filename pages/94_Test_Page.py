@@ -19,4 +19,4 @@ try:
     st.json(insert_result.data)
 except APIError as e:
     st.error("❌ Supabase API error occurred")
-    st.json(e.response.json())  # This shows detailed error info
+    st.write(e)
