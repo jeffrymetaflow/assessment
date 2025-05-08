@@ -39,12 +39,17 @@ def save_session_to_supabase():
     project_id = st.session_state["project_data"]["id"]
 
     updated_data = {
+        "user_email": (
+            st.session_state["project_data"].get("user_email")
+            or st.session_state.get("user_email")
+        ),
         "revenue": st.session_state.get("revenue"),
         "expenses": st.session_state.get("expenses"),
         "architecture": st.session_state.get("architecture"),
         "maturity_score": st.session_state.get("maturity_score"),
-        "last_saved": datetime.utcnow().isoformat()  # Set save timestamp
+        "last_saved": datetime.utcnow().isoformat()
     }
+
 
     try:
         result = supabase.table("projects").update(updated_data).eq("id", project_id).execute()
