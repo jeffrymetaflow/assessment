@@ -147,3 +147,9 @@ from controller.supabase_controller import save_session_to_supabase
 
 if st.button("💾 Save Project to Supabase"):
     save_session_to_supabase()
+
+# Show last saved timestamp
+if "project_data" in st.session_state:
+    last_saved = st.session_state["project_data"].get("last_saved")
+    if last_saved:
+        st.caption(f"🕒 Last saved: {last_saved}")
