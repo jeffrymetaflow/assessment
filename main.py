@@ -146,6 +146,21 @@ elif step == "📂 Open Existing Project":
         else:
             st.warning("No projects found for this email.")
 
+from controller.supabase_controller import delete_project_by_id
+
+if st.button("🗑️ Delete This Project"):
+    confirm = st.checkbox("Confirm deletion of this project")
+
+    if confirm:
+        result = delete_project_by_id(project["id"])
+        if result:
+            st.success("🗑️ Project successfully deleted.")
+
+            # Clear session to avoid stale data
+            for key in ["project_data", "revenue", "expenses", "architecture", "maturity_score"]:
+                st.session_state.pop(key, None)
+            st.rerun()
+
 # --- PROJECT ACTIVE FLOW ---
 if "project_id" in st.session_state:
     st.success(f"📁 Active Project: {st.session_state['client_name']} | {st.session_state['project_name']}")
