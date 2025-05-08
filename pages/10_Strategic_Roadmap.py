@@ -10,6 +10,8 @@ from utils.session_state import initialize_session
 initialize_session()
 from utils.auth import enforce_login
 enforce_login()
+from controller.supabase_controller import save_session_to_supabase
+
 
 st.set_page_config(page_title="Strategic Roadmap", layout="wide")
 st.title("📊 Strategic_Roadmap")
@@ -69,7 +71,11 @@ for quarter in sorted(roadmap_df["Quarter"].unique()):
         st.checkbox(f"{row['Category']} – {row['Action Item']}", key=f"{row['Category']}_{quarter}")
 
 
-from controller.supabase_controller import save_session_to_supabase
-
 if st.button("💾 Save Project to Supabase"):
     save_session_to_supabase()
+
+# Show last saved timestamp
+if "project_data" in st.session_state:
+    last_saved = st.session_state["project_data"].get("last_saved")
+    if last_saved:
+        st.caption(f"🕒 Last saved: {last_saved}")
