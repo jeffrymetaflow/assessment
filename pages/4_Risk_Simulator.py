@@ -9,6 +9,8 @@ from utils.bootstrap import page_bootstrap
 
 st.title("💸 Revenue at Risk Simulator")
 
+page_bootstrap(current_page="Risk Simulator")  # Or "Risk Model", etc.
+
 # --- Retrieve Required Data ---
 revenue = st.session_state.get("revenue", 0)
 
