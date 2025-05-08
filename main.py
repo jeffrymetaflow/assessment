@@ -102,7 +102,29 @@ if step == "➕ Start New Client Assessment":
                 st.error("Please fill in both fields.")
 
 elif step == "📂 Open Existing Project":
-    st.warning("Project loader functionality coming soon.")
+    st.subheader("📂 Load an Existing Project")
+
+    from controller.supabase_controller import get_projects_by_email
+
+    email = st.text_input("Enter your email address to load saved projects")
+
+    if email:
+        projects = get_projects_by_email(email)
+
+        if projects:
+            selected = st.selectbox("Select a project:", [p["project_name"] for p in projects])
+            project = next(p for p in projects if p["project_name"] == selected)
+
+            # Load into session_state
+            st.session_state["project_data"] = project
+            st.session_state["revenue"] = project.get("revenue")
+            st.session_state["expenses"] = project.get("expenses", {})
+            st.session_state["architecture"] = project.get("architecture", {})
+            st.session_state["maturity_score"] = project.get("maturity_score")
+
+            st.success(f"✅ Project '{project['project_name']}' loaded. Navigate to any tab to begin.")
+        else:
+            st.warning("No projects found for this email.")
 
 # --- PROJECT ACTIVE FLOW ---
 if "project_id" in st.session_state:
