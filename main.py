@@ -430,7 +430,7 @@ if st.sidebar.button("🧹 Reset Session"):
         if key not in reserved_keys:
             del st.session_state[key]
 
-st.experimental_rerun()
+    st.experimental_rerun()
 
 # --- Polished AIOps-Specific Risk Insights Dashboard ---
 if st.session_state.controller.get_components():
