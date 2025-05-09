@@ -66,6 +66,10 @@ st.sidebar.header("Navigation")
 
 page_bootstrap(current_page="IT Assessment")  # Or "Risk Model", etc.
 
+# Retrieve prior responses if they exist
+previous_answers = st.session_state.get("it_maturity_answers", {})
+responses = {}
+
 # Questionnaire Form
 with st.form("maturity_form"):
     for category, questions in grouped_questions.items():
