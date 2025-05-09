@@ -437,9 +437,9 @@ elif section == "⚙️ Inputs":
     
     submitted = st.form_submit_button("Submit")
 
-if submitted:
-    st.success("✅ Cybersecurity assessment submitted.")
-    st.session_state["cybersecurity_answers"] = cyber_responses.copy()
+    if submitted:
+        st.success("✅ Cybersecurity assessment submitted.")
+        st.session_state["cybersecurity_answers"] = cyber_responses.copy()
 
     if submitted:
         st.session_state["cyber_form_submitted"] = True
