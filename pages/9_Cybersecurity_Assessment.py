@@ -408,30 +408,45 @@ elif section == "⚙️ Inputs":
     }
     
     with st.form("maturity_form"):
+        previous_cyber_answers = st.session_state.get("cybersecurity_answers", {})
+        cyber_responses = {}  # new: store answers
         section_scores = {}
         category_scores = {}
         category_totals = {}
+    
         for category, blocks in groupby(questionnaire, key=lambda x: x["category"]):
             st.subheader(category)
             for block in blocks:
                 st.write(block["section"])
-                # Initialize yes_count for each block
                 yes_count = 0
                 for idx, q in enumerate(block["questions"]):
                     hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
                     unique_key = f"{category}_{block['section']}_{hashed_q}"
-                    answer = st.radio(q, ["Yes", "No"], key=unique_key)
+    
+                    # Restore previous answer if exists
+                    default = previous_cyber_answers.get(unique_key, None)
+                    index = 0 if default == "Yes" else 1 if default == "No" else 0
+                    answer = st.radio(q, ["Yes", "No"], key=unique_key, index=index)
+    
+                    cyber_responses[unique_key] = answer  # store it
                     if answer == "Yes":
                         yes_count += 1
-                # Calculate the section score
+    
                 if len(block["questions"]) > 0:
                     section_scores[block["section"]] = yes_count / len(block["questions"])
-       
+    
         submitted = st.form_submit_button("Submit")
+
+if submitted:
+    st.success("✅ Cybersecurity assessment submitted.")
+    st.session_state["cybersecurity_answers"] = cyber_responses.copy()
 
     if submitted:
         st.session_state["cyber_form_submitted"] = True
         st.success("Form submitted!")
+        st.session_state["cybersecurity_answers"] = cyber_responses.copy()
+        st.success("✅ Cybersecurity answers saved to session.")
+
     
     if submitted:
         st.success("Form submitted!")
