@@ -435,7 +435,7 @@ elif section == "⚙️ Inputs":
                 if len(block["questions"]) > 0:
                     section_scores[block["section"]] = yes_count / len(block["questions"])
     
-    submitted = st.form_submit_button("Submit")
+submitted = st.form_submit_button("Submit")
 
     if submitted:
         st.success("✅ Cybersecurity assessment submitted.")
