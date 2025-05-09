@@ -162,7 +162,7 @@ elif step == "📂 Open Existing Project":
                     st.rerun()
 
 # --- PROJECT ACTIVE FLOW ---
-if "project_id" in st.session_state:
+if "project_data" in st.session_state:
     st.success(f"📁 Active Project: {st.session_state['client_name']} | {st.session_state['project_name']}")
 
     # --- REVENUE SETUP ---
