@@ -48,7 +48,8 @@ def save_session_to_supabase():
         "architecture": st.session_state.get("architecture"),
         "maturity_score": st.session_state.get("maturity_score"),
         "last_saved": datetime.utcnow().isoformat(),
-        "maturity_answers": st.session_state.get("it_maturity_answers")
+        "maturity_answers": st.session_state.get("it_maturity_answers"),
+        "cyber_answers": st.session_state.get("cybersecurity_answers"),
     }
 
 
