@@ -77,6 +77,7 @@ with st.form("maturity_form"):
 
 # Scoring and Results
 if submitted:
+    st.session_state["it_maturity_answers"] = responses.copy()
     st.header("📊 Maturity Assessment Results")
     score_data = []
 
