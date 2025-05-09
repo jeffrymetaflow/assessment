@@ -425,9 +425,12 @@ if uploaded_file is not None:
     st.sidebar.success("✅ Session loaded!")
 
 if st.sidebar.button("🧹 Reset Session"):
+    reserved_keys = {"_is_running_with_streamlit", "rerun_data", "_session_state"}
     for key in list(st.session_state.keys()):
-        del st.session_state[key]
-    st.experimental_rerun()
+        if key not in reserved_keys:
+            del st.session_state[key]
+
+st.experimental_rerun()
 
 # --- Polished AIOps-Specific Risk Insights Dashboard ---
 if st.session_state.controller.get_components():
