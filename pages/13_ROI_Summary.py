@@ -33,13 +33,6 @@ st.date_input("Assessment Date", value=assessment_date, key="assessment_date")
 st.text_input("ITRM Analyst", value=analyst_name, key="analyst_name")
 st.text_input("Assessment Scope", value=assessment_scope, key="assessment_scope")
 
-# Financials
-st.subheader("💰 Financial Impact Summary")
-it_spend_baseline = st.session_state.get("it_expense", 12400000)
-it_spend_optimized = st.session_state.get("optimized_it_expense", 10800000)
-cloud_cagr_baseline = st.session_state.get("cloud_cagr_baseline", "23%")
-cloud_cagr_optimized = st.session_state.get("cloud_cagr_optimized", "12%")
-
 # --- ROI FINANCIAL SUMMARY ---
 st.markdown("---")
 st.markdown("## 💡 ROI Financial Summary")
