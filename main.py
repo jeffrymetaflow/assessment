@@ -167,8 +167,6 @@ if "project_data" in st.session_state:
         st.success(f"📁 Active Project: {st.session_state['client_name']} | {st.session_state['project_name']}")
     else:
         st.info("No active project selected. Please start or open a project.")
-else:
-    st.info("No project data found. Please start or open a project.")
     
     # --- REVENUE SETUP ---
     with st.expander("💵 Project Revenue", expanded=True):
@@ -236,6 +234,9 @@ else:
     
             except Exception as e:
                 st.warning(f"Error fetching revenue: {e}")
+
+else:
+    st.info("No project data found. Please start or open a project.")
     
     # --- COMPONENT UPLOAD ---
     st.markdown("### 📥 Upload Components")
