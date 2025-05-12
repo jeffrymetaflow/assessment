@@ -40,15 +40,26 @@ it_spend_optimized = st.session_state.get("optimized_it_expense", 10800000)
 cloud_cagr_baseline = st.session_state.get("cloud_cagr_baseline", "23%")
 cloud_cagr_optimized = st.session_state.get("cloud_cagr_optimized", "12%")
 
+# --- ROI FINANCIAL SUMMARY ---
+st.markdown("---")
+st.markdown("## 💡 ROI Financial Summary")
+
+# Retrieve from session or defaults
+it_spend_baseline = st.session_state.get("it_spend_baseline", 12_000_000)
+it_spend_optimized = st.session_state.get("it_spend_optimized", 9_000_000)
+cloud_cagr_baseline = st.session_state.get("cloud_cagr_baseline", 0.15)  # 15%
+cloud_cagr_optimized = st.session_state.get("cloud_cagr_optimized", 0.13)  # 13%
+
 financial_data = {
     "Metric": ["Total Annual IT Spend", "Cloud Cost Growth (3-Year)"],
-    "Before ITRM": [f"${it_spend_baseline / 1e6:.1f}M", cloud_cagr_baseline],
-    "After ITRM": [f"${it_spend_optimized / 1e6:.1f}M", cloud_cagr_optimized],
+    "Before ITRM": [f"${it_spend_baseline / 1e6:.1f}M", f"{cloud_cagr_baseline:.1%}"],
+    "After ITRM": [f"${it_spend_optimized / 1e6:.1f}M", f"{cloud_cagr_optimized:.1%}"],
     "Savings/Improvement": [
         f"${(it_spend_baseline - it_spend_optimized) / 1e6:.1f}M (↓{(it_spend_baseline - it_spend_optimized) / it_spend_baseline:.1%})",
-        "↓11%"
+        f"↓{(cloud_cagr_baseline - cloud_cagr_optimized) / cloud_cagr_baseline:.1%}"
     ]
 }
+
 st.dataframe(pd.DataFrame(financial_data))
 
 # Risk Reduction
