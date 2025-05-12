@@ -161,12 +161,39 @@ elif step == "📂 Open Existing Project":
                         st.session_state.pop(key, None)
                     st.rerun()
 
-# --- PROJECT ACTIVE FLOW ---
-if "project_data" in st.session_state:
-    if 'client_name' in st.session_state and 'project_name' in st.session_state:
-        st.success(f"📁 Active Project: {st.session_state['client_name']} | {st.session_state['project_name']}")
-    else:
-        st.info("No active project selected. Please start or open a project.")
+# --- USER AUTHENTICATION CHECK ---
+if "user_email" not in st.session_state:
+    st.warning("Please login to continue.")
+    st.stop()
+
+# --- PROJECT SELECTION ---
+if "project_data" not in st.session_state:
+    st.info("No active project. Please start a new assessment or load an existing project.")
+        # --- PROJECT START/OPEN OPTIONS ---
+    step = st.radio("Select Option:", ["➕ Start New Client Assessment", "📂 Open Existing Project"], horizontal=True)
+
+    if step == "➕ Start New Client Assessment":
+        with st.form("new_project_form", clear_on_submit=True):
+            client_name = st.text_input("Client Name")
+            project_name = st.text_input("Project / Assessment Name")
+            user_email = st.session_state.get("user_email", "")  # pre-populate from session
+
+            submitted = st.form_submit_button("Start New Project")
+
+            if submitted:
+                if client_name and project_name and user_email:
+                    st.session_state["client_name"] = client_name
+                    st.session_state["project_name"] = project_name
+                    st.session_state["project_data"] = {"client_name": client_name, "project_name": project_name}
+                    st.success("New project created successfully. Please continue below.")
+                else:
+                    st.warning("Please complete all fields to start a new project.")
+
+    elif step == "📂 Open Existing Project":
+        st.info("(Placeholder) Load existing projects from your storage/database here.")
+else:
+    # --- PROJECT ACTIVE INFO ---
+    st.success(f"📁 Active Project: {st.session_state.get('client_name', 'Unknown Client')} | {st.session_state.get('project_name', 'Unknown Project')}")
     
     # --- REVENUE SETUP ---
     with st.expander("💵 Project Revenue", expanded=True):
@@ -234,10 +261,7 @@ if "project_data" in st.session_state:
     
             except Exception as e:
                 st.warning(f"Error fetching revenue: {e}")
-
-else:
-    st.info("No project data found. Please start or open a project.")
-    
+   
     # --- COMPONENT UPLOAD ---
     st.markdown("### 📥 Upload Components")
     file = st.file_uploader("Upload .csv with: Name, Category, Spend, Renewal Date, Risk Score")
