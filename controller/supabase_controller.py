@@ -36,6 +36,10 @@ def save_session_to_supabase():
         st.warning("⚠️ No project loaded — nothing to save.")
         return None
 
+    if "id" not in st.session_state["project_data"]:
+        st.error("❌ Project ID missing from project data. Please recreate or reload your project session.")
+        return None
+
     project_id = st.session_state["project_data"]["id"]
 
     updated_data = {
@@ -52,11 +56,9 @@ def save_session_to_supabase():
         "cyber_answers": st.session_state.get("cybersecurity_answers"),
     }
 
-
     try:
         result = supabase.table("projects").update(updated_data).eq("id", project_id).execute()
 
-        # Update local session copy
         if result.data:
             st.session_state["project_data"] = result.data[0]
             st.success(f"✅ Project saved at {result.data[0]['last_saved']}")
