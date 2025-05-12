@@ -182,9 +182,11 @@ if "project_data" not in st.session_state:
 
             if submitted:
                 if client_name and project_name and user_email:
-                    project_id = str(uuid.uuid4())  # create a unique ID
                     st.session_state["client_name"] = client_name
                     st.session_state["project_name"] = project_name
+                    import uuid
+
+                    project_id = str(uuid.uuid4())
                     st.session_state["project_data"] = {
                         "id": project_id,
                         "client_name": client_name,
