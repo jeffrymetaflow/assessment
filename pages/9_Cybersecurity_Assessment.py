@@ -390,78 +390,78 @@ elif section == "⚙️ Inputs":
         },
     ]
 
-# --- Always sort BEFORE groupby ---
-questionnaire.sort(key=lambda x: x["category"])
-
-# --- Safety check ---
-if not questionnaire:
-    st.error("⚠️ Questionnaire is empty. Cannot proceed.")
-    st.stop()
-
-# --- Safely restore cybersecurity_answers from session or Supabase project_data ---
-if "cybersecurity_answers" not in st.session_state or not isinstance(st.session_state["cybersecurity_answers"], dict):
-    if "project_data" in st.session_state and "session_data" in st.session_state["project_data"]:
-        st.session_state["cybersecurity_answers"] = st.session_state["project_data"]["session_data"].get("cyber_answers", {})
-    else:
-        st.session_state["cybersecurity_answers"] = {}
-
-# --- Title and intro ---
-st.title("\U0001F9E0 Cybersecurity Maturity Assessment Tool")
-st.markdown("""
-Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
-""")
-
-# --- Form block ---
-with st.form("maturity_form"):
-    cyber_responses = {}
-
-    for category, blocks_iter in groupby(questionnaire, key=lambda x: x["category"]):
-        st.subheader(category)
-        blocks = list(blocks_iter)  # Materialize iterator
-        for block in blocks:
-            st.write(block["section"])
-            yes_count = 0
-            for idx, q in enumerate(block["questions"]):
-                hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
-                unique_key = f"{category}_{block['section']}_{hashed_q}"
-
-                default = st.session_state["cybersecurity_answers"].get(unique_key, None)
-                index = 0 if default == "Yes" else 1 if default == "No" else 0
-                answer = st.radio(q, ["Yes", "No"], key=unique_key, index=index)
-
-                cyber_responses[unique_key] = answer
-
-    submitted = st.form_submit_button("Submit Assessment")
-
-category_scores = {}
-
-# --- After form submit ---
-if submitted:
-    st.session_state["cybersecurity_answers"] = cyber_responses.copy()
-    st.success("✅ Cybersecurity assessment submitted.")
+    # --- Always sort BEFORE groupby ---
+    questionnaire.sort(key=lambda x: x["category"])
     
+    # --- Safety check ---
+    if not questionnaire:
+        st.error("⚠️ Questionnaire is empty. Cannot proceed.")
+        st.stop()
+    
+    # --- Safely restore cybersecurity_answers from session or Supabase project_data ---
+    if "cybersecurity_answers" not in st.session_state or not isinstance(st.session_state["cybersecurity_answers"], dict):
+        if "project_data" in st.session_state and "session_data" in st.session_state["project_data"]:
+            st.session_state["cybersecurity_answers"] = st.session_state["project_data"]["session_data"].get("cyber_answers", {})
+        else:
+            st.session_state["cybersecurity_answers"] = {}
+    
+    # --- Title and intro ---
+    st.title("\U0001F9E0 Cybersecurity Maturity Assessment Tool")
+    st.markdown("""
+    Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
+    """)
+    
+    # --- Form block ---
+    with st.form("maturity_form"):
+        cyber_responses = {}
+    
+        for category, blocks_iter in groupby(questionnaire, key=lambda x: x["category"]):
+            st.subheader(category)
+            blocks = list(blocks_iter)  # Materialize iterator
+            for block in blocks:
+                st.write(block["section"])
+                yes_count = 0
+                for idx, q in enumerate(block["questions"]):
+                    hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
+                    unique_key = f"{category}_{block['section']}_{hashed_q}"
+    
+                    default = st.session_state["cybersecurity_answers"].get(unique_key, None)
+                    index = 0 if default == "Yes" else 1 if default == "No" else 0
+                    answer = st.radio(q, ["Yes", "No"], key=unique_key, index=index)
+    
+                    cyber_responses[unique_key] = answer
+    
+        submitted = st.form_submit_button("Submit Assessment")
+    
+    category_scores = {}
+    
+    # --- After form submit ---
     if submitted:
-        st.session_state["cyber_form_submitted"] = True
-        st.success("Form submitted!")
         st.session_state["cybersecurity_answers"] = cyber_responses.copy()
-        st.success("✅ Cybersecurity answers saved to session.")
-
+        st.success("✅ Cybersecurity assessment submitted.")
+        
+        if submitted:
+            st.session_state["cyber_form_submitted"] = True
+            st.success("Form submitted!")
+            st.session_state["cybersecurity_answers"] = cyber_responses.copy()
+            st.success("✅ Cybersecurity answers saved to session.")
     
-    if submitted:
-        st.success("Form submitted!")
-        st.session_state["category_scores"] = category_scores
-        st.session_state["category_totals"] = category_totals
-        st.write(section_scores)
-        st.write(category_scores)
-        st.write("### Category Scores")
-
-        section_scores = {
-            "Identity": 0.75,
-            "Protect": 0.65,
-            "Detect": 0.80,
-            "Respond": 0.60,
-            "Recover": 0.85
-        }
+        
+        if submitted:
+            st.success("Form submitted!")
+            st.session_state["category_scores"] = category_scores
+            st.session_state["category_totals"] = category_totals
+            st.write(section_scores)
+            st.write(category_scores)
+            st.write("### Category Scores")
+    
+            section_scores = {
+                "Identity": 0.75,
+                "Protect": 0.65,
+                "Detect": 0.80,
+                "Respond": 0.60,
+                "Recover": 0.85
+            }
 
         # Store section_scores in session state for use in the "Summary" page
         st.session_state["section_scores"] = section_scores
