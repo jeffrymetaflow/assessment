@@ -20,7 +20,12 @@ section = st.sidebar.radio("Go to", [
     "✅ AI Recommendations",
     ])
 
-st.sidebar.text_input("Client Name", value=default_client_name, disabled=True)
+default_client_name = st.session_state.get("project_data", {}).get("client_name", "")
+
+if default_client_name:
+    st.sidebar.text_input("Client Name", value=default_client_name, disabled=True)
+else:
+    st.sidebar.warning("⚠️ No Client Name found. Please load or create a project first.")
 
 page_bootstrap(current_page="Cybersecurity_Assessment")  
 
