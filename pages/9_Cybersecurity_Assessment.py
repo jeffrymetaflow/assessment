@@ -50,7 +50,8 @@ if section == "🧠 Overview Summary":
     1. Conduct Workshops
     2. Develop Strategic Roadmap
     3. Integrate Technologies
-
+    """
+    
     st.markdown("For more details, visit the [NIST Cybersecurity Framework website](https://www.nist.gov/).")
 
     st.markdown("""
