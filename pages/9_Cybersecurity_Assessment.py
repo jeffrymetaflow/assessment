@@ -50,6 +50,7 @@ if section == "🧠 Overview Summary":
     1. Conduct Workshops
     2. Develop Strategic Roadmap
     3. Integrate Technologies
+    
     **NIST Cybersecurity Framework Functions:**
 
     - **Identify:** Understand the business context, the resources that support critical functions, and the related cybersecurity risks.
