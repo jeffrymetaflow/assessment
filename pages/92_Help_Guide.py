@@ -38,5 +38,5 @@ Align projects to business priorities over time.
 Use AI to guide decisions or suggest vendors/tools.  
 **Inputs**: Natural language questions  
 **Outputs**: AI insights, strategy ideas, guidance
-""")
+
 
