@@ -67,10 +67,12 @@ if st.sidebar.button("🔄 Clear Assessment"):
     st.session_state.pop("it_maturity_answers", None)
     st.experimental_rerun()
 
-# Ensure answers always exist in session_state
 if "it_maturity_answers" not in st.session_state:
-    st.session_state["it_maturity_answers"] = {}
-
+    if "project_data" in st.session_state and "session_data" in st.session_state["project_data"]:
+        st.session_state["it_maturity_answers"] = st.session_state["project_data"]["session_data"].get("maturity_answers", {})
+    else:
+        st.session_state["it_maturity_answers"] = {}
+        
 page_bootstrap(current_page="IT Assessment")
 
 # ----------------- Questionnaire Form -----------------
