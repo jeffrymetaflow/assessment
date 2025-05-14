@@ -415,10 +415,11 @@ with st.form("maturity_form"):
     category_scores = {}
     category_totals = {}
 
-    for category, blocks in groupby(questionnaire, key=lambda x: x["category"]):
-        st.subheader(category)
-        for block in blocks:
-            st.write(block["section"])
+    for category, blocks_iter in groupby(questionnaire, key=lambda x: x["category"]):
+            st.subheader(category)
+            blocks = list(blocks_iter)  # Important: materialize the iterator to reuse
+            for block in blocks:
+                st.write(block["section"])
             yes_count = 0
             for idx, q in enumerate(block["questions"]):
                 hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
