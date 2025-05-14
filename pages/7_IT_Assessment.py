@@ -174,8 +174,16 @@ if submitted:
         else:
             st.markdown(f"**Recommended Products/Services:** _No specific products found_")
 
-st.write("🔍 Debugging IT Maturity Recommendations in Session State")
-st.json(st.session_state["it_maturity_recommendations"])
+# --- Always display recommendations if they exist ---
+if "it_maturity_recommendations" in st.session_state and st.session_state["it_maturity_recommendations"]:
+    st.header("🧭 Recommendations by Category (Saved)")
+    for rec in st.session_state["it_maturity_recommendations"]:
+        st.markdown(f"### {rec['category']} (Score: {rec['score']}%)")
+        st.markdown(f"**Recommendation:** {rec['recommendation']}")
+        if rec.get("products"):
+            st.markdown(f"**Recommended Products/Services:** {', '.join(rec['products'])}")
+        else:
+            st.markdown(f"**Recommended Products/Services:** _No specific products found_")
 
 # ---------------- Admin Tab: Edit Questions ----------------
 st.markdown("---")
