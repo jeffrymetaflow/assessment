@@ -146,7 +146,7 @@ if submitted:
         if score >= 80:
             rec = f"✅ *{category}* is highly mature. Continue optimizing with automation and cross-domain integration."
             rec_text = None
-        elif score < 50:
+        elif score < 79:
             with st.spinner(f"🔍 Generating AI recommendation for {category}..."):
                 rec_text = generate_maturity_recommendation(category)
             rec = f"❌ *{category}* is low maturity.\n\n🔧 **AI Recommendation:** {rec_text}"
