@@ -21,24 +21,27 @@ st.title("🛒 Product Recommendations & Budget Plan (AI Price Lookup)")
 # Initialize Tavily client
 tavily = TavilyClient(api_key=st.secrets["tavily_api_key"])
 
-# --- Extract products from recommendation text ---
-def extract_products_from_text(recommendation_text):
-    match = re.search(r'🛍️ Recommended Products/Services: (.+)', recommendation_text)
-    if match:
-        products_line = match.group(1)
-        products_list = [p.strip() for p in products_line.split(",")]
-        return products_list
-    return []
-
-# --- AI-powered product price lookup ---
-def lookup_product_price_ai(product_name):
+# --- AI-powered product price lookup with Supabase caching ---
+def lookup_product_price_ai_with_supabase(product_name):
     try:
+        # Check Supabase first
+        response = supabase.table("product_prices").select("*").eq("product_name", product_name).execute()
+        if response.data and len(response.data) > 0:
+            cached_price = response.data[0]["price"]
+            return cached_price
+
+        # If not found, perform AI lookup
         query = f"{product_name} enterprise software list price"
         results = tavily.search(query, max_results=3)
         for result in results:
             price_match = re.search(r'\$[0-9,]+', result['snippet'])
             if price_match:
                 price = float(price_match.group(0).replace('$','').replace(',',''))
+                # Store new price in Supabase
+                supabase.table("product_prices").insert({
+                    "product_name": product_name,
+                    "price": price
+                }).execute()
                 return price
         return None
     except Exception as e:
@@ -62,10 +65,9 @@ def assign_phase(score):
 
 products_data = []
 for rec in recommendations:
-    if "recommendation" in rec:
-        products_list = extract_products_from_text(rec["recommendation"])
-        for product_name in products_list:
-            price = lookup_product_price_ai(product_name)
+    if "products" in rec and rec["products"]:
+        for product_name in rec["products"]:
+            price = lookup_product_price_ai_with_supabase(product_name)
             products_data.append({
                 "Quarter": assign_phase(rec["score"]),
                 "Category": rec["category"],
@@ -74,13 +76,6 @@ for rec in recommendations:
                 "% Discount": 0,
                 "Discounted Price ($)": round(price, 2) if price else "N/A",
             })
-
-st.header("🔍 Debugging Recommendations")
-if recommendations:
-    for rec in recommendations:
-        st.write(rec)
-else:
-    st.info("Session recommendations are empty.")
 
 # --- Display table with interactive discount ---
 if products_data:
