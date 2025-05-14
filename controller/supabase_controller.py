@@ -8,7 +8,11 @@ def save_project(project_data):
     """Insert a new project into Supabase"""
     try:
         response = supabase.table("projects").insert(project_data).execute()
-        return response.data[0]
+        if response.status_code == 201 and response.data:
+            return response.data[0]
+        else:
+            print("Save failed, status:", response.status_code, "data:", response.data)
+            return None
     except APIError as e:
         print("Save failed:", e)
         return None
