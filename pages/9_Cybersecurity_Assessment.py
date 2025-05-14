@@ -20,25 +20,7 @@ section = st.sidebar.radio("Go to", [
     "✅ AI Recommendations",
     ])
 
-# Check if "component_mapping" exists in session state
-if "component_mapping" in st.session_state:
-    # Auto-populate the client name from session state
-    default_client_name = st.session_state["component_mapping"].get("client_name", "")
-else:
-    # Default to an empty string if session state is not available
-    default_client_name = ""
-
-# Display the text input field for "Client Name"
-client_name = st.sidebar.text_input(
-    "Client Name",
-    placeholder="e.g., Acme Corp",
-    value=default_client_name,  # Auto-populate if available
-)
-
-# Save back to session state if updated
-if client_name:  # Only save if the user enters something
-    st.session_state["component_mapping"] = st.session_state.get("component_mapping", {})
-    st.session_state["component_mapping"]["client_name"] = client_name
+st.sidebar.text_input("Client Name", value=default_client_name, disabled=True)
 
 page_bootstrap(current_page="Cybersecurity_Assessment")  
 
