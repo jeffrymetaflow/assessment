@@ -403,6 +403,11 @@ st.markdown("""
 Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
 """)
 
+# Safety check to confirm it's loaded before using
+if not questionnaire:
+    st.error("⚠️ Questionnaire is empty. Cannot proceed.")
+    st.stop()
+
 # --- Form block ---
 with st.form("maturity_form"):
     cyber_responses = {}
