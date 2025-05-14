@@ -57,6 +57,10 @@ if not st.session_state.started:
     st.stop()
 
 # --- INIT CONTROLLER ---
+if st.session_state.get("new_project_created"):
+    st.session_state.pop("new_project_created", None)
+    st.experimental_rerun()
+
 if "controller" not in st.session_state:
     st.session_state.controller = ITRMController()
 
