@@ -8,10 +8,10 @@ def save_project(project_data):
     try:
         response = supabase.table("projects").insert(project_data).execute()
         print("Raw Supabase Response:", response)
-        if response.status_code == 201 and response.data:
+        if response.data:
             return response.data[0]
         else:
-            print("Save failed, status:", response.status_code, "data:", response.data)
+            print("Save failed, data is None or empty")
             return None
     except APIError as e:
         print("Save failed:", e)
