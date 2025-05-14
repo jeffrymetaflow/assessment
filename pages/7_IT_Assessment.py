@@ -164,7 +164,10 @@ if submitted:
             "recommendation": rec_text,
             "products": products
         })
-        
+
+st.write("🔍 Debugging IT Maturity Recommendations in Session State")
+st.json(st.session_state["it_maturity_recommendations"])
+
 # ---------------- Admin Tab: Edit Questions ----------------
 st.markdown("---")
 st.subheader("✏️ Edit Assessment Questions")
