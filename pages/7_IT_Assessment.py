@@ -147,34 +147,33 @@ if submitted:
     """)
 
 if submitted:
-# Recommendations Section
     st.header("🧭 Recommendations by Category")
 
-# Clear old recommendations once
     st.session_state["it_maturity_recommendations"] = []
     for _, row in score_df.iterrows():
         score = row["Score (%)"]
         category = row["Category"]
-    
+
+        rec_text_data = generate_maturity_recommendation(category)
+        rec_text = rec_text_data.get("text", "")
+        products = rec_text_data.get("products", [])
+
         if score >= 80:
-            rec = f"✅ *{category}* is highly mature. Continue optimizing with automation and cross-domain integration."
-            rec_text = None
-        elif score < 79:
-            with st.spinner(f"🔍 Generating AI recommendation for {category}..."):
-                rec_text = generate_maturity_recommendation(category)
-            rec = f"❌ *{category}* is low maturity.\n\n🔧 **AI Recommendation:** {rec_text}"
+            rec_full = f"✅ *{category}* is highly mature. Continue optimizing with automation and cross-domain integration.\n\n{rec_text}"
+        elif score < 50:
+            rec_full = f"❌ *{category}* is low maturity.\n\n🔧 **AI Recommendation:** {rec_text}"
         else:
-            rec = f"⚠️ *{category}* shows moderate maturity. Focus on standardization, consolidation, and governance improvements."
-            rec_text = None
-    
-        st.markdown(rec)
-    
+            rec_full = f"⚠️ *{category}* shows moderate maturity. Focus on standardization, consolidation, and governance improvements.\n\n{rec_text}"
+
+        st.markdown(rec_full)
+
         st.session_state["it_maturity_recommendations"].append({
             "category": category,
             "score": score,
-            "recommendation": rec_text
+            "recommendation": rec_text,
+            "products": products
         })
-
+        
 # ---------------- Admin Tab: Edit Questions ----------------
 st.markdown("---")
 st.subheader("✏️ Edit Assessment Questions")
