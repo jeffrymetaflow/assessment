@@ -7,6 +7,7 @@ initialize_session()
 from utils.ai_assist import generate_maturity_recommendation
 from utils.auth import enforce_login
 enforce_login()
+from controller.supabase_controller import save_session_to_supabase
 
 # Embedded grouped questions JSON (shortened for readability — insert full content below)
 grouped_questions = {
@@ -61,8 +62,14 @@ based on your current IT environment. Your responses will be used to calculate a
 across several technology domains.
 """)
 
-responses = {}
-st.sidebar.header("Navigation")
+# ----------------- Clear Button -----------------
+if st.sidebar.button("🔄 Clear Assessment"):
+    if "it_maturity_answers" in st.session_state:
+        del st.session_state["it_maturity_answers"]
+        st.experimental_rerun()
+
+# ----------------- Initialize or Load Answers -----------------
+responses = st.session_state.get("it_maturity_answers", {})
 
 page_bootstrap(current_page="IT Assessment")  # Or "Risk Model", etc.
 
