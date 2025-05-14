@@ -87,7 +87,6 @@ if step == "➕ Start New Client Assessment":
 
         if submitted:
             if client_name and project_name and user_email:
-                project_id = str(uuid.uuid4())
                 project_payload = {
                     "project_id": str(uuid.uuid4()),  # This is YOUR app's logical ID (text)
                     "client_name": client_name,
