@@ -390,6 +390,11 @@ elif section == "⚙️ Inputs":
         },
     ]
 
+# Safety check to confirm it's loaded before using
+if not questionnaire:
+    st.error("⚠️ Questionnaire is empty. Cannot proceed.")
+    st.stop()
+
 # Safely restore cybersecurity_answers from project_data session
 if "cybersecurity_answers" not in st.session_state or not isinstance(st.session_state["cybersecurity_answers"], dict):
     if "project_data" in st.session_state and "session_data" in st.session_state["project_data"]:
@@ -402,11 +407,6 @@ st.title("🧠 Cybersecurity Maturity Assessment Tool")
 st.markdown("""
 Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
 """)
-
-# Safety check to confirm it's loaded before using
-if not questionnaire:
-    st.error("⚠️ Questionnaire is empty. Cannot proceed.")
-    st.stop()
 
 # --- Form block ---
 with st.form("maturity_form"):
