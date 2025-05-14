@@ -51,9 +51,6 @@ def save_session_to_supabase():
             st.session_state["project_data"].get("user_email")
             or st.session_state.get("user_email")
         ),
-        "revenue": st.session_state.get("revenue"),
-        "expenses": st.session_state.get("expenses"),
-        "architecture": st.session_state.get("architecture"),
         "maturity_score": st.session_state.get("maturity_score"),
         "last_saved": datetime.utcnow().isoformat(),
         "maturity_answers": st.session_state.get("it_maturity_answers"),
