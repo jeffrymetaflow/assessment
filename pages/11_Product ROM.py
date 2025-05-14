@@ -30,11 +30,12 @@ def lookup_product_price_ai_with_supabase(product_name):
             cached_price = response.data[0]["price"]
             return cached_price
 
-        # If not found, perform AI lookup
-        query = f"{product_name} enterprise software list price"
-        results = tavily.search(query, max_results=3)
+        # If not found, perform enhanced AI lookup
+        query = f"{product_name} enterprise software pricing OR list price site:{product_name.split()[0]}.com"
+        results = tavily.search(query, max_results=5)
         for result in results:
-            price_match = re.search(r'\$[0-9,]+', result['snippet'])
+            combined_text = f"{result.get('title', '')} {result.get('snippet', '')}"
+            price_match = re.search(r'\$[0-9,]+', combined_text)
             if price_match:
                 price = float(price_match.group(0).replace('$','').replace(',',''))
                 # Store new price in Supabase
@@ -43,6 +44,9 @@ def lookup_product_price_ai_with_supabase(product_name):
                     "price": price
                 }).execute()
                 return price
+        return None
+    except Exception as e:
+        print(f"AI lookup failed for {product_name}: {e}")
         return None
     except Exception as e:
         print(f"AI lookup failed for {product_name}: {e}")
