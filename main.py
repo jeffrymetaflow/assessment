@@ -102,6 +102,7 @@ if step == "➕ Start New Client Assessment":
                     st.session_state["project_name"] = project_name
                     st.session_state["user_email"] = user_email
                     st.session_state["new_project_created"] = True
+
                     st.success("New project created and saved to Supabase. Please proceed.")
                 else:
                     st.error("Failed to save project. Please try again.")
