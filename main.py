@@ -66,7 +66,6 @@ if "project_data" not in st.session_state:
     if projects:
         project = projects[0]  # Later allow selection
         st.session_state["project_data"] = project
-
         st.session_state["maturity_score"] = project.get("maturity_score", 0)
 
 controller = st.session_state.controller
