@@ -75,20 +75,23 @@ page_bootstrap(current_page="IT Assessment")
 
 # ----------------- Questionnaire Form -----------------
 with st.form("maturity_form"):
+    local_responses = {}  # Local variable only inside form
+
     for category, questions in grouped_questions.items():
         st.subheader(category.strip())
         for q in questions:
             key = f"{category.strip()}::{q}"
-            # Use session_state as the data store (avoids reset on tab switch)
-            if key not in st.session_state["it_maturity_answers"]:
-                st.session_state["it_maturity_answers"][key] = "No"
-            st.session_state["it_maturity_answers"][key] = st.radio(
-                q.strip(),
-                ["Yes", "No"],
-                key=key,
-                index=0 if st.session_state["it_maturity_answers"][key] == "Yes" else 1
-            )
+            # Use session_state as default, but manage locally inside form
+            default = st.session_state["it_maturity_answers"].get(key, "No")
+            local_responses[key] = st.radio(q.strip(), ["Yes", "No"], key=key, index=0 if default == "Yes" else 1)
+    
     submitted = st.form_submit_button("Submit Assessment")
+
+# ----------------- After submit logic -----------------
+if submitted:
+    # Safely update session_state AFTER submission
+    st.session_state["it_maturity_answers"] = local_responses.copy()
+    st.success("✅ Assessment Submitted & Saved.")
 
 # Scoring and Results
 if submitted:
