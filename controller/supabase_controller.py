@@ -5,9 +5,9 @@ from postgrest.exceptions import APIError
 from datetime import datetime
 
 def save_project(project_data):
-    """Insert a new project into Supabase"""
     try:
         response = supabase.table("projects").insert(project_data).execute()
+        print("Raw Supabase Response:", response)
         if response.status_code == 201 and response.data:
             return response.data[0]
         else:
