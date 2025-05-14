@@ -433,7 +433,7 @@ elif section == "⚙️ Inputs":
     
         submitted = st.form_submit_button("Submit Assessment")
     
-        # Group questions by category
+    # Group questions by category
     grouped_questions = {
         category: [q for block in blocks for q in block["questions"]]
         for category, blocks in groupby(questionnaire, key=lambda x: x["category"])
