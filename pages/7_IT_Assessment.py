@@ -5,6 +5,7 @@ from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 initialize_session()
 from utils.ai_assist import generate_maturity_recommendation
+from utils.ai_assist import generate_it_maturity_recommendation_with_products
 from utils.auth import enforce_login
 enforce_login()
 from controller.supabase_controller import save_session_to_supabase
@@ -148,24 +149,14 @@ if submitted:
 
 if submitted:
     st.header("🧭 Recommendations by Category")
-
     st.session_state["it_maturity_recommendations"] = []
     for _, row in score_df.iterrows():
         score = row["Score (%)"]
         category = row["Category"]
 
-        rec_text_data = generate_maturity_recommendation(category)
-        rec_text = rec_text_data.get("text", "")
-        products = rec_text_data.get("products", [])
-
-        if score >= 80:
-            rec_full = f"✅ *{category}* is highly mature. Continue optimizing with automation and cross-domain integration.\n\n{rec_text}"
-        elif score < 50:
-            rec_full = f"❌ *{category}* is low maturity.\n\n🔧 **AI Recommendation:** {rec_text}"
-        else:
-            rec_full = f"⚠️ *{category}* shows moderate maturity. Focus on standardization, consolidation, and governance improvements.\n\n{rec_text}"
-
-        st.markdown(rec_full)
+        rec_data = generate_it_maturity_recommendation_with_products(category)
+        rec_text = rec_data.get("recommendation", "")
+        products = rec_data.get("products", [])
 
         st.session_state["it_maturity_recommendations"].append({
             "category": category,
