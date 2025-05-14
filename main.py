@@ -213,7 +213,6 @@ with st.sidebar:
     st.markdown("### 📊 Session Info")
     st.write(f"Client: {st.session_state.get('client_name', '-')}")
     st.write(f"Project: {st.session_state.get('project_name', '-')}")
-    st.write(f"Revenue: {st.session_state.get('project_revenue', '-')}")
 
 # Export session as downloadable JSON
 session_data = {k: v for k, v in st.session_state.items() if not k.startswith('_')}
