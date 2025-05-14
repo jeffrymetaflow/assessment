@@ -26,7 +26,7 @@ if not client_name:
     st.warning("⚠️ No Client Name found. Please load or create a project first.")
     st.stop()
 
-st.markdown(f"**Client Name:** {client_name}")
+
 
 page_bootstrap(current_page="Cybersecurity_Assessment")  
 
