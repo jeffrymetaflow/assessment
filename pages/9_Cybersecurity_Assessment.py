@@ -433,6 +433,8 @@ with st.form("maturity_form"):
 
     submitted = st.form_submit_button("Submit Assessment")
 
+category_scores = {}
+
 # --- After form submit ---
 if submitted:
     st.session_state["cybersecurity_answers"] = cyber_responses.copy()
