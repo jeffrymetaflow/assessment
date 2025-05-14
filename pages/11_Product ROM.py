@@ -21,13 +21,6 @@ st.title("🛒 Product Recommendations & Budget Plan (AI Price Lookup)")
 # Initialize Tavily client
 tavily = TavilyClient(api_key=st.secrets["tavily_api_key"])
 
-st.header("🔍 Debugging Recommendations")
-if recommendations:
-    for rec in recommendations:
-        st.write(rec)
-else:
-    st.info("Session recommendations are empty.")
-
 # --- Extract products from recommendation text ---
 def extract_products_from_text(recommendation_text):
     match = re.search(r'🛍️ Recommended Products/Services: (.+)', recommendation_text)
@@ -81,6 +74,13 @@ for rec in recommendations:
                 "% Discount": 0,
                 "Discounted Price ($)": round(price, 2) if price else "N/A",
             })
+
+st.header("🔍 Debugging Recommendations")
+if recommendations:
+    for rec in recommendations:
+        st.write(rec)
+else:
+    st.info("Session recommendations are empty.")
 
 # --- Display table with interactive discount ---
 if products_data:
