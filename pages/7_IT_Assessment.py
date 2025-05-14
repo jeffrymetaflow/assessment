@@ -165,6 +165,15 @@ if submitted:
             "products": products
         })
 
+        # ✅ Immediately render to page
+        st.markdown(f"### {category} (Score: {score}%)")
+        st.markdown(f"**Recommendation:** {rec_text}")
+
+        if products:
+            st.markdown(f"**Recommended Products/Services:** {', '.join(products)}")
+        else:
+            st.markdown(f"**Recommended Products/Services:** _No specific products found_")
+
 st.write("🔍 Debugging IT Maturity Recommendations in Session State")
 st.json(st.session_state["it_maturity_recommendations"])
 
