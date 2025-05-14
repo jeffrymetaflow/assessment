@@ -128,11 +128,14 @@ elif step == "📂 Open Existing Project":
             project = next(p for p in projects if p["project_name"] == selected)
 
             st.session_state["project_data"] = project
-            st.session_state["maturity_score"] = project.get("maturity_score", 0)
-
-            st.success(f"✅ Project '{project['project_name']}' loaded. Navigate to any tab to begin.")
-        else:
-            st.warning("No projects found for this email.")
+            if "session_data" in project:
+                session_data = project["session_data"]
+                st.session_state["maturity_score"] = session_data.get("maturity_score")
+                st.session_state["it_maturity_answers"] = session_data.get("maturity_answers")
+                st.session_state["cybersecurity_answers"] = session_data.get("cyber_answers")
+                st.success("🔄 Project session data synced.")
+            else:
+                st.warning("⚠️ No session data found for this project.")
 
 # --- USER AUTHENTICATION CHECK ---
 if "user_email" not in st.session_state:
