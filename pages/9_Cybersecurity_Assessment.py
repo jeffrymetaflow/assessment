@@ -57,7 +57,7 @@ if section == "🧠 Overview Summary":
     - **Protect:** Develop and implement safeguards to ensure the delivery of critical services.
     - **Detect:** Identify the occurrence of a cybersecurity event in a timely manner.
     - **Respond:** Take action regarding a detected cybersecurity incident.
-    - **Recover:** Maintain plans for resilience and restore capabilities or services impaired due to a cybersecurity inciden
+    - **Recover:** Maintain plans for resilience and restore capabilities or services impaired due to a cybersecurity incident
     
     """
     
