@@ -43,14 +43,15 @@ products_data = []
 for rec in recommendations:
     if "products" in rec and rec["products"]:
         for product in rec["products"]:
-            products_data.append({
-                "Quarter": assign_phase(rec["score"]),
-                "Category": rec["category"],
-                "Product": product["name"],
-                "List Price ($)": product["list_price"],
-                "% Discount": 0,  # Default manual input
-                "Discounted Price ($)": product["list_price"],
-            })
+            if isinstance(product, dict) and "name" in product and "list_price" in product:
+                products_data.append({
+                    "Quarter": assign_phase(rec["score"]),
+                    "Category": rec["category"],
+                    "Product": product["name"],
+                    "List Price ($)": product["list_price"],
+                    "% Discount": 0,  # Default manual input
+                    "Discounted Price ($)": product["list_price"],
+                })
 
 if products_data:
     product_df = pd.DataFrame(products_data)
