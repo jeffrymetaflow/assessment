@@ -14,20 +14,6 @@ with st.expander("🔐 Login & Session Setup"):
     - All data is saved to your session or exportable to JSON
     """)
 
-with st.expander("🧱 Component Mapping"):
-    st.markdown("""
-    - Upload architecture or describe major components
-    - Classify spend by category (HW, SW, Cloud, etc.)
-    - This drives cost visuals and architectural AI analysis
-    """)
-
-with st.expander("🏩 Architecture + AI"):
-    st.markdown("""
-    - Upload Visio or describe project structure
-    - Run AI analysis on optimization opportunities
-    - View potential architecture alternatives
-    """)
-
 with st.expander("🔐 Cybersecurity & IT Maturity"):
     st.markdown("""
     - Complete structured assessments
