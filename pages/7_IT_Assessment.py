@@ -54,6 +54,7 @@ grouped_questions = {
         "Digital twin or simulation models are used for infrastructure planning."
     ]
 }
+# --- Page Config ---
 st.set_page_config(page_title="IT Maturity Assessment", layout="wide")
 st.title("🧠 IT Maturity Assessment Tool")
 st.markdown("""
@@ -62,49 +63,49 @@ based on your current IT environment. Your responses will be used to calculate a
 across several technology domains.
 """)
 
-# ----------------- Clear Button -----------------
+# --- Clear Button ---
 if st.sidebar.button("🔄 Clear Assessment"):
     st.session_state.pop("it_maturity_answers", None)
     st.experimental_rerun()
 
-if "it_maturity_answers" not in st.session_state:
+# --- Safe Initialization ---
+if "it_maturity_answers" not in st.session_state or not isinstance(st.session_state["it_maturity_answers"], dict):
     if "project_data" in st.session_state and "session_data" in st.session_state["project_data"]:
         st.session_state["it_maturity_answers"] = st.session_state["project_data"]["session_data"].get("maturity_answers", {})
     else:
         st.session_state["it_maturity_answers"] = {}
-        
-page_bootstrap(current_page="IT Assessment")
 
 # ----------------- Questionnaire Form -----------------
 with st.form("maturity_form"):
-    local_responses = {}  # Local variable only inside form
+    local_responses = {}
 
     for category, questions in grouped_questions.items():
         st.subheader(category.strip())
         for q in questions:
             key = f"{category.strip()}::{q}"
-            # Use session_state as default, but manage locally inside form
             default = st.session_state["it_maturity_answers"].get(key, "No")
-            local_responses[key] = st.radio(q.strip(), ["Yes", "No"], key=key, index=0 if default == "Yes" else 1)
-    
+            local_responses[key] = st.radio(
+                q.strip(),
+                ["Yes", "No"],
+                key=key,
+                index=0 if default == "Yes" else 1
+            )
+
     submitted = st.form_submit_button("Submit Assessment")
 
 # ----------------- After submit logic -----------------
 if submitted:
-    # Safely update session_state AFTER submission
     st.session_state["it_maturity_answers"] = local_responses.copy()
     st.success("✅ Assessment Submitted & Saved.")
 
-# Scoring and Results
-if submitted:
-    st.session_state["it_maturity_answers"] = responses.copy()
+    # Calculate and show results
     st.header("📊 Maturity Assessment Results")
     score_data = []
 
     for category in grouped_questions:
         questions = grouped_questions[category]
         yes_count = sum(
-            1 for q in questions if responses.get(f"{category.strip()}::{q}") == "Yes"
+            1 for q in questions if local_responses.get(f"{category.strip()}::{q}") == "Yes"
         )
         total = len(questions)
         percent = round((yes_count / total) * 100, 1)
@@ -112,7 +113,6 @@ if submitted:
 
     score_df = pd.DataFrame(score_data).sort_values(by="Category")
     st.dataframe(score_df, use_container_width=True)
-    
     st.session_state['it_maturity_scores'] = score_df
     
     # Heatmap visual (Streamlit-compatible, no matplotlib)
