@@ -64,22 +64,30 @@ across several technology domains.
 
 # ----------------- Clear Button -----------------
 if st.sidebar.button("🔄 Clear Assessment"):
-    if "it_maturity_answers" in st.session_state:
-        del st.session_state["it_maturity_answers"]
-        st.experimental_rerun()
+    st.session_state.pop("it_maturity_answers", None)
+    st.experimental_rerun()
 
-# ----------------- Initialize or Load Answers -----------------
-responses = st.session_state.get("it_maturity_answers", {})
+# Ensure answers always exist in session_state
+if "it_maturity_answers" not in st.session_state:
+    st.session_state["it_maturity_answers"] = {}
 
-page_bootstrap(current_page="IT Assessment")  # Or "Risk Model", etc.
+page_bootstrap(current_page="IT Assessment")
 
-# Questionnaire Form
+# ----------------- Questionnaire Form -----------------
 with st.form("maturity_form"):
     for category, questions in grouped_questions.items():
         st.subheader(category.strip())
         for q in questions:
             key = f"{category.strip()}::{q}"
-            responses[key] = st.radio(q.strip(), ["Yes", "No"], key=key)
+            # Use session_state as the data store (avoids reset on tab switch)
+            if key not in st.session_state["it_maturity_answers"]:
+                st.session_state["it_maturity_answers"][key] = "No"
+            st.session_state["it_maturity_answers"][key] = st.radio(
+                q.strip(),
+                ["Yes", "No"],
+                key=key,
+                index=0 if st.session_state["it_maturity_answers"][key] == "Yes" else 1
+            )
     submitted = st.form_submit_button("Submit Assessment")
 
 # Scoring and Results
