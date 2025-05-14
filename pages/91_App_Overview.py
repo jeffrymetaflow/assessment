@@ -21,20 +21,6 @@ with st.expander("🧱 Component Mapping"):
     - This drives cost visuals and architectural AI analysis
     """)
 
-with st.expander("📊 Executive Dashboard"):
-    st.markdown("""
-    - View AI-generated strategic recommendations
-    - See financial forecasts and cybersecurity risks
-    - Export visual PDF summaries for stakeholders
-    """)
-
-with st.expander("📈 Forecast & Risk Simulators"):
-    st.markdown("""
-    - Run 'what-if' scenarios using the Forecast Sensitivity Simulator
-    - Model risk, cost trends, and category shifts
-    - Justify IT investment with simulation-backed evidence
-    """)
-
 with st.expander("🏩 Architecture + AI"):
     st.markdown("""
     - Upload Visio or describe project structure
