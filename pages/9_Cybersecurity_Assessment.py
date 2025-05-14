@@ -52,6 +52,18 @@ if section == "🧠 Overview Summary":
     3. Integrate Technologies
     """
 
+    st.markdown("For more details, visit the [NIST Cybersecurity Framework website](https://www.nist.gov/).")
+
+    st.markdown("""
+    **NIST Cybersecurity Framework Functions:**
+
+    - **Identify:** Understand the business context, the resources that support critical functions, and the related cybersecurity risks.
+    - **Protect:** Develop and implement safeguards to ensure the delivery of critical services.
+    - **Detect:** Identify the occurrence of a cybersecurity event in a timely manner.
+    - **Respond:** Take action regarding a detected cybersecurity incident.
+    - **Recover:** Maintain plans for resilience and restore capabilities or services impaired due to a cybersecurity incident.
+    """)
+    
     st.markdown(summary) 
 
     # Default values for section_scores if form hasn't been submitted
