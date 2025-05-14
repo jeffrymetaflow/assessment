@@ -131,6 +131,44 @@ def generate_maturity_recommendation(category: str, question_summary: str = "") 
     response = llm.invoke(prompt)
     return response.content.strip()
 
+def generate_it_maturity_recommendation_with_products(category: str) -> dict:
+    """
+    Returns an IT Maturity recommendation and suggested products.
+    Example format: {"recommendation": "...", "products": ["..."]}
+    """
+    recommendations_catalog = {
+        "Survival / Legacy / Ad-Hoc": {
+            "recommendation": "Adopt cloud-ready infrastructure by migrating legacy workloads to a hybrid or public cloud environment.",
+            "products": ["AWS EC2", "Azure VM", "VMware Cloud on AWS", "IBM Cloud"]
+        },
+        "Standardized / Service-Aligned": {
+            "recommendation": "Implement centralized ITSM tools and standardized service catalogs.",
+            "products": ["ServiceNow", "BMC Helix ITSM", "Cherwell Service Management", "Ivanti Neurons for ITSM"]
+        },
+        "Virtualized / Cloud-Ready": {
+            "recommendation": "Leverage containerization and orchestration platforms for agility and scalability.",
+            "products": ["Kubernetes", "OpenShift", "Amazon EKS", "Azure AKS"]
+        },
+        "Automated / Observability-Driven": {
+            "recommendation": "Invest in observability platforms and CI/CD pipelines for automated deployments and proactive monitoring.",
+            "products": ["Datadog", "New Relic", "Splunk Observability Cloud", "PagerDuty", "GitLab CI/CD"]
+        },
+        "Business-Aligned / Self-Service": {
+            "recommendation": "Enable self-service IT portals tied to business KPIs and cost transparency dashboards.",
+            "products": ["ServiceNow Service Portal", "CloudHealth", "Apptio", "Flexera One"]
+        },
+        "Innovative / Predictive / Autonomous": {
+            "recommendation": "Implement AI-driven autonomous operations (AIOps) and predictive analytics for proactive IT operations.",
+            "products": ["Dynatrace Davis AI", "Moogsoft", "BigPanda", "IBM Watson AIOps"]
+        },
+        "default": {
+            "recommendation": f"Review and improve your {category} IT strategy with automation, cloud-native, and observability practices.",
+            "products": []
+        }
+    }
+
+    return recommendations_catalog.get(category, recommendations_catalog["default"])
+
 def generate_maturity_recommendation_with_products(category: str) -> dict:
     """
     Uses the AI assistant to generate both a recommendation and a product list for a low-maturity cybersecurity category.
