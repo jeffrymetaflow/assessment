@@ -99,7 +99,7 @@ if step == "➕ Start New Client Assessment":
                     "session_data": {}
                 }
                 result = save_project(project_payload)
-
+                st.write("Debug Supabase response:", result)
                 if result:
                     st.session_state["project_data"] = result
                     st.session_state["client_name"] = client_name
