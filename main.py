@@ -92,7 +92,6 @@ if step == "➕ Start New Client Assessment":
             if client_name and project_name and user_email:
                 project_id = str(uuid.uuid4())
                 project_payload = {
-                    "id": project_id,
                     "client_name": client_name,
                     "project_name": project_name,
                     "user_email": user_email,
