@@ -139,6 +139,31 @@ if submitted:
     fig.update_layout(xaxis_tickangle=-45)
     st.plotly_chart(fig, use_container_width=True)
 
+# --- Always display scores & charts if present ---
+if "it_maturity_scores" in st.session_state:
+    st.header("📊 Maturity Assessment Results (Saved)")
+    st.dataframe(st.session_state['it_maturity_scores'], use_container_width=True)
+
+    st.subheader("🔵 Heatmap View of Maturity by Category")
+    st.dataframe(
+        st.session_state['it_maturity_scores'].style
+            .format({"Score (%)": "{:.1f}"})
+            .background_gradient(cmap="RdYlGn", subset=["Score (%)"])
+    )
+
+    st.subheader("📈 Bar Chart of Scores (Color-Coded)")
+    fig = px.bar(
+        st.session_state['it_maturity_scores'],
+        x="Category",
+        y="Score (%)",
+        color="Score (%)",
+        color_continuous_scale="RdYlGn",
+        range_y=[0, 100],
+        text="Score (%)",
+        title="IT Maturity by Category"
+    )
+    fig.update_layout(xaxis_tickangle=-45)
+    st.plotly_chart(fig, use_container_width=True)
     
     st.markdown("""
 ### 🔍 Interpretation:
