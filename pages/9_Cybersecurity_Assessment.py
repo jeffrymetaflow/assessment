@@ -411,28 +411,7 @@ elif section == "⚙️ Inputs":
     Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
     """)
     
-    # --- Form block ---
-    with st.form("maturity_form"):
-        cyber_responses = {}
-    
-        for category, blocks_iter in groupby(questionnaire, key=lambda x: x["category"]):
-            st.subheader(category)
-            blocks = list(blocks_iter)  # Materialize iterator
-            for block in blocks:
-                st.write(block["section"])
-                yes_count = 0
-                for idx, q in enumerate(block["questions"]):
-                    hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
-                    unique_key = f"{category}_{block['section']}_{hashed_q}"
-    
-                    default = st.session_state["cybersecurity_answers"].get(unique_key, None)
-                    index = 0 if default == "Yes" else 1 if default == "No" else 0
-                    answer = st.radio(q, ["Yes", "No"], key=unique_key, index=index)
-    
-                    cyber_responses[unique_key] = answer
-    
-        submitted = st.form_submit_button("Submit Assessment")
-    
+ 
     # Group questions by category
     grouped_questions = {
         category: [q for block in blocks for q in block["questions"]]
