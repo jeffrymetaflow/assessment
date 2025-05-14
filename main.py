@@ -113,7 +113,6 @@ if step == "➕ Start New Client Assessment":
 # Safely trigger rerun outside the form block
 if st.session_state.get("new_project_created"):
     st.experimental_rerun()
-                st.error("Please fill in all fields including email.")
                 
 elif step == "📂 Open Existing Project":
     st.subheader("📂 Load an Existing Project")
