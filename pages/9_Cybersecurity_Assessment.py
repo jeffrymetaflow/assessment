@@ -390,12 +390,15 @@ elif section == "⚙️ Inputs":
         },
     ]
 
-# Safety check to confirm it's loaded before using
+# --- Always sort BEFORE groupby ---
+questionnaire.sort(key=lambda x: x["category"])
+
+# --- Safety check ---
 if not questionnaire:
     st.error("⚠️ Questionnaire is empty. Cannot proceed.")
     st.stop()
 
-# Safely restore cybersecurity_answers from project_data session
+# --- Safely restore cybersecurity_answers from session or Supabase project_data ---
 if "cybersecurity_answers" not in st.session_state or not isinstance(st.session_state["cybersecurity_answers"], dict):
     if "project_data" in st.session_state and "session_data" in st.session_state["project_data"]:
         st.session_state["cybersecurity_answers"] = st.session_state["project_data"]["session_data"].get("cyber_answers", {})
@@ -403,7 +406,7 @@ if "cybersecurity_answers" not in st.session_state or not isinstance(st.session_
         st.session_state["cybersecurity_answers"] = {}
 
 # --- Title and intro ---
-st.title("🧠 Cybersecurity Maturity Assessment Tool")
+st.title("\U0001F9E0 Cybersecurity Maturity Assessment Tool")
 st.markdown("""
 Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
 """)
@@ -411,31 +414,22 @@ Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the 
 # --- Form block ---
 with st.form("maturity_form"):
     cyber_responses = {}
-    section_scores = {}
-    category_scores = {}
-    category_totals = {}
 
     for category, blocks_iter in groupby(questionnaire, key=lambda x: x["category"]):
-            st.subheader(category)
-            blocks = list(blocks_iter)  # Important: materialize the iterator to reuse
-            for block in blocks:
-                st.write(block["section"])
+        st.subheader(category)
+        blocks = list(blocks_iter)  # Materialize iterator
+        for block in blocks:
+            st.write(block["section"])
             yes_count = 0
             for idx, q in enumerate(block["questions"]):
                 hashed_q = hashlib.md5(q.encode()).hexdigest()[:8]
                 unique_key = f"{category}_{block['section']}_{hashed_q}"
 
-                # Safely load from session_state at top (ensured), only use local inside form
                 default = st.session_state["cybersecurity_answers"].get(unique_key, None)
                 index = 0 if default == "Yes" else 1 if default == "No" else 0
                 answer = st.radio(q, ["Yes", "No"], key=unique_key, index=index)
 
                 cyber_responses[unique_key] = answer
-                if answer == "Yes":
-                    yes_count += 1
-
-            if len(block["questions"]) > 0:
-                section_scores[block["section"]] = yes_count / len(block["questions"])
 
     submitted = st.form_submit_button("Submit Assessment")
 
