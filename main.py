@@ -14,11 +14,11 @@ from utils.session_state import initialize_session
 initialize_session()
 from utils.auth import enforce_login
 enforce_login()
-from controller.supabase_controller import get_projects_by_email, save_project
+
 
 # ✅ MUST BE FIRST STREAMLIT COMMAND
 st.set_page_config(page_title="ITRM Main Dashboard", layout="wide")
-
+from controller.supabase_controller import get_projects_by_email, save_project
 from PIL import Image
 
 logo_url = "https://raw.githubusercontent.com/jeffrymetaflow/ITRM-Prototype-v2/main/ITRM%20Logo.png"
