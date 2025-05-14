@@ -86,29 +86,37 @@ if step == "➕ Start New Client Assessment":
         submitted = st.form_submit_button("Start New Project")
 
         if submitted:
-            if client_name and project_name and user_email:
-                project_payload = {
-                    "project_id": str(uuid.uuid4()),  # This is YOUR app's logical ID (text)
-                    "client_name": client_name,
-                    "project_name": project_name,
-                    "user_email": user_email,
-                    "session_data": {}
-                }
-                result = save_project(project_payload)
-                st.write("Debug Supabase response:", result)
-                if result:
-                    st.session_state["project_data"] = result
-                    st.session_state["client_name"] = client_name
-                    st.session_state["project_name"] = project_name
-                    st.session_state["user_email"] = user_email
+    if client_name and project_name and user_email:
+        project_id = str(uuid.uuid4())
+        project_payload = {
+            "project_id": project_id,
+            "client_name": client_name,
+            "project_name": project_name,
+            "user_email": user_email,
+            "session_data": {}
+        }
+        result = save_project(project_payload)
 
-                    st.success("New project created and saved to Supabase. Reloading...")
-                    st.experimental_rerun()
-                else:
+        if result:
+            st.session_state["project_data"] = result
+            st.session_state["client_name"] = client_name
+            st.session_state["project_name"] = project_name
+            st.session_state["user_email"] = user_email
+            st.session_state["new_project_created"] = True
+
+            st.success("New project created and saved to Supabase. Please proceed.")
+        else:
+            st.error("Failed to save project. Please try again.")
+    else:
+        st.error("Please fill in all fields including email.")
+
+# Safely trigger rerun outside the form block
+if st.session_state.get("new_project_created"):
+    st.experimental_rerun()
                     st.error("Failed to save project. Please try again.")
             else:
                 st.error("Please fill in all fields including email.")
-
+                
 elif step == "📂 Open Existing Project":
     st.subheader("📂 Load an Existing Project")
 
