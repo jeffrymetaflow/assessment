@@ -46,15 +46,15 @@ def save_session_to_supabase():
 
     project_id = st.session_state["project_data"]["id"]
 
+    # ✅ Clean and safe: Only update session_data JSON column
     updated_data = {
-        "user_email": (
-            st.session_state["project_data"].get("user_email")
-            or st.session_state.get("user_email")
-        ),
-        "maturity_score": st.session_state.get("maturity_score"),
-        "last_saved": datetime.utcnow().isoformat(),
-        "maturity_answers": st.session_state.get("it_maturity_answers"),
-        "cyber_answers": st.session_state.get("cybersecurity_answers"),
+        "session_data": {
+            "maturity_score": st.session_state.get("maturity_score"),
+            "maturity_answers": st.session_state.get("it_maturity_answers"),
+            "cyber_answers": st.session_state.get("cybersecurity_answers"),
+            "last_saved": datetime.utcnow().isoformat()
+        },
+        "user_email": st.session_state.get("user_email")
     }
 
     try:
@@ -62,7 +62,7 @@ def save_session_to_supabase():
 
         if result.data:
             st.session_state["project_data"] = result.data[0]
-            st.success(f"✅ Project saved at {result.data[0]['last_saved']}")
+            st.success(f"✅ Project saved at {result.data[0]['updated_at']}")
         return result.data[0] if result.data else None
     except APIError as e:
         st.error("❌ Failed to save project to Supabase.")
@@ -78,3 +78,4 @@ def delete_project_by_id(project_id):
         st.error("❌ Failed to delete project.")
         st.write(e)
         return None
+
