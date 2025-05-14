@@ -14,12 +14,11 @@ from utils.session_state import initialize_session
 initialize_session()
 from utils.auth import enforce_login
 enforce_login()
-from controller.supabase_controller import get_projects_by_email
+from controller.supabase_controller import get_projects_by_email, save_project
 
 # ✅ MUST BE FIRST STREAMLIT COMMAND
 st.set_page_config(page_title="ITRM Main Dashboard", layout="wide")
 
-import streamlit as st
 from PIL import Image
 
 logo_url = "https://raw.githubusercontent.com/jeffrymetaflow/ITRM-Prototype-v2/main/ITRM%20Logo.png"
@@ -68,11 +67,10 @@ if "project_data" not in st.session_state:
         project = projects[0]  # Later allow selection
         st.session_state["project_data"] = project
 
-        # Optional: break out fields for convenience
-        st.session_state["revenue"] = project["revenue"]
-        st.session_state["expenses"] = project["expenses"]
-        st.session_state["architecture"] = project["architecture"]
-        st.session_state["maturity_score"] = project["maturity_score"]
+        st.session_state["revenue"] = project.get("revenue", 0)
+        st.session_state["expenses"] = project.get("expenses", {})
+        st.session_state["architecture"] = project.get("architecture", {})
+        st.session_state["maturity_score"] = project.get("maturity_score", 0)
 
 controller = st.session_state.controller
 
@@ -86,38 +84,37 @@ if step == "➕ Start New Client Assessment":
     with st.form("new_project_form", clear_on_submit=True):
         client_name = st.text_input("Client Name")
         project_name = st.text_input("Project / Assessment Name")
-        user_email = st.text_input("Your Email Address")  # ← added
+        user_email = st.text_input("Your Email Address")
 
         submitted = st.form_submit_button("Start New Project")
 
         if submitted:
             if client_name and project_name and user_email:
-                st.session_state["client_name"] = client_name
-                st.session_state["project_name"] = project_name
-                st.session_state["user_email"] = user_email
-
-                # Create initial project_data payload
-                st.session_state["project_data"] = {
-                    "user_email": user_email,
+                project_id = str(uuid.uuid4())
+                project_payload = {
+                    "id": project_id,
+                    "client_name": client_name,
                     "project_name": project_name,
-                    "maturity_score": 0
+                    "user_email": user_email,
+                    "session_data": {}
                 }
+                result = save_project(project_payload)
 
-                # Also store individual fields for easier access in pages
-                st.session_state["revenue"] = 0
-                st.session_state["expenses"] = {}
-                st.session_state["architecture"] = {}
-                st.session_state["maturity_score"] = 0
+                if result:
+                    st.session_state["project_data"] = result
+                    st.session_state["client_name"] = client_name
+                    st.session_state["project_name"] = project_name
+                    st.session_state["user_email"] = user_email
 
-                st.success("🧾 New project session created. Navigate to any tab to begin.")
-                st.rerun()
+                    st.success("New project created and saved to Supabase. Reloading...")
+                    st.experimental_rerun()
+                else:
+                    st.error("Failed to save project. Please try again.")
             else:
                 st.error("Please fill in all fields including email.")
 
 elif step == "📂 Open Existing Project":
     st.subheader("📂 Load an Existing Project")
-
-    from controller.supabase_controller import get_projects_by_email
 
     email = st.text_input("Enter your email address to load saved projects")
 
@@ -128,28 +125,12 @@ elif step == "📂 Open Existing Project":
             selected = st.selectbox("Select a project:", [p["project_name"] for p in projects])
             project = next(p for p in projects if p["project_name"] == selected)
 
-            # Load into session_state
             st.session_state["project_data"] = project
-            st.session_state["maturity_score"] = project.get("maturity_score")
+            st.session_state["maturity_score"] = project.get("maturity_score", 0)
 
             st.success(f"✅ Project '{project['project_name']}' loaded. Navigate to any tab to begin.")
         else:
             st.warning("No projects found for this email.")
-
-        from controller.supabase_controller import delete_project_by_id
-
-        if st.button("🗑️ Delete This Project"):
-            confirm = st.checkbox("Confirm deletion of this project")
-        
-            if confirm:
-                result = delete_project_by_id(project["id"])
-                if result:
-                    st.success("🗑️ Project successfully deleted.")
-        
-                    # Clear session to avoid stale data
-                    for key in ["project_data", "maturity_score"]:
-                        st.session_state.pop(key, None)
-                    st.rerun()
 
 # --- USER AUTHENTICATION CHECK ---
 if "user_email" not in st.session_state:
@@ -159,54 +140,17 @@ if "user_email" not in st.session_state:
 # --- PROJECT SELECTION ---
 if "project_data" not in st.session_state:
     st.info("No active project. Please start a new assessment or load an existing project.")
-        # --- PROJECT START/OPEN OPTIONS ---
-    step = st.radio("Select Option:", ["➕ Start New Client Assessment", "📂 Open Existing Project"], horizontal=True)
-
-    if step == "➕ Start New Client Assessment":
-        with st.form("new_project_form", clear_on_submit=True):
-            client_name = st.text_input("Client Name")
-            project_name = st.text_input("Project / Assessment Name")
-            user_email = st.session_state.get("user_email", "")  # pre-populate from session
-
-            submitted = st.form_submit_button("Start New Project")
-
-            if submitted:
-                if client_name and project_name and user_email:
-                    st.session_state["client_name"] = client_name
-                    st.session_state["project_name"] = project_name
-                    import uuid
-
-                    project_id = str(uuid.uuid4())
-                    st.session_state["project_data"] = {
-                        "id": project_id,
-                        "client_name": client_name,
-                        "project_name": project_name
-                    }
-                    st.success("New project created successfully. Please continue below.")
-                else:
-                    st.warning("Please complete all fields to start a new project.")
-
-    elif step == "📂 Open Existing Project":
-        st.info("(Placeholder) Load existing projects from your storage/database here.")
 else:
-    # --- PROJECT ACTIVE INFO ---
     st.success(f"📁 Active Project: {st.session_state.get('client_name', 'Unknown Client')} | {st.session_state.get('project_name', 'Unknown Project')}")
-    
-    # --- AI Assistant Setup ---
     page_bootstrap(current_page="Main")
 
-   
-    # --- Reset Project State ---
     if st.button("Start New Project"):
         if "controller" in st.session_state and hasattr(st.session_state.controller, "clear_components"):
             st.session_state.controller.clear_components()
         else:
             st.error("Controller is not initialized or does not have the 'clear_components' method.")
-            st.session_state["csv_loaded"] = False
-            st.session_state["json_loaded"] = False
-            st.session_state["pdf_loaded"] = False
-            st.session_state["visio_loaded"] = False
-              
+        st.session_state.clear()
+        st.experimental_rerun()
 
 # --- SIDEBAR ---
 with st.sidebar:
@@ -214,7 +158,6 @@ with st.sidebar:
     st.write(f"Client: {st.session_state.get('client_name', '-')}")
     st.write(f"Project: {st.session_state.get('project_name', '-')}")
 
-# Export session as downloadable JSON
 session_data = {k: v for k, v in st.session_state.items() if not k.startswith('_')}
 json_str = json.dumps(session_data, default=str)
 st.sidebar.download_button(
@@ -224,7 +167,6 @@ st.sidebar.download_button(
     mime="application/json"
 )
 
-# Upload session to restore state
 uploaded_file = st.sidebar.file_uploader("🔁 Import Session", type="json")
 if uploaded_file is not None:
     uploaded_state = json.load(uploaded_file)
@@ -237,7 +179,6 @@ if st.sidebar.button("🧹 Reset Session"):
     for key in list(st.session_state.keys()):
         if key not in reserved_keys:
             del st.session_state[key]
-
     st.experimental_rerun()
 
 # --- AI Assistant Reasoning Enhancement ---
@@ -272,4 +213,3 @@ st.markdown(
     "This tool is for pilot use only and does not represent final security controls.",
     unsafe_allow_html=True
 )
-
