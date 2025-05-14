@@ -390,6 +390,7 @@ elif section == "⚙️ Inputs":
         },
     ]
 
+    responses = {}
     # --- Always sort BEFORE groupby ---
     questionnaire.sort(key=lambda x: x["category"])
     
