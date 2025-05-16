@@ -228,21 +228,6 @@ def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimiz
 )
 
 
-def generate_ai_maturity_recommendation_with_products(category):
-    dynamic_products = get_dynamic_product_recommendations(category)
-
-    # Optional: fallback if Tavily or GPT fails
-    if not dynamic_products:
-        return {
-            "recommendation": f"No dynamic products found for {category}.",
-            "products": []
-        }
-
-    return {
-        "recommendation": f"These tools are best suited for improving your {category} maturity.",
-        "products": dynamic_products
-    }
-
 @st.cache_data(show_spinner="🔍 Fetching and caching product recommendations...")
 def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
     try:
