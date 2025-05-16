@@ -197,7 +197,7 @@ def get_dynamic_product_recommendations(category: str) -> list:
         results = tavily.search(query, max_results=5)
 
         combined = " ".join([
-            f"{r.get('title')} — {r.get('snippet')}" for r in results if r.get("snippet")
+            f"{r.get('title', '')} — {r.get('snippet', '')}" for r in results if isinstance(r, dict) and r.get("snippet")
         ])
 
         prompt = (
@@ -235,8 +235,9 @@ def generate_cybersecurity_recommendation_with_products(category: str) -> dict:
         query = f"Best enterprise cybersecurity tools for {category}"
         tavily = TavilyClient(api_key=tavily_key)
         results = tavily.search(query, max_results=5)
+
         combined = " ".join([
-            f"{r.get('title')} — {r.get('snippet')}" for r in results if r.get("snippet")
+            f"{r.get('title', '')} — {r.get('snippet', '')}" for r in results if isinstance(r, dict) and r.get("snippet")
         ])
 
         prompt = (
