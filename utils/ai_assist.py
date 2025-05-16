@@ -9,6 +9,7 @@ from langchain_core.callbacks.manager import CallbackManagerForToolRun
 from langchain.tools import Tool
 from utils.intent_classifier import classify_intent
 from postgrest.exceptions import APIError
+from utils.supabase_client import supabase
 
 # --- Load API Keys ---
 openai_key = st.secrets["openai_api_key"]
