@@ -150,12 +150,12 @@ if "it_maturity_scores" in st.session_state:
             .background_gradient(cmap="RdYlGn", subset=["Score (%)"])
     )
 
-# Make sure score_df is defined
-score_df = st.session_state.get("it_maturity_scores")
-
-if score_df is None:
-    st.warning("⚠️ No scores found to display.")
-    st.stop()
+    # Make sure score_df is defined
+    score_df = st.session_state.get("it_maturity_scores")
+    
+    if score_df is None:
+        st.warning("⚠️ No scores found to display.")
+        st.stop()
     
     st.subheader("📈 Bar Chart of Scores (Color-Coded)")
     fig = px.bar(
