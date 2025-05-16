@@ -200,10 +200,11 @@ if submitted:
         st.markdown(f"### {category} (Score: {score}%)")
         st.markdown(f"**Recommendation:** {rec_text}")
 
-        if products:
-            st.markdown(f"**Recommended Products/Services:** {', '.join(products)}")
+        if products and isinstance(products[0], dict):
+            product_names = [p.get("name", "Unknown") for p in products]
+            st.markdown(f"**Recommended Products/Services:** {', '.join(product_names)}")
         else:
-            st.markdown(f"**Recommended Products/Services:** _No specific products found_")
+            st.markdown(f"**Recommended Products/Services:** {', '.join(products)}" if products else "_No specific products found_")
 
 # --- Always display recommendations if they exist ---
 if "it_maturity_recommendations" in st.session_state and st.session_state["it_maturity_recommendations"]:
@@ -212,10 +213,10 @@ if "it_maturity_recommendations" in st.session_state and st.session_state["it_ma
         st.markdown(f"### {rec['category']} (Score: {rec['score']}%)")
         st.markdown(f"**Recommendation:** {rec['recommendation']}")
         if rec.get("products"):
-            st.markdown(f"**Recommended Products/Services:** {', '.join(rec['products'])}")
+            st.markdown(f"**Recommended Products/Services:** {', '.join(product_names)}")
         else:
-            st.markdown(f"**Recommended Products/Services:** _No specific products found_")
-
+            st.markdown(f"**Recommended Products/Services:** {', '.join(products)}" if products else "_No specific products found_")
+            
 # ---------------- Admin Tab: Edit Questions ----------------
 st.markdown("---")
 st.subheader("✏️ Edit Assessment Questions")
