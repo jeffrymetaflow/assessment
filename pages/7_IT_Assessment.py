@@ -169,7 +169,7 @@ if "it_maturity_scores" in st.session_state:
         title="IT Maturity by Category"
     )
     fig.update_layout(xaxis_tickangle=-45)
-    st.plotly_chart(fig, use_container_width=True, key=f"plot_{idx}")
+    st.plotly_chart(fig, use_container_width=True, key="plot_1")
     
     st.markdown("""
 ### 🔍 Interpretation:
