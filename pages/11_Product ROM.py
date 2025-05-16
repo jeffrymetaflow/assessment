@@ -58,6 +58,8 @@ if "it_maturity_recommendations" in st.session_state:
     recommendations.extend(st.session_state["it_maturity_recommendations"])
 if "cyber_maturity_recommendations" in st.session_state:
     recommendations.extend(st.session_state["cyber_maturity_recommendations"])
+if "ai_maturity_recommendations" in st.session_state:
+    st.subheader("🛠️ Suggested AI Tools and Services")
 
 def assign_phase(score):
     if score < 50:
