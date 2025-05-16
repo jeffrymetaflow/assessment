@@ -34,15 +34,15 @@ if "it_maturity_recommendations" in st.session_state:
 if "cyber_maturity_recommendations" in st.session_state:
     recommendations.extend(st.session_state["cyber_maturity_recommendations"])
 
-if not recommendations:
-    st.warning("⚠️ No recommendations found. Please complete the IT Maturity Assessment first.")
-    st.stop()
-
 if "ai_maturity_recommendations" in st.session_state:
     st.subheader("🤖 AI Maturity Recommendations")
     for rec in st.session_state["ai_maturity_recommendations"]:
         st.markdown(f"**{rec['category']} (Score: {rec['score']}%)**")
         st.markdown(f"🔹 {rec['recommendation']}")
+
+if not recommendations:
+    st.warning("⚠️ No recommendations found. Please complete the IT Maturity Assessment first.")
+    st.stop()
 
 # Assign roadmap phase by category score
 def assign_phase(score):
