@@ -62,10 +62,13 @@ def assign_phase(score):
 roadmap_data = []
 for rec in recommendations:
     action = rec.get("recommendation", "Maintain and enhance automation")
+    product_names = ", ".join([p["name"] for p in rec.get("products", []) if isinstance(p, dict)]) if rec.get("products") else "N/A"
+
     roadmap_data.append({
         "Quarter": assign_phase(rec["score"]),
         "Category": rec["category"],
         "Action Item": action,
+        "Products": product_names,
         "Source": rec.get("source", "Unknown")
     })
 
