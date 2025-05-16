@@ -201,21 +201,22 @@ if submitted:
         st.markdown(f"**Recommendation:** {rec_text}")
 
         if products and isinstance(products[0], dict):
-            product_names = [p.get("name", "Unknown") for p in products]
-            st.markdown(f"**Recommended Products/Services:** {', '.join(product_names)}")
+            st.markdown("**Recommended Products/Services:**")
+            st.dataframe(pd.DataFrame(products), use_container_width=True)
         else:
-            st.markdown(f"**Recommended Products/Services:** {', '.join(products)}" if products else "_No specific products found_")
+            st.markdown("**Recommended Products/Services:** _No specific products found_")
 
-# --- Always display recommendations if they exist ---
+# --- Saved recommendations rendering ---
 if "it_maturity_recommendations" in st.session_state and st.session_state["it_maturity_recommendations"]:
     st.header("🧭 Recommendations by Category (Saved)")
     for rec in st.session_state["it_maturity_recommendations"]:
         st.markdown(f"### {rec['category']} (Score: {rec['score']}%)")
         st.markdown(f"**Recommendation:** {rec['recommendation']}")
-        if rec.get("products"):
-            st.markdown(f"**Recommended Products/Services:** {', '.join(product_names)}")
+        products = rec.get("products", [])
+        if products and isinstance(products[0], dict):
+            st.dataframe(pd.DataFrame(products), use_container_width=True)
         else:
-            st.markdown(f"**Recommended Products/Services:** {', '.join(products)}" if products else "_No specific products found_")
+            st.markdown("**Recommended Products/Services:** _No specific products found_")
             
 # ---------------- Admin Tab: Edit Questions ----------------
 st.markdown("---")
