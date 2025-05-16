@@ -270,49 +270,49 @@ def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
         }
 
 def get_dynamic_product_recommendations(category: str):
-    import openai
-    from tavily import TavilyClient
-
     tavily = TavilyClient(api_key=st.secrets["tavily_api_key"])
     openai.api_key = st.secrets["openai_api_key"]
 
-    query = f"Top enterprise tools for {category.lower()} in AI maturity"
-    results = tavily.search(query, max_results=5)
+    try:
+        query = f"Top enterprise tools for {category.lower()} in AI maturity"
+        results = tavily.search(query, max_results=5)
 
-    source_text = "\n\n".join([
-        f"Title: {r.get('title', '')}\nSnippet: {r.get('snippet', '')}\nURL: {r.get('url', '')}"
-        for r in results
-    ])
+        source_text = "\n\n".join([
+            f"Title: {r.get('title', '')}\nSnippet: {r.get('snippet', '')}\nURL: {r.get('url', '')}"
+            for r in results
+        ])
 
-    prompt = f"""
+        prompt = f"""
 Based on the following search results, return a list of 3 recommended products in JSON format.
 Each product should include: name, 2-3 key features, a rough price estimate ($/$$/$$$), and what it's best suited for.
 
 Search Results:
 {source_text}
 
-Respond in the following JSON format:
+Respond only with a JSON array like this:
 [
   {{
-    "name": "...",
-    "features": ["...", "..."],
+    "name": "Product Name",
+    "features": ["Feature A", "Feature B"],
     "price_estimate": "$$",
-    "best_for": "..."
+    "best_for": "Use case or scenario"
   }}
 ]
 """
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant that summarizes product research."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.3
-    )
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that summarizes product research."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3
+        )
 
-    try:
-        return eval(response.choices[0].message.content)
+        json_text = response.choices[0].message.content.strip()
+        return json.loads(json_text)
+
     except Exception as e:
-        print("GPT parsing error:", e)
+        print("🛑 GPT or Tavily error:", e)
         return []
+
