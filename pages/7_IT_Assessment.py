@@ -83,7 +83,7 @@ with st.form("maturity_form"):
         st.subheader(category.strip())
         for q in questions:
             key = f"{category.strip()}::{q.strip()}"
-            default = st.session_state["it_maturity_answers"].get(key, "No")
+            default = (st.session_state.get("it_maturity_answers") or {}).get(key, "No")
             local_responses[key] = st.radio(
                 q.strip(),
                 ["Yes", "No"],
