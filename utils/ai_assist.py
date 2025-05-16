@@ -10,6 +10,7 @@ from langchain.tools import Tool
 from utils.intent_classifier import classify_intent
 from postgrest.exceptions import APIError
 from utils.supabase_client import supabase
+from tavily import TavilyClient
 
 # --- Load API Keys ---
 openai_key = st.secrets["openai_api_key"]
