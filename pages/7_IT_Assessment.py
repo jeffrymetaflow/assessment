@@ -4,7 +4,7 @@ import plotly.express as px
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 initialize_session()
-from utils.ai_assist import generate_maturity_recommendation
+from utils.ai_assist import generate_ai_maturity_recommendation_with_products
 from utils.ai_assist import generate_it_maturity_recommendation_with_products
 from utils.auth import enforce_login
 enforce_login()
