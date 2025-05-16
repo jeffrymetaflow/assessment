@@ -225,3 +225,34 @@ def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimiz
         f"The following text is from a company's 10-K filing:\n\n{excerpt}\n\n"
         f"What is the total annual revenue reported in this filing? Return only the dollar figure."
 )
+
+
+def generate_ai_maturity_recommendation_with_products(category):
+    # Sample logic – update with real recommendations + product mapping
+    recommendations = {
+        "Infrastructure and Technology": {
+            "recommendation": "Invest in scalable compute infrastructure with GPU support and observability tools.",
+            "products": ["NVIDIA DGX", "Datadog", "AWS SageMaker"]
+        },
+        "Data Management and Quality": {
+            "recommendation": "Establish centralized data governance and enhance data lineage tracking.",
+            "products": ["Collibra", "Alation", "Databricks Unity Catalog"]
+        },
+        "Talent and Skills": {
+            "recommendation": "Build cross-functional AI teams and upskill your existing staff.",
+            "products": ["Coursera for Business", "DataCamp", "Pluralsight"]
+        },
+        "Strategy and Vision": {
+            "recommendation": "Define a long-term AI roadmap tied to business KPIs and digital transformation.",
+            "products": ["Lucidchart", "Azure AI Strategy Services", "Salesforce Einstein Planning"]
+        },
+        "Ethics and Governance": {
+            "recommendation": "Develop an AI ethics framework and implement model auditability tools.",
+            "products": ["AI Fairness 360", "Microsoft Responsible AI Dashboard", "Fiddler AI"]
+        }
+    }
+
+    return recommendations.get(category, {
+        "recommendation": "No recommendation available.",
+        "products": []
+    })
