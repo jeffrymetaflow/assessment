@@ -152,7 +152,7 @@ if "it_maturity_scores" in st.session_state:
 
     st.subheader("📈 Bar Chart of Scores (Color-Coded)")
     fig = px.bar(
-        st.session_state['it_maturity_scores'],
+        score_df,
         x="Category",
         y="Score (%)",
         color="Score (%)",
