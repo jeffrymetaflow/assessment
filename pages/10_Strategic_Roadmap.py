@@ -77,7 +77,6 @@ roadmap_df = pd.DataFrame(roadmap_data)
 st.subheader("📅 Strategic Timeline by Quarter")
 st.dataframe(roadmap_df, use_container_width=True)
 
-st.markdown("🔹 **Legend**: _IT = Blue_, _Cyber = Red_, _AI = Green_")
 
 st.subheader("✅ Progress Tracker")
 for quarter in sorted(roadmap_df["Quarter"].unique()):
