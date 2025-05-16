@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from itertools import groupby
 import hashlib
-from utils.ai_assist import generate_maturity_recommendation_with_products
+from utils.ai_assist import generate_cybersecurity_recommendation_with_products
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 initialize_session()
