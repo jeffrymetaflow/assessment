@@ -163,7 +163,7 @@ else:
 
         rec_data = generate_ai_maturity_recommendation_with_products(category)
         rec_text = rec_data.get("recommendation", "")
-        products = rec_data.get("products", [])
+        products = rec_data.get("products", [])  # now expected to be a list of product dictionaries
 
         st.session_state["ai_maturity_recommendations"].append({
             "category": category,
@@ -174,7 +174,11 @@ else:
 
         st.markdown(f"### {category} (Score: {score}%)")
         st.markdown(f"**Recommendation:** {rec_text}")
-        if products:
-            st.markdown(f"**Recommended Products/Services:** {', '.join(products)}")
+
+        if products and isinstance(products[0], dict):
+            st.markdown("**Recommended Products/Services:**")
+            st.dataframe(pd.DataFrame(products), use_container_width=True)
+        elif products:
+            st.table(pd.DataFrame({"Product": products}))
         else:
             st.markdown("**Recommended Products/Services:** _No specific products found_")
