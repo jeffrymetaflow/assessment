@@ -415,7 +415,10 @@ elif section == "⚙️ Inputs":
     Welcome to the interactive Cybersecurity Maturity Assessment. Please answer the following questions based on your current IT environment. Your responses will be used to calculate a maturity score.
     """)
     
- 
+# --- Ensure cybersecurity_answers is always a dict ---
+    if "cybersecurity_answers" not in st.session_state or not isinstance(st.session_state["cybersecurity_answers"], dict):
+        st.session_state["cybersecurity_answers"] = {}
+    
     # Group questions by category
     grouped_questions = {
         category: [q for block in blocks for q in block["questions"]]
