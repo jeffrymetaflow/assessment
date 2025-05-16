@@ -8,7 +8,7 @@ from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from langchain_core.callbacks.manager import CallbackManagerForToolRun
 from langchain.tools import Tool
 from utils.intent_classifier import classify_intent
-
+from dynamic_ai_recommender import get_dynamic_product_recommendations
 
 # --- Load API Keys ---
 openai_key = st.secrets["openai_api_key"]
@@ -227,8 +227,6 @@ def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimiz
 )
 
 
-from dynamic_ai_recommender import get_dynamic_product_recommendations
-
 def generate_ai_maturity_recommendation_with_products(category):
     dynamic_products = get_dynamic_product_recommendations(category)
 
@@ -244,23 +242,43 @@ def generate_ai_maturity_recommendation_with_products(category):
         "products": dynamic_products
     }
 
-from dynamic_ai_recommender import get_dynamic_product_recommendations
-
-@st.cache_data(show_spinner="🔍 Fetching product recommendations...")
+@st.cache_data(show_spinner="🔍 Fetching and caching product recommendations...")
 def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
-    """
-    Returns dynamic product recommendations and a general recommendation string for a given category.
-    Results are cached per session to reduce GPT/Tavily calls.
-    """
-    dynamic_products = get_dynamic_product_recommendations(category)
+    try:
+        # Check if cached in Supabase
+        response = supabase.table("ai_product_recommendations").select("*").eq("category", category).execute()
+        if response.data and len(response.data) > 0:
+            return {
+                "recommendation": response.data[0]["recommendation"],
+                "products": response.data[0]["products"]
+            }
 
-    if not dynamic_products:
-        return {
-            "recommendation": f"No dynamic products found for {category}.",
-            "products": []
+        # If not found, generate dynamically
+        dynamic_products = get_dynamic_product_recommendations(category)
+        if not dynamic_products:
+            return {
+                "recommendation": f"No dynamic products found for {category}.",
+                "products": []
+            }
+
+        result = {
+            "recommendation": f"These tools are best suited for improving your {category} maturity.",
+            "products": dynamic_products
         }
 
-    return {
-        "recommendation": f"These tools are best suited for improving your {category} maturity.",
-        "products": dynamic_products
-    }
+        # Cache in Supabase
+        supabase.table("ai_product_recommendations").insert({
+            "category": category,
+            "recommendation": result["recommendation"],
+            "products": result["products"],
+            "created_at": datetime.utcnow().isoformat()
+        }).execute()
+
+        return result
+
+    except APIError as e:
+        st.warning(f"⚠️ Supabase error: {e}")
+        return {
+            "recommendation": f"Dynamic fetch failed for {category}.",
+            "products": []
+        }
