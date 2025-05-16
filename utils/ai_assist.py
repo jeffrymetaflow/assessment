@@ -150,59 +150,11 @@ def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimiz
 def generate_it_maturity_recommendation_with_products(category: str) -> dict:
     return generate_ai_maturity_recommendation_with_products(category)
 
-def generate_cybersecurity_recommendation_with_products(category: str) -> dict:
-    try:
-        response = supabase.table("cyber_product_recommendations").select("*").eq("category", category).execute()
-        if response.data:
-            return {
-                "recommendation": response.data[0]["recommendation"],
-                "products": response.data[0]["products"]
-            }
-
-        query = f"Best enterprise cybersecurity tools for {category}"
-        tavily = TavilyClient(api_key=tavily_key)
-        results = tavily.search(query, max_results=5)
-        combined = " ".join([
-            f"{r.get('title')} — {r.get('snippet')}" for r in results if r.get("snippet")
-        ])
-
-        prompt = (
-            f"Based on this content:\n{combined}\n\n"
-            f"List 3-5 cybersecurity tools for '{category}'. Format as JSON:\n"
-            "[{\"name\": \"\", \"features\": [\"\"], \"price_estimate\": \"\", \"suitability\": \"\"}]"
-        )
-
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3
-        )
-
-        parsed = json.loads(response.choices[0].message.content)
-        if not parsed:
-            return {"recommendation": f"No cybersecurity tools found for {category}.", "products": []}
-
-        recommendation = (
-            f"These cybersecurity tools align well with improving **{category}** maturity and risk posture."
-        )
-
-        supabase.table("cyber_product_recommendations").insert({
-            "category": category,
-            "recommendation": recommendation,
-            "products": parsed,
-            "created_at": datetime.utcnow().isoformat()
-        }).execute()
-
-        return {"recommendation": recommendation, "products": parsed}
-
-    except Exception as e:
-        st.error(f"❌ Cyber recommendation error: {e}")
-        return {"recommendation": f"Error retrieving cybersecurity products for {category}.", "products": []}
-
 def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
     try:
         response = supabase.table("ai_product_recommendations").select("*").eq("category", category).execute()
         if response.data:
+            st.info(f"✅ Using cached recommendation for '{category}' from Supabase.")
             return {
                 "recommendation": response.data[0]["recommendation"],
                 "products": response.data[0]["products"]
@@ -227,6 +179,7 @@ def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
             "created_at": datetime.utcnow().isoformat()
         }).execute()
 
+        st.info(f"💡 New recommendation generated and cached for '{category}'.")
         return {"recommendation": recommendation, "products": dynamic_products}
 
     except APIError as e:
@@ -259,8 +212,65 @@ def get_dynamic_product_recommendations(category: str) -> list:
             temperature=0.3
         )
 
-        return json.loads(response.choices[0].message.content)
+        content = response.choices[0].message.content
+        st.write(f"📦 Raw GPT Response for '{category}':\n", content)
+
+        parsed = json.loads(content)
+        return parsed if isinstance(parsed, list) else []
 
     except Exception as e:
-        print(f"❌ Error in product fetch: {e}")
+        st.error(f"❌ Error in dynamic product fetch for '{category}': {e}")
         return []
+
+def generate_cybersecurity_recommendation_with_products(category: str) -> dict:
+    try:
+        response = supabase.table("cyber_product_recommendations").select("*").eq("category", category).execute()
+        if response.data:
+            st.info(f"✅ Using cached cybersecurity recommendation for '{category}' from Supabase.")
+            return {
+                "recommendation": response.data[0]["recommendation"],
+                "products": response.data[0]["products"]
+            }
+
+        query = f"Best enterprise cybersecurity tools for {category}"
+        tavily = TavilyClient(api_key=tavily_key)
+        results = tavily.search(query, max_results=5)
+        combined = " ".join([
+            f"{r.get('title')} — {r.get('snippet')}" for r in results if r.get("snippet")
+        ])
+
+        prompt = (
+            f"Based on this content:\n{combined}\n\n"
+            f"List 3-5 cybersecurity tools for '{category}'. Format as JSON:\n"
+            "[{\"name\": \"\", \"features\": [\"\"], \"price_estimate\": \"\", \"suitability\": \"\"}]"
+        )
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3
+        )
+
+        content = response.choices[0].message.content
+        st.write(f"📦 Raw Cybersecurity GPT Response for '{category}':\n", content)
+
+        parsed = json.loads(content)
+        if not parsed:
+            return {"recommendation": f"No cybersecurity tools found for {category}.", "products": []}
+
+        recommendation = (
+            f"These cybersecurity tools align well with improving **{category}** maturity and risk posture."
+        )
+
+        supabase.table("cyber_product_recommendations").insert({
+            "category": category,
+            "recommendation": recommendation,
+            "products": parsed,
+            "created_at": datetime.utcnow().isoformat()
+        }).execute()
+
+        return {"recommendation": recommendation, "products": parsed}
+
+    except Exception as e:
+        st.error(f"❌ Cyber recommendation error for '{category}': {e}")
+        return {"recommendation": f"Error retrieving cybersecurity products for {category}.", "products": []}
