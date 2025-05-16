@@ -32,8 +32,8 @@ if "it_maturity_recommendations" in st.session_state:
     for r in st.session_state["it_maturity_recommendations"]:
         r["source"] = "IT"
 
-if "cybersecurity_recommendations" in st.session_state:
-    for r in st.session_state["cybersecurity_recommendations"]:
+if "cyber_maturity_recommendations" in st.session_state:
+    for r in st.session_state["cyber_maturity_recommendations"]:
         r["source"] = "Cyber"
 
 if "ai_maturity_recommendations" in st.session_state:
@@ -42,7 +42,7 @@ if "ai_maturity_recommendations" in st.session_state:
 
 recommendations = (
     st.session_state.get("it_maturity_recommendations", []) +
-    st.session_state.get("cybersecurity_recommendations", []) +
+    st.session_state.get("cyber_maturity_recommendations", []) + 
     st.session_state.get("ai_maturity_recommendations", [])
 )
 
