@@ -147,41 +147,8 @@ def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimiz
     else:
         return "I'm not sure how to help with that yet. Try asking about your budget, risk, or tools."
 
-def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
-    try:
-        response = supabase.table("ai_product_recommendations").select("*").eq("category", category).execute()
-        if response.data:
-            return {
-                "recommendation": response.data[0]["recommendation"],
-                "products": response.data[0]["products"]
-            }
-
-        dynamic_products = get_dynamic_product_recommendations(category)
-        if not dynamic_products:
-            return {
-                "recommendation": f"No dynamic products found for {category}.",
-                "products": []
-            }
-
-        recommendation = (
-            f"These tools are well-suited for improving **{category}** maturity. "
-            "Focus on high-suitability tools first."
-        )
-
-        supabase.table("ai_product_recommendations").insert({
-            "category": category,
-            "recommendation": recommendation,
-            "products": dynamic_products,
-            "created_at": datetime.utcnow().isoformat()
-        }).execute()
-
-        return {"recommendation": recommendation, "products": dynamic_products}
-
-    except APIError as e:
-        st.warning(f"⚠️ Supabase error: {e}")
-    except Exception as e:
-        st.error(f"❌ Error generating recommendations: {e}")
-    return {"recommendation": f"Failed to generate recommendations for {category}.", "products": []}
+def generate_it_maturity_recommendation_with_products(category: str) -> dict:
+    return generate_ai_maturity_recommendation_with_products(category)
 
 def generate_cybersecurity_recommendation_with_products(category: str) -> dict:
     try:
@@ -231,6 +198,42 @@ def generate_cybersecurity_recommendation_with_products(category: str) -> dict:
     except Exception as e:
         st.error(f"❌ Cyber recommendation error: {e}")
         return {"recommendation": f"Error retrieving cybersecurity products for {category}.", "products": []}
+
+def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
+    try:
+        response = supabase.table("ai_product_recommendations").select("*").eq("category", category).execute()
+        if response.data:
+            return {
+                "recommendation": response.data[0]["recommendation"],
+                "products": response.data[0]["products"]
+            }
+
+        dynamic_products = get_dynamic_product_recommendations(category)
+        if not dynamic_products:
+            return {
+                "recommendation": f"No dynamic products found for {category}.",
+                "products": []
+            }
+
+        recommendation = (
+            f"These tools are well-suited for improving **{category}** maturity. "
+            "Focus on high-suitability tools first."
+        )
+
+        supabase.table("ai_product_recommendations").insert({
+            "category": category,
+            "recommendation": recommendation,
+            "products": dynamic_products,
+            "created_at": datetime.utcnow().isoformat()
+        }).execute()
+
+        return {"recommendation": recommendation, "products": dynamic_products}
+
+    except APIError as e:
+        st.warning(f"⚠️ Supabase error: {e}")
+    except Exception as e:
+        st.error(f"❌ Error generating recommendations: {e}")
+    return {"recommendation": f"Failed to generate recommendations for {category}.", "products": []}
 
 def get_dynamic_product_recommendations(category: str) -> list:
     try:
