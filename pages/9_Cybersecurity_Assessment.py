@@ -714,11 +714,8 @@ elif section == "⚙️ Inputs":
 # ---------- AI Recommendations ----------
 if section == "✅ AI Recommendations":
     st.title("✅ Cybersecurity Assessment AI Recommendations")
-
     submitted = st.session_state.get("cyber_form_submitted", False)
 
-
-    # Generate and store AI recommendations if form was submitted
     if submitted and "cyber_maturity_recommendations" not in st.session_state:
         cat_df = st.session_state.get("cyber_category_scores", pd.DataFrame())
         st.session_state["cyber_maturity_recommendations"] = []
@@ -729,7 +726,7 @@ if section == "✅ AI Recommendations":
                 score = row["Score (%)"]
 
                 if score < 80:
-                    rec_data = generate_maturity_recommendation_with_products(category)
+                    rec_obj = generate_cybersecurity_recommendation_with_products(category)
                     st.session_state["cyber_maturity_recommendations"].append({
                         "category": category,
                         "score": score,
@@ -754,27 +751,23 @@ if section == "✅ AI Recommendations":
             products = rec.get("products", [])
 
             if score < 50:
-                st.markdown(f"""❌ *{category}* is low maturity.
-
-🔧 **AI Suggestion:** {suggestion}
-
-🛍️ **Recommended Products/Services:** {', '.join(products) if products else 'N/A'}""")
+                st.markdown(f"❌ *{category}* is low maturity.\n\n🔧 **AI Suggestion:** {suggestion}")
             elif score < 80:
-                st.markdown(f"""⚠️ *{category}* is moderately mature.
-
-🛠️ **Next Step:** {suggestion}
-
-🛍️ **Recommended Products/Services:** {', '.join(products) if products else 'N/A'}""")
+                st.markdown(f"⚠️ *{category}* is moderately mature.\n\n🛠️ **Next Step:** {suggestion}")
             else:
-                st.markdown(f"""✅ *{category}* is highly mature.
+                st.markdown(f"✅ *{category}* is highly mature.\n\n🧰 **Guidance:** {suggestion}")
 
-🧰 **Guidance:** {suggestion}
-
-🛍️ **Recommended Products/Services:** {', '.join(products) if products else 'N/A'}""")
+            # Render product metadata
+            if products and isinstance(products[0], dict):
+                st.markdown("**Recommended Products/Services:**")
+                df = pd.DataFrame(products).fillna("N/A")
+                st.dataframe(df, use_container_width=True)
+            elif products:
+                st.markdown(f"**Recommended Products/Services:** {', '.join(products)}")
+            else:
+                st.markdown("**Recommended Products/Services:** _No specific products found_")
     else:
         st.warning("⚠️ No AI recommendations found yet. Please complete the cybersecurity maturity assessment first.")
-
-
 
 
 if st.button("💾 Save Project to Supabase"):
