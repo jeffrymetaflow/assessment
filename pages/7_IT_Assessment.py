@@ -185,7 +185,7 @@ if submitted:
         score = row["Score (%)"]
         category = row["Category"]
 
-        rec_data = generate_it_maturity_recommendation_with_products(category)
+        rec_data = generate_ai_maturity_recommendation_with_products(category)
         rec_text = rec_data.get("recommendation", "")
         products = rec_data.get("products", [])
 
