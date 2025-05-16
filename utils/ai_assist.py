@@ -1,7 +1,9 @@
 import openai
 import os
+import json
 import pandas as pd
 import streamlit as st
+from datetime import datetime
 from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
@@ -11,7 +13,6 @@ from utils.intent_classifier import classify_intent
 from postgrest.exceptions import APIError
 from utils.supabase_client import supabase
 from tavily import TavilyClient
-from utils.dynamic_ai_recommender import get_dynamic_product_recommendations
 
 # --- Load API Keys ---
 openai_key = st.secrets["openai_api_key"]
@@ -23,7 +24,6 @@ llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=openai_key)
 search_tool = TavilySearchResults()
 
 def fetch_module_summary(prompt: str, run_manager: CallbackManagerForToolRun = None):
-    import streamlit as st
     components = st.session_state.get("components", [])
     if not components:
         return "No component data found to analyze."
@@ -52,12 +52,13 @@ agent = initialize_agent(
 def answer_with_code_context(query: str):
     if not openai_key:
         return "❌ OpenAI API key not configured."
-
     try:
+        from utils.vector_index import load_vector_index
         vectorstore = load_vector_index()
         retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+        from langchain.chains import RetrievalQA
         qa = RetrievalQA.from_chain_type(
-            llm=ChatOpenAI(temperature=0, api_key=st.secrets["openai_api_key"]),
+            llm=ChatOpenAI(temperature=0, api_key=openai_key),
             chain_type="stuff",
             retriever=retriever
         )
@@ -121,83 +122,6 @@ def fallback_classifier(prompt):
         return "optimize_margin"
     return "unknown"
 
-def generate_maturity_recommendation(category: str, question_summary: str = "") -> str:
-    """
-    Uses the AI assistant to generate improvement recommendations for a low-maturity category.
-    """
-    prompt = (
-        f"The IT maturity category '{category}' scored low. "
-        f"Recommend practical steps, tools, services, or best practices that could help an organization "
-        f"improve in this area. {question_summary.strip() if question_summary else ''} "
-        f"Focus on changes that could shift this maturity from 'low' to 'moderate' or 'high'."
-    )
-    response = llm.invoke(prompt)
-    return response.content.strip()
-
-def generate_it_maturity_recommendation_with_products(category: str) -> dict:
-    """
-    Returns an IT Maturity recommendation and suggested products.
-    Example format: {"recommendation": "...", "products": ["..."]}
-    """
-    recommendations_catalog = {
-        "Survival / Legacy / Ad-Hoc": {
-            "recommendation": "Adopt cloud-ready infrastructure by migrating legacy workloads to a hybrid or public cloud environment.",
-            "products": ["AWS EC2", "Azure VM", "VMware Cloud on AWS", "IBM Cloud"]
-        },
-        "Standardized / Service-Aligned": {
-            "recommendation": "Implement centralized ITSM tools and standardized service catalogs.",
-            "products": ["ServiceNow", "BMC Helix ITSM", "Cherwell Service Management", "Ivanti Neurons for ITSM"]
-        },
-        "Virtualized / Cloud-Ready": {
-            "recommendation": "Leverage containerization and orchestration platforms for agility and scalability.",
-            "products": ["Kubernetes", "OpenShift", "Amazon EKS", "Azure AKS"]
-        },
-        "Automated / Observability-Driven": {
-            "recommendation": "Invest in observability platforms and CI/CD pipelines for automated deployments and proactive monitoring.",
-            "products": ["Datadog", "New Relic", "Splunk Observability Cloud", "PagerDuty", "GitLab CI/CD"]
-        },
-        "Business-Aligned / Self-Service": {
-            "recommendation": "Enable self-service IT portals tied to business KPIs and cost transparency dashboards.",
-            "products": ["ServiceNow Service Portal", "CloudHealth", "Apptio", "Flexera One"]
-        },
-        "Innovative / Predictive / Autonomous": {
-            "recommendation": "Implement AI-driven autonomous operations (AIOps) and predictive analytics for proactive IT operations.",
-            "products": ["Dynatrace Davis AI", "Moogsoft", "BigPanda", "IBM Watson AIOps"]
-        },
-        "default": {
-            "recommendation": f"Review and improve your {category} IT strategy with automation, cloud-native, and observability practices.",
-            "products": []
-        }
-    }
-
-    return recommendations_catalog.get(category, recommendations_catalog["default"])
-
-def generate_maturity_recommendation_with_products(category: str) -> dict:
-    """
-    Uses the AI assistant to generate both a recommendation and a product list for a low-maturity cybersecurity category.
-    Returns a dictionary like: {"recommendation": "...", "products": ["Product1", "Product2"]}
-    """
-    prompt = (
-        f"The cybersecurity category '{category}' scored low in a maturity assessment. "
-        f"Suggest a practical improvement recommendation, and include a list of commercial tools or services "
-        f"that would help an enterprise improve in this area.\n\n"
-        f"Return your response in JSON format:\n"
-        f"{{\"recommendation\": \"...\", \"products\": [\"...\", \"...\"]}}"
-    )
-
-    response = llm.invoke(prompt)
-
-    # Parse and safely return the result
-    try:
-        import json
-        return json.loads(response.content)
-    except Exception:
-        return {
-            "recommendation": response.content.strip(),
-            "products": []
-        }
-
-# --- Central AI Assist Dispatch Function ---
 def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimize Costs"):
     intent = classify_intent(user_prompt)
     if intent == "unknown":
@@ -223,88 +147,62 @@ def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimiz
     else:
         return "I'm not sure how to help with that yet. Try asking about your budget, risk, or tools."
 
-
-    prompt = (
-        f"The following text is from a company's 10-K filing:\n\n{excerpt}\n\n"
-        f"What is the total annual revenue reported in this filing? Return only the dollar figure."
-)
-
-@st.cache_data(show_spinner="🔍 Fetching and caching product recommendations...")
 def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
     try:
-        # Step 1: Check Supabase cache
         response = supabase.table("ai_product_recommendations").select("*").eq("category", category).execute()
-        if response.data and len(response.data) > 0:
-            cached = response.data[0]
+        if response.data:
             return {
-                "recommendation": cached["recommendation"],
-                "products": cached["products"]
+                "recommendation": response.data[0]["recommendation"],
+                "products": response.data[0]["products"]
             }
 
-        # Step 2: Generate recommendations dynamically
         dynamic_products = get_dynamic_product_recommendations(category)
-
         if not dynamic_products:
             return {
                 "recommendation": f"No dynamic products found for {category}.",
                 "products": []
             }
 
-        recommendation_text = (
-            f"Based on current best practices, these tools are well-suited for improving your AI maturity "
-            f"in the area of **{category}**. Focus on high-suitability tools for faster outcomes."
+        recommendation = (
+            f"These tools are well-suited for improving **{category}** maturity. "
+            "Focus on high-suitability tools first."
         )
 
-        # Step 3: Save to Supabase for caching
         supabase.table("ai_product_recommendations").insert({
             "category": category,
-            "recommendation": recommendation_text,
+            "recommendation": recommendation,
             "products": dynamic_products,
             "created_at": datetime.utcnow().isoformat()
         }).execute()
 
-        return {
-            "recommendation": recommendation_text,
-            "products": dynamic_products
-        }
+        return {"recommendation": recommendation, "products": dynamic_products}
 
     except APIError as e:
         st.warning(f"⚠️ Supabase error: {e}")
-        return {
-            "recommendation": f"Dynamic fetch failed for {category}.",
-            "products": []
-        }
     except Exception as e:
-        st.error(f"❌ AI recommendation error: {e}")
-        return {
-            "recommendation": f"An error occurred while generating recommendations for {category}.",
-            "products": []
-        }
+        st.error(f"❌ Error generating recommendations: {e}")
+    return {"recommendation": f"Failed to generate recommendations for {category}.", "products": []}
 
-
-def get_dynamic_product_recommendations(category):
+def generate_cybersecurity_recommendation_with_products(category: str) -> dict:
     try:
-        # Initialize Tavily and OpenAI
-        tavily = TavilyClient(api_key=st.secrets["tavily_api_key"])
-        openai.api_key = st.secrets["openai_api_key"]
+        response = supabase.table("cyber_product_recommendations").select("*").eq("category", category).execute()
+        if response.data:
+            return {
+                "recommendation": response.data[0]["recommendation"],
+                "products": response.data[0]["products"]
+            }
 
-        # Step 1: Search the web for category-specific tools
-        query = f"Top enterprise tools or software platforms for improving {category} in AI maturity"
+        query = f"Best enterprise cybersecurity tools for {category}"
+        tavily = TavilyClient(api_key=tavily_key)
         results = tavily.search(query, max_results=5)
-
-        # Combine Tavily snippets
-        combined_text = " ".join([
-            f"{r.get('title', '')} — {r.get('snippet', '')}" for r in results if r.get("snippet")
+        combined = " ".join([
+            f"{r.get('title')} — {r.get('snippet')}" for r in results if r.get("snippet")
         ])
 
-        # Step 2: Ask GPT to extract products in structured format
         prompt = (
-            f"Based on this content:\n{combined_text}\n\n"
-            f"Recommend 3 to 5 enterprise tools or platforms that help improve the category '{category}' "
-            f"as part of an AI maturity assessment. For each tool, provide the following:\n"
-            f"- name\n- key features\n- estimated price (or leave blank if unknown)\n- suitability (Low/Med/High)\n\n"
-            f"Return your answer in pure JSON array format like this:\n"
-            f"[{{\"name\": \"Tool A\", \"features\": [\"feature1\", \"feature2\"], \"price_estimate\": \"$X\", \"suitability\": \"High\"}}, ...]"
+            f"Based on this content:\n{combined}\n\n"
+            f"List 3-5 cybersecurity tools for '{category}'. Format as JSON:\n"
+            "[{\"name\": \"\", \"features\": [\"\"], \"price_estimate\": \"\", \"suitability\": \"\"}]"
         )
 
         response = openai.ChatCompletion.create(
@@ -313,12 +211,53 @@ def get_dynamic_product_recommendations(category):
             temperature=0.3
         )
 
-        # Step 3: Parse the response
-        import json
-        content = response.choices[0].message.content
-        parsed = json.loads(content)
-        return parsed if isinstance(parsed, list) else []
+        parsed = json.loads(response.choices[0].message.content)
+        if not parsed:
+            return {"recommendation": f"No cybersecurity tools found for {category}.", "products": []}
+
+        recommendation = (
+            f"These cybersecurity tools align well with improving **{category}** maturity and risk posture."
+        )
+
+        supabase.table("cyber_product_recommendations").insert({
+            "category": category,
+            "recommendation": recommendation,
+            "products": parsed,
+            "created_at": datetime.utcnow().isoformat()
+        }).execute()
+
+        return {"recommendation": recommendation, "products": parsed}
 
     except Exception as e:
-        print(f"❌ Error in dynamic product fetch: {e}")
+        st.error(f"❌ Cyber recommendation error: {e}")
+        return {"recommendation": f"Error retrieving cybersecurity products for {category}.", "products": []}
+
+def get_dynamic_product_recommendations(category: str) -> list:
+    try:
+        tavily = TavilyClient(api_key=tavily_key)
+        openai.api_key = openai_key
+
+        query = f"Top enterprise tools or platforms for improving {category} AI maturity"
+        results = tavily.search(query, max_results=5)
+
+        combined = " ".join([
+            f"{r.get('title')} — {r.get('snippet')}" for r in results if r.get("snippet")
+        ])
+
+        prompt = (
+            f"Based on this content:\n{combined}\n\n"
+            f"List 3-5 tools for '{category}' in AI maturity. Format as JSON:\n"
+            "[{\"name\": \"\", \"features\": [\"\"], \"price_estimate\": \"\", \"suitability\": \"\"}]"
+        )
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3
+        )
+
+        return json.loads(response.choices[0].message.content)
+
+    except Exception as e:
+        print(f"❌ Error in product fetch: {e}")
         return []
