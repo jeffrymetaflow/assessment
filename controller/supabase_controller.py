@@ -52,6 +52,9 @@ def save_session_to_supabase():
             "maturity_score": st.session_state.get("maturity_score"),
             "maturity_answers": st.session_state.get("it_maturity_answers"),
             "cyber_answers": st.session_state.get("cybersecurity_answers"),
+            "ai_maturity_answers": st.session_state.get("ai_maturity_answers"),
+            "ai_maturity_scores": st.session_state.get("ai_maturity_scores"),
+            "ai_maturity_recommendations": st.session_state.get("ai_maturity_recommendations"),
             "last_saved": datetime.utcnow().isoformat()
         },
         "user_email": st.session_state.get("user_email")
