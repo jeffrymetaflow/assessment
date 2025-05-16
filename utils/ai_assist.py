@@ -20,7 +20,7 @@ tavily_key = st.secrets["tavily_api_key"]
 os.environ["TAVILY_API_KEY"] = tavily_key or ""
 
 # --- LangChain Agent ---
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=openai_key)
+llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_key)
 search_tool = TavilySearchResults()
 
 def fetch_module_summary(prompt: str, run_manager: CallbackManagerForToolRun = None):
@@ -58,7 +58,7 @@ def answer_with_code_context(query: str):
         retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
         from langchain.chains import RetrievalQA
         qa = RetrievalQA.from_chain_type(
-            llm=ChatOpenAI(temperature=0, api_key=openai_key),
+            llm=ChatOpenAI(temperature=0, openai_api_key=openai_key),
             chain_type="stuff",
             retriever=retriever
         )
@@ -191,8 +191,6 @@ def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
 def get_dynamic_product_recommendations(category: str) -> list:
     try:
         tavily = TavilyClient(api_key=tavily_key)
-        openai.api_key = openai_key
-
         query = f"Top enterprise tools or platforms for improving {category} AI maturity"
         results = tavily.search(query, max_results=5)
 
@@ -206,7 +204,8 @@ def get_dynamic_product_recommendations(category: str) -> list:
             "[{\"name\": \"\", \"features\": [\"\"], \"price_estimate\": \"\", \"suitability\": \"\"}]"
         )
 
-        response = openai.ChatCompletion.create(
+        client = openai.OpenAI(api_key=openai_key)
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
@@ -246,7 +245,8 @@ def generate_cybersecurity_recommendation_with_products(category: str) -> dict:
             "[{\"name\": \"\", \"features\": [\"\"], \"price_estimate\": \"\", \"suitability\": \"\"}]"
         )
 
-        response = openai.ChatCompletion.create(
+        client = openai.OpenAI(api_key=openai_key)
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
