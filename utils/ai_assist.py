@@ -11,6 +11,7 @@ from utils.intent_classifier import classify_intent
 from postgrest.exceptions import APIError
 from utils.supabase_client import supabase
 from tavily import TavilyClient
+from utils.dynamic_ai_recommender import get_dynamic_product_recommendations
 
 # --- Load API Keys ---
 openai_key = st.secrets["openai_api_key"]
