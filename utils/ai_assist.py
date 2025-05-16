@@ -270,50 +270,43 @@ def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
             "products": []
         }
 
-def get_dynamic_product_recommendations(category: str):
-    tavily = TavilyClient(api_key=st.secrets["tavily_api_key"])
-    openai.api_key = st.secrets["openai_api_key"]
-
+def get_dynamic_product_recommendations(category):
     try:
-        query = f"Top enterprise tools for {category.lower()} in AI maturity"
+        # Initialize Tavily and OpenAI
+        tavily = TavilyClient(api_key=st.secrets["tavily_api_key"])
+        openai.api_key = st.secrets["openai_api_key"]
+
+        # Step 1: Search the web for category-specific tools
+        query = f"Top enterprise tools or software platforms for improving {category} in AI maturity"
         results = tavily.search(query, max_results=5)
 
-        source_text = "\n\n".join([
-            f"Title: {r.get('title', '')}\nSnippet: {r.get('snippet', '')}\nURL: {r.get('url', '')}"
-            for r in results
+        # Combine Tavily snippets
+        combined_text = " ".join([
+            f"{r.get('title', '')} — {r.get('snippet', '')}" for r in results if r.get("snippet")
         ])
 
-        prompt = f"""
-Based on the following search results, return a list of 3 recommended products in JSON format.
-Each product should include: name, 2-3 key features, a rough price estimate ($/$$/$$$), and what it's best suited for.
-
-Search Results:
-{source_text}
-
-Respond only with a JSON array like this:
-[
-  {{
-    "name": "Product Name",
-    "features": ["Feature A", "Feature B"],
-    "price_estimate": "$$",
-    "best_for": "Use case or scenario"
-  }}
-]
-"""
+        # Step 2: Ask GPT to extract products in structured format
+        prompt = (
+            f"Based on this content:\n{combined_text}\n\n"
+            f"Recommend 3 to 5 enterprise tools or platforms that help improve the category '{category}' "
+            f"as part of an AI maturity assessment. For each tool, provide the following:\n"
+            f"- name\n- key features\n- estimated price (or leave blank if unknown)\n- suitability (Low/Med/High)\n\n"
+            f"Return your answer in pure JSON array format like this:\n"
+            f"[{{\"name\": \"Tool A\", \"features\": [\"feature1\", \"feature2\"], \"price_estimate\": \"$X\", \"suitability\": \"High\"}}, ...]"
+        )
 
         response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that summarizes product research."},
-                {"role": "user", "content": prompt}
-            ],
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
             temperature=0.3
         )
 
-        json_text = response.choices[0].message.content.strip()
-        return json.loads(json_text)
+        # Step 3: Parse the response
+        import json
+        content = response.choices[0].message.content
+        parsed = json.loads(content)
+        return parsed if isinstance(parsed, list) else []
 
     except Exception as e:
-        print("🛑 GPT or Tavily error:", e)
+        print(f"❌ Error in dynamic product fetch: {e}")
         return []
-
