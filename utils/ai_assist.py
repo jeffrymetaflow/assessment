@@ -8,6 +8,7 @@ from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from langchain_core.callbacks.manager import CallbackManagerForToolRun
 from langchain.tools import Tool
 from utils.intent_classifier import classify_intent
+from postgrest.exceptions import APIError
 
 # --- Load API Keys ---
 openai_key = st.secrets["openai_api_key"]
