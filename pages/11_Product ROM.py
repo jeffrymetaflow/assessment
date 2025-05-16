@@ -84,17 +84,27 @@ def assign_phase(score):
 products_data = []
 for rec in recommendations:
     if "products" in rec and rec["products"]:
-        for product_name in rec["products"]:
+        for product in rec["products"]:
+            if isinstance(product, dict):
+                product_name = product.get("name", "Unknown")
+                price_estimate = product.get("price_estimate", "N/A")
+            else:
+                product_name = product
+                price_estimate = "N/A"
+        
             price = lookup_product_price_ai_with_supabase(product_name)
+        
             products_data.append({
                 "Quarter": assign_phase(rec["score"]),
                 "Category": rec["category"],
                 "Product": product_name,
+                "Estimated Price (from AI)": price_estimate,
                 "List Price ($)": round(price, 2) if price else "N/A",
                 "% Discount": 0,
                 "Discounted Price ($)": round(price, 2) if price else "N/A",
+                "Source": rec["source"]
             })
-
+            
 # --- Display table with interactive discount ---
 if products_data:
     product_df = pd.DataFrame(products_data)
