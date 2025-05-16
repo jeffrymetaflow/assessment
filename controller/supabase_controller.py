@@ -1,5 +1,6 @@
 # controller/supabase_controller.py
 import streamlit as st
+import json
 from utils.supabase_client import supabase
 from postgrest.exceptions import APIError
 from datetime import datetime
@@ -35,6 +36,23 @@ def update_project_by_id(project_id, updated_data):
         print("Update failed:", e)
         return None
 
+def delete_project_by_id(project_id):
+    """Deletes a project from Supabase by UUID"""
+    try:
+        result = supabase.table("projects").delete().eq("id", project_id).execute()
+        return result
+    except APIError as e:
+        st.error("❌ Failed to delete project.")
+        st.write(e)
+        return None
+
+def safe_for_json(obj):
+    try:
+        json.dumps(obj)
+        return obj
+    except TypeError:
+        return str(obj)
+
 def save_session_to_supabase():
     if "project_data" not in st.session_state:
         st.warning("⚠️ No project loaded — nothing to save.")
@@ -46,15 +64,22 @@ def save_session_to_supabase():
 
     project_id = st.session_state["project_data"]["id"]
 
-    # ✅ Clean and safe: Only update session_data JSON column
+    # Safely prepare AI recommendation block for storage
+    ai_recs = []
+    for r in st.session_state.get("ai_maturity_recommendations", []):
+        ai_recs.append({
+            "category": r.get("category"),
+            "score": r.get("score"),
+            "recommendation": r.get("recommendation"),
+            "products": safe_for_json(r.get("products"))
+        })
+
     updated_data = {
         "session_data": {
             "maturity_score": st.session_state.get("maturity_score"),
             "maturity_answers": st.session_state.get("it_maturity_answers"),
             "cyber_answers": st.session_state.get("cybersecurity_answers"),
-            "ai_maturity_answers": st.session_state.get("ai_maturity_answers"),
-            "ai_maturity_scores": st.session_state.get("ai_maturity_scores"),
-            "ai_maturity_recommendations": st.session_state.get("ai_maturity_recommendations"),
+            "ai_recommendations": ai_recs,
             "last_saved": datetime.utcnow().isoformat()
         },
         "user_email": st.session_state.get("user_email")
@@ -71,14 +96,3 @@ def save_session_to_supabase():
         st.error("❌ Failed to save project to Supabase.")
         st.write(e)
         return None
-
-def delete_project_by_id(project_id):
-    """Deletes a project from Supabase by UUID"""
-    try:
-        result = supabase.table("projects").delete().eq("id", project_id).execute()
-        return result
-    except APIError as e:
-        st.error("❌ Failed to delete project.")
-        st.write(e)
-        return None
-
