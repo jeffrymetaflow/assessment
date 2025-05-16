@@ -405,6 +405,9 @@ elif section == "⚙️ Inputs":
             st.session_state["cybersecurity_answers"] = st.session_state["project_data"]["session_data"].get("cyber_answers", {})
         else:
             st.session_state["cybersecurity_answers"] = {}
+
+# --- Always use this variable afterward ---
+previous_cyber_answers = st.session_state["cybersecurity_answers"]
     
     # --- Title and intro ---
     st.title("\U0001F9E0 Cybersecurity Maturity Assessment Tool")
