@@ -157,28 +157,29 @@ else:
 
     st.header("🧭 Recommendations by Category")
     st.session_state["ai_maturity_recommendations"] = []
+    
     for _, row in score_df.iterrows():
         score = row["Score (%)"]
         category = row["Category"]
-
+    
         rec_data = generate_ai_maturity_recommendation_with_products(category)
         rec_text = rec_data.get("recommendation", "")
-        products = rec_data.get("products", [])  # now expected to be a list of product dictionaries
-
+        products = rec_data.get("products", [])
+    
         st.session_state["ai_maturity_recommendations"].append({
             "category": category,
             "score": score,
             "recommendation": rec_text,
             "products": products
         })
-
+    
         st.markdown(f"### {category} (Score: {score}%)")
         st.markdown(f"**Recommendation:** {rec_text}")
-
+    
         if products and isinstance(products[0], dict):
             st.markdown("**Recommended Products/Services:**")
-            st.dataframe(pd.DataFrame(products), use_container_width=True)
-        elif products:
-            st.table(pd.DataFrame({"Product": products}))
+            df = pd.DataFrame(products)
+            df = df.fillna("N/A")  # fallback for missing fields
+            st.dataframe(df, use_container_width=True)
         else:
             st.markdown("**Recommended Products/Services:** _No specific products found_")
