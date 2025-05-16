@@ -243,3 +243,24 @@ def generate_ai_maturity_recommendation_with_products(category):
         "recommendation": f"These tools are best suited for improving your {category} maturity.",
         "products": dynamic_products
     }
+
+from dynamic_ai_recommender import get_dynamic_product_recommendations
+
+@st.cache_data(show_spinner="🔍 Fetching product recommendations...")
+def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
+    """
+    Returns dynamic product recommendations and a general recommendation string for a given category.
+    Results are cached per session to reduce GPT/Tavily calls.
+    """
+    dynamic_products = get_dynamic_product_recommendations(category)
+
+    if not dynamic_products:
+        return {
+            "recommendation": f"No dynamic products found for {category}.",
+            "products": []
+        }
+
+    return {
+        "recommendation": f"These tools are best suited for improving your {category} maturity.",
+        "products": dynamic_products
+    }
