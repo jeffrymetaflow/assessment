@@ -54,12 +54,24 @@ def lookup_product_price_ai_with_supabase(product_name):
 
 # --- Safely extract and enrich product recommendations ---
 recommendations = []
+
+# IT Recommendations
 if "it_maturity_recommendations" in st.session_state:
-    recommendations.extend(st.session_state["it_maturity_recommendations"])
+    for r in st.session_state["it_maturity_recommendations"]:
+        r["source"] = "IT"
+        recommendations.append(r)
+
+# Cybersecurity Recommendations
 if "cyber_maturity_recommendations" in st.session_state:
-    recommendations.extend(st.session_state["cyber_maturity_recommendations"])
+    for r in st.session_state["cyber_maturity_recommendations"]:
+        r["source"] = "Cyber"
+        recommendations.append(r)
+
+# AI Recommendations
 if "ai_maturity_recommendations" in st.session_state:
-    st.subheader("🛠️ Suggested AI Tools and Services")
+    for r in st.session_state["ai_maturity_recommendations"]:
+        r["source"] = "AI"
+        recommendations.append(r)
 
 def assign_phase(score):
     if score < 50:
