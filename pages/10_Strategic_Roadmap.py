@@ -29,16 +29,22 @@ Based on your assessment scores and ITRM trajectory, this roadmap offers recomme
 recommendations = []
 
 if "it_maturity_recommendations" in st.session_state:
-    recommendations.extend(st.session_state["it_maturity_recommendations"])
+    for r in st.session_state["it_maturity_recommendations"]:
+        r["source"] = "IT"
 
-if "cyber_maturity_recommendations" in st.session_state:
-    recommendations.extend(st.session_state["cyber_maturity_recommendations"])
+if "cybersecurity_recommendations" in st.session_state:
+    for r in st.session_state["cybersecurity_recommendations"]:
+        r["source"] = "Cyber"
 
 if "ai_maturity_recommendations" in st.session_state:
-    st.subheader("🤖 AI Maturity Recommendations")
-    for rec in st.session_state["ai_maturity_recommendations"]:
-        st.markdown(f"**{rec['category']} (Score: {rec['score']}%)**")
-        st.markdown(f"🔹 {rec['recommendation']}")
+    for r in st.session_state["ai_maturity_recommendations"]:
+        r["source"] = "AI"
+
+recommendations = (
+    st.session_state.get("it_maturity_recommendations", []) +
+    st.session_state.get("cybersecurity_recommendations", []) +
+    st.session_state.get("ai_maturity_recommendations", [])
+)
 
 if not recommendations:
     st.warning("⚠️ No recommendations found. Please complete the IT Maturity Assessment first.")
@@ -55,20 +61,20 @@ def assign_phase(score):
 
 roadmap_data = []
 for rec in recommendations:
-    if rec["recommendation"]:
-        action = rec["recommendation"]
-    else:
-        action = "Maintain and enhance automation"
+    action = rec.get("recommendation", "Maintain and enhance automation")
     roadmap_data.append({
         "Quarter": assign_phase(rec["score"]),
         "Category": rec["category"],
-        "Action Item": action
+        "Action Item": action,
+        "Source": rec.get("source", "Unknown")
     })
 
 roadmap_df = pd.DataFrame(roadmap_data)
 
 st.subheader("📅 Strategic Timeline by Quarter")
 st.dataframe(roadmap_df, use_container_width=True)
+
+st.markdown("🔹 **Legend**: _IT = Blue_, _Cyber = Red_, _AI = Green_")
 
 st.subheader("✅ Progress Tracker")
 for quarter in sorted(roadmap_df["Quarter"].unique()):
