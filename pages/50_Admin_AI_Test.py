@@ -54,4 +54,4 @@ except Exception as e:
     st.error(f"❌ Tavily test failed: {e}")
 
 
-List 3-5 enterprise-grade AI tools that help improve the 'Ethics and Governance' dimension in AI maturity. Return JSON with name, features, price_estimate, source.
+
