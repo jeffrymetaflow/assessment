@@ -36,3 +36,19 @@ from langchain_community.tools.tavily_search.tool import TavilySearchResults
 
 tavily = TavilySearchResults()
 print(tavily.run("Best enterprise data governance tools 2024"))
+
+st.subheader("🔎 Tavily Test")
+
+try:
+    tavily_tool = TavilySearchResults()
+    results = tavily_tool.run("Top enterprise AI governance tools")
+
+    if results and isinstance(results, list) and len(results) > 0:
+        st.success("Tavily connected and returned results!")
+        for r in results[:3]:  # Show a sample
+            st.markdown(f"- [{r.get('title', 'No Title')}]({r.get('url')})")
+    else:
+        st.warning("⚠️ Tavily returned no usable results.")
+
+except Exception as e:
+    st.error(f"❌ Tavily test failed: {e}")
