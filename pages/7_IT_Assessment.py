@@ -5,7 +5,6 @@ from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 initialize_session()
 from utils.ai_assist import generate_ai_maturity_recommendation_with_products
-from utils.ai_assist import generate_it_maturity_recommendation_with_products
 from utils.auth import enforce_login
 enforce_login()
 from controller.supabase_controller import save_session_to_supabase
