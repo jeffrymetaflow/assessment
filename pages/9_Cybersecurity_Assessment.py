@@ -436,7 +436,7 @@ elif section == "⚙️ Inputs":
                     unique_key = f"{category}_{block['section']}_{hashed_q}"
     
                     # Restore previous answer if exists
-                    default = st.session_state.get("cybersecurity_answers", {}).get(unique_key, "No")
+                    default = st.session_state["cybersecurity_answers"].get(unique_key, "No")
                     index = 0 if default == "Yes" else 1 if default == "No" else 0
                     answer = st.radio(q, ["Yes", "No"], key=unique_key, index=index)
     
