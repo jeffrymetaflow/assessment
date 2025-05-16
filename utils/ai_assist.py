@@ -228,40 +228,44 @@ def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimiz
         f"What is the total annual revenue reported in this filing? Return only the dollar figure."
 )
 
-
 @st.cache_data(show_spinner="🔍 Fetching and caching product recommendations...")
 def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
     try:
-        # Check if cached in Supabase
+        # Step 1: Check Supabase cache
         response = supabase.table("ai_product_recommendations").select("*").eq("category", category).execute()
         if response.data and len(response.data) > 0:
+            cached = response.data[0]
             return {
-                "recommendation": response.data[0]["recommendation"],
-                "products": response.data[0]["products"]
+                "recommendation": cached["recommendation"],
+                "products": cached["products"]
             }
 
-        # If not found, generate dynamically
+        # Step 2: Generate recommendations dynamically
         dynamic_products = get_dynamic_product_recommendations(category)
+
         if not dynamic_products:
             return {
                 "recommendation": f"No dynamic products found for {category}.",
                 "products": []
             }
 
-        result = {
-            "recommendation": f"These tools are best suited for improving your {category} maturity.",
-            "products": dynamic_products
-        }
+        recommendation_text = (
+            f"Based on current best practices, these tools are well-suited for improving your AI maturity "
+            f"in the area of **{category}**. Focus on high-suitability tools for faster outcomes."
+        )
 
-        # Cache in Supabase
+        # Step 3: Save to Supabase for caching
         supabase.table("ai_product_recommendations").insert({
             "category": category,
-            "recommendation": result["recommendation"],
-            "products": result["products"],
+            "recommendation": recommendation_text,
+            "products": dynamic_products,
             "created_at": datetime.utcnow().isoformat()
         }).execute()
 
-        return result
+        return {
+            "recommendation": recommendation_text,
+            "products": dynamic_products
+        }
 
     except APIError as e:
         st.warning(f"⚠️ Supabase error: {e}")
@@ -269,6 +273,13 @@ def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
             "recommendation": f"Dynamic fetch failed for {category}.",
             "products": []
         }
+    except Exception as e:
+        st.error(f"❌ AI recommendation error: {e}")
+        return {
+            "recommendation": f"An error occurred while generating recommendations for {category}.",
+            "products": []
+        }
+
 
 def get_dynamic_product_recommendations(category):
     try:
