@@ -729,7 +729,7 @@ if section == "✅ AI Recommendations":
                 score = row["Score (%)"]
 
                 if score < 80:
-                    rec_obj = generate_maturity_recommendation_with_products(category)
+                    rec_data = generate_maturity_recommendation_with_products(category)
                     st.session_state["cyber_maturity_recommendations"].append({
                         "category": category,
                         "score": score,
