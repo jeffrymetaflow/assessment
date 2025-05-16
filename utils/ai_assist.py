@@ -227,32 +227,19 @@ def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimiz
 )
 
 
-def generate_ai_maturity_recommendation_with_products(category):
-    # Sample logic – update with real recommendations + product mapping
-    recommendations = {
-        "Infrastructure and Technology": {
-            "recommendation": "Invest in scalable compute infrastructure with GPU support and observability tools.",
-            "products": ["NVIDIA DGX", "Datadog", "AWS SageMaker"]
-        },
-        "Data Management and Quality": {
-            "recommendation": "Establish centralized data governance and enhance data lineage tracking.",
-            "products": ["Collibra", "Alation", "Databricks Unity Catalog"]
-        },
-        "Talent and Skills": {
-            "recommendation": "Build cross-functional AI teams and upskill your existing staff.",
-            "products": ["Coursera for Business", "DataCamp", "Pluralsight"]
-        },
-        "Strategy and Vision": {
-            "recommendation": "Define a long-term AI roadmap tied to business KPIs and digital transformation.",
-            "products": ["Lucidchart", "Azure AI Strategy Services", "Salesforce Einstein Planning"]
-        },
-        "Ethics and Governance": {
-            "recommendation": "Develop an AI ethics framework and implement model auditability tools.",
-            "products": ["AI Fairness 360", "Microsoft Responsible AI Dashboard", "Fiddler AI"]
-        }
-    }
+from dynamic_ai_recommender import get_dynamic_product_recommendations
 
-    return recommendations.get(category, {
-        "recommendation": "No recommendation available.",
-        "products": []
-    })
+def generate_ai_maturity_recommendation_with_products(category):
+    dynamic_products = get_dynamic_product_recommendations(category)
+
+    # Optional: fallback if Tavily or GPT fails
+    if not dynamic_products:
+        return {
+            "recommendation": f"No dynamic products found for {category}.",
+            "products": []
+        }
+
+    return {
+        "recommendation": f"These tools are best suited for improving your {category} maturity.",
+        "products": dynamic_products
+    }
