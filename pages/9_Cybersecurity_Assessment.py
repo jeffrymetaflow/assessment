@@ -715,31 +715,30 @@ elif section == "⚙️ Inputs":
 if section == "✅ AI Recommendations":
     st.title("✅ Cybersecurity Assessment AI Recommendations")
     submitted = st.session_state.get("cyber_form_submitted", False)
-
-    if submitted and "cyber_maturity_recommendations" not in st.session_state:
-        cat_df = st.session_state.get("cyber_category_scores", pd.DataFrame())
+    cat_df = st.session_state.get("cyber_category_scores", pd.DataFrame())
+    
+    if (submitted or not st.session_state.get("cyber_maturity_recommendations")) and not cat_df.empty:
         st.session_state["cyber_maturity_recommendations"] = []
-
-        if not cat_df.empty:
-            for _, row in cat_df.iterrows():
-                category = row["Category"]
-                score = row["Score (%)"]
-
-                if score < 80:
-                    rec_obj = generate_cybersecurity_recommendation_with_products(category)
-                    st.session_state["cyber_maturity_recommendations"].append({
-                        "category": category,
-                        "score": score,
-                        "recommendation": rec_obj.get("recommendation", "No suggestion returned."),
-                        "products": rec_obj.get("products", [])
-                    })
-                else:
-                    st.session_state["cyber_maturity_recommendations"].append({
-                        "category": category,
-                        "score": score,
-                        "recommendation": "Maintain and enhance automation.",
-                        "products": []
-                    })
+    
+        for _, row in cat_df.iterrows():
+            category = row["Category"]
+            score = row["Score (%)"]
+    
+            if score < 80:
+                rec_obj = generate_cybersecurity_recommendation_with_products(category)
+                st.session_state["cyber_maturity_recommendations"].append({
+                    "category": category,
+                    "score": score,
+                    "recommendation": rec_obj.get("recommendation", "No suggestion returned."),
+                    "products": rec_obj.get("products", [])
+                })
+            else:
+                st.session_state["cyber_maturity_recommendations"].append({
+                    "category": category,
+                    "score": score,
+                    "recommendation": "Maintain and enhance automation.",
+                    "products": []
+                })
         else:
             st.warning("⚠️ No assessment scores found. Please complete and submit the form in the 'Inputs' tab.")
 
