@@ -79,6 +79,8 @@ if "it_maturity_answers" not in st.session_state or not isinstance(st.session_st
 with st.form("maturity_form"):
     local_responses = {}
 
+    it_answers = st.session_state.get("it_maturity_answers", {})
+    
     for category, questions in grouped_questions.items():
         st.subheader(category.strip())
         for q in questions:
