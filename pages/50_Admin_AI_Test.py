@@ -52,3 +52,7 @@ if tavily_key:
 else:
     st.warning("No Tavily API key found in secrets.")
 
+from langchain_community.tools.tavily_search.tool import TavilySearchResults
+
+tavily = TavilySearchResults()
+print(tavily.run("Best enterprise data governance tools 2024"))
