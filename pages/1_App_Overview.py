@@ -14,6 +14,13 @@ with st.expander("🔐 Login & Session Setup"):
     - All data is saved to your session or exportable to JSON
     """)
 
+with st.expander("🤖 AI Readiness"):
+    st.markdown("""
+    - Complete structured assessments
+    - Receive scores across 5 categories
+    - Align long-term IT planning with spend and risk
+    """)
+
 with st.expander("🔐 Cybersecurity & IT Maturity"):
     st.markdown("""
     - Complete structured assessments
@@ -21,7 +28,7 @@ with st.expander("🔐 Cybersecurity & IT Maturity"):
     - Feed results into the dashboard for strategic alignment
     """)
 
-with st.expander("🤡 Strategic Roadmap + Personas"):
+with st.expander("🤡 Strategic Roadmap"):
     st.markdown("""
     - Build a transformation roadmap
     - Map against industry personas and use cases
