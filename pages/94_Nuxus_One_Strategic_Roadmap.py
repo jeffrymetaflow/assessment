@@ -1,4 +1,6 @@
 import streamlit as st
+st.set_page_config(page_title="Nexus One Strategic Roadmap", layout="wide")
+
 import pandas as pd
 import numpy as np
 from utils.bootstrap import page_bootstrap
@@ -8,11 +10,10 @@ from controller.supabase_controller import save_session_to_supabase
 from utils.supabase_client import get_supabase
 
 initialize_session()
-page_bootstrap(current_page="Strategic Roadmap")
+page_bootstrap(current_page="Nexus One Strategic Roadmap")
 enforce_login()
 
-st.set_page_config(page_title="Strategic Roadmap", layout="wide")
-st.title("📊 Strategic_Roadmap")
+st.title("📊 Nexus One Strategic_Roadmap")
 
 st.markdown("""
 ### Strategic Roadmap
@@ -122,4 +123,5 @@ if "project_data" in st.session_state:
     last_saved = st.session_state["project_data"].get("last_saved")
     if last_saved:
         st.caption(f"🕒 Last saved: {last_saved}")
+
 
