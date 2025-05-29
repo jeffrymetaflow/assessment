@@ -61,16 +61,6 @@ else:
 low_score_df = roadmap_df[roadmap_df["Score"] < 80]
 low_score_cats = low_score_df["category"].unique().tolist()
 
-# --- Category Score Heatmap
-st.subheader("📉 Heatmap of Assessment Gaps by Category")
-valid_scores = roadmap_df.dropna(subset=["Score"])
-
-if not valid_scores.empty:
-    category_scores = valid_scores.groupby("category")["Score"].mean().sort_values()
-    st.bar_chart(category_scores)
-else:
-    st.info("No valid category scores available for heatmap display.")
-
 # --- Load suppliers from Supabase
 supabase = get_supabase()
 response = supabase.table("suppliers").select("*").execute()
