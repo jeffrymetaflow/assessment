@@ -51,8 +51,6 @@ supabase = get_supabase()
 # Dynamically infer needs
 low_score_cats = roadmap_df.loc[roadmap_df["Score"] < 80, "Category"].unique().tolist()
 compliance_need = "HIPAA" if "compliance" in roadmap_df["Action Item"].str.lower().to_string().lower() else ""
-seat_range_need = "1000+" if "scale" in roadmap_df["Action Item"].str.lower().to_string().lower() else ""
-teams_support_need = "Direct routing" if "teams" in roadmap_df["Action Item"].str.lower().to_string().lower() else ""
 
 response = supabase.table("suppliers").select("*").execute()
 suppliers = response.data
@@ -85,8 +83,6 @@ if recommended_suppliers:
                 top_match_label = "🟢 Top Match" if score_supplier(supplier) == top_score and idx == 0 else ""
                 st.markdown(f"### {supplier.get('supplier_name', 'Supplier')} {top_match_label}")
                 st.markdown(f"- **Compliance**: {supplier.get('compliance')}")
-                st.markdown(f"- **Teams Support**: {supplier.get('teams_support')}")
-                st.markdown(f"- **Seat Range**: {supplier.get('seat_range')}")
                 if supplier.get("website"):
                     st.markdown(f"- [🌐 Visit Website]({supplier.get('website')})")
             with st.expander("📨 Request Quote"):
