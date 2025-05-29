@@ -42,11 +42,22 @@ if not recommendations:
 roadmap_df = pd.DataFrame(recommendations)
 roadmap_df["category"] = roadmap_df["category"].fillna("General")
 
+# --- Safely extract compliance need
+available_columns = roadmap_df.columns.tolist()
+target_column = "recommendation" if "recommendation" in available_columns else (
+    "Action Item" if "Action Item" in available_columns else None
+)
+
+if target_column:
+    action_text = roadmap_df[target_column].str.lower().to_string().lower()
+    compliance_need = "HIPAA" if "compliance" in action_text else ""
+else:
+    compliance_need = ""
+
 # Identify low-score areas
 low_score_cats = roadmap_df.loc[roadmap_df["Score"] < 80, "category"].unique().tolist()
-compliance_need = "HIPAA" if "compliance" in roadmap_df["Action Item"].str.lower().to_string().lower() else ""
 
-# Placeholder for seat/Teams logic (if needed later)
+# Placeholder for seat/Teams logic (can be extended)
 seat_range_need = ""
 teams_support_need = ""
 
