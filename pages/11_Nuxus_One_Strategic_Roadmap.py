@@ -79,12 +79,12 @@ st.subheader("🔗 Nexus One Supplier Recommendations")
 supabase = get_supabase()
 
 # Dynamically infer needs
-target_category = roadmap_df.loc[roadmap_df["Score"] < 80, "Category"].mode().values[0] if not roadmap_df[roadmap_df["Score"] < 80].empty else "UCaaS"
+low_score_cats = roadmap_df.loc[roadmap_df["Score"] < 80, "Category"].unique().tolist()
 compliance_need = "HIPAA" if "compliance" in roadmap_df["Action Item"].str.lower().to_string().lower() else ""
 seat_range_need = "1000+" if "scale" in roadmap_df["Action Item"].str.lower().to_string().lower() else ""
 teams_support_need = "Direct routing" if "teams" in roadmap_df["Action Item"].str.lower().to_string().lower() else ""
 
-response = supabase.table("suppliers").select("*").eq("category", target_category).execute()
+response = supabase.table("suppliers").select("*").execute()
 suppliers = response.data
 
 def score_supplier(s):
@@ -98,7 +98,10 @@ def score_supplier(s):
     return score
 
 scored = sorted(suppliers, key=score_supplier, reverse=True)
-recommended_suppliers = [s for s in scored if score_supplier(s) > 0][:3]
+recommended_suppliers = [
+    s for s in scored
+    if any(cat.lower() in (s.get("mapped_categories") or "").lower() for cat in low_score_cats)
+][:3]
 
 if recommended_suppliers:
     st.markdown("### 🧩 Matched Suppliers")
@@ -131,4 +134,3 @@ if "project_data" in st.session_state:
     last_saved = st.session_state["project_data"].get("last_saved")
     if last_saved:
         st.caption(f"🕒 Last saved: {last_saved}")
-
