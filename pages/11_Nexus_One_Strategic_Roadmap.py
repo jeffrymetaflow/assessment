@@ -83,7 +83,52 @@ def score_supplier(s):
     return score
 
 scored = sorted(suppliers, key=score_supplier, reverse=True)
-recommended_suppliers = [s for s in scored if score_supplier(s) > 0][:3]
+
+# --- Supplier Display Toggle
+st.subheader("🔗 Nexus One Supplier Recommendations")
+
+show_all = st.checkbox("Show all matching suppliers")
+
+# Score and filter suppliers
+recommended_suppliers = [s for s in scored if score_supplier(s) > 0]
+displayed_suppliers = recommended_suppliers if show_all else recommended_suppliers[:3]
+
+if displayed_suppliers:
+    st.markdown("### 🧩 Matched Suppliers")
+    top_score = score_supplier(displayed_suppliers[0])
+
+    for idx, supplier in enumerate(displayed_suppliers):
+        with st.container():
+            cols = st.columns([2, 6])
+            with cols[0]:
+                logo_url = supplier.get("logo_url")
+                if not logo_url or not logo_url.startswith("http"):
+                    logo_url = "https://via.placeholder.com/100"
+                st.image(logo_url, width=100)
+
+            with cols[1]:
+                top_match_label = "🟢 Top Match" if score_supplier(supplier) == top_score and idx == 0 else ""
+                st.markdown(f"### {supplier.get('supplier_name', 'Supplier')} {top_match_label}")
+                st.markdown(f"- **Compliance**: {supplier.get('compliance') or 'N/A'}")
+                st.markdown(f"- **Mapped Categories**: {supplier.get('mapped_categories') or 'N/A'}")
+
+                # Show matched categories explicitly
+                matched = [
+                    cat for cat in low_score_cats
+                    if cat.lower() in (supplier.get("mapped_categories") or "").lower()
+                ]
+                if matched:
+                    st.markdown(f"- **Matched Needs**: `{', '.join(matched)}`")
+
+                if supplier.get("website"):
+                    st.markdown(f"- [🌐 Visit Website]({supplier.get('website')})")
+
+            with st.expander("📨 Request Quote"):
+                st.markdown("""
+                <iframe src="https://share.hsforms.com/1aBcD-ExampleEmbedCode" width="100%" height="600" style="border:0;" frameborder="0" scrolling="no"></iframe>
+                """, unsafe_allow_html=True)
+else:
+    st.info("No matching Nexus One suppliers found for the current profile.")
 
 # --- Display results
 st.subheader("🔗 Nexus One Supplier Recommendations")
