@@ -13,7 +13,7 @@ initialize_session()
 page_bootstrap(current_page="Nexus One Strategic Roadmap")
 enforce_login()
 
-st.title("📊 Nexus One Strategic_Roadmap")
+st.title("📊 Nexus One Strategic Roadmap")
 
 st.markdown("""
 ### Strategic Roadmap
