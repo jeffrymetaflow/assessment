@@ -90,12 +90,15 @@ st.subheader("🔗 Nexus One Supplier Recommendations")
 show_all = st.checkbox("Show all matching suppliers")
 
 # Score and filter suppliers
-recommended_suppliers = [s for s in scored if score_supplier(s) > 0]
-displayed_suppliers = recommended_suppliers if show_all else recommended_suppliers[:3]
+scored_suppliers = [s for s in scored if score_supplier(s) > 0]
 
-if displayed_suppliers:
+if not scored_suppliers:
+    st.info("No matching Nexus One suppliers found for the current profile.")
+else:
+    displayed_suppliers = scored_suppliers if show_all else scored_suppliers[:3]
+    top_score = score_supplier(scored_suppliers[0])  # Always compare against top overall
+
     st.markdown("### 🧩 Matched Suppliers")
-    top_score = score_supplier(displayed_suppliers[0])
 
     for idx, supplier in enumerate(displayed_suppliers):
         with st.container():
@@ -107,7 +110,8 @@ if displayed_suppliers:
                 st.image(logo_url, width=100)
 
             with cols[1]:
-                top_match_label = "🟢 Top Match" if score_supplier(supplier) == top_score and idx == 0 else ""
+                is_top = score_supplier(supplier) == top_score
+                top_match_label = "🟢 Top Match" if is_top and not show_all and idx == 0 else ""
                 st.markdown(f"### {supplier.get('supplier_name', 'Supplier')} {top_match_label}")
                 st.markdown(f"- **Compliance**: {supplier.get('compliance') or 'N/A'}")
                 st.markdown(f"- **Mapped Categories**: {supplier.get('mapped_categories') or 'N/A'}")
