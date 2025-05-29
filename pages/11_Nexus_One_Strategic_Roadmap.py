@@ -55,7 +55,13 @@ else:
     compliance_need = ""
 
 # Identify low-score areas
-low_score_cats = roadmap_df.loc[roadmap_df["Score"] < 80, "category"].unique().tolist()
+low_score_df = roadmap_df[roadmap_df["Score"] < 80]
+low_score_cats = low_score_df["category"].unique().tolist()
+
+# --- Category Score Heatmap
+st.subheader("📉 Heatmap of Assessment Gaps by Category")
+category_scores = roadmap_df.groupby("category")["Score"].mean().sort_values()
+st.bar_chart(category_scores)
 
 # Placeholder for seat/Teams logic (can be extended)
 seat_range_need = ""
@@ -92,14 +98,28 @@ if recommended_suppliers:
         with st.container():
             cols = st.columns([2, 6])
             with cols[0]:
-                st.image(supplier.get("logo_url", "https://via.placeholder.com/100"), width=100)
+                logo_url = supplier.get("logo_url")
+                if not logo_url or not logo_url.startswith("http"):
+                    logo_url = "https://via.placeholder.com/100"
+                st.image(logo_url, width=100)
+
             with cols[1]:
                 top_match_label = "🟢 Top Match" if score_supplier(supplier) == top_score and idx == 0 else ""
                 st.markdown(f"### {supplier.get('supplier_name', 'Supplier')} {top_match_label}")
                 st.markdown(f"- **Compliance**: {supplier.get('compliance') or 'N/A'}")
                 st.markdown(f"- **Mapped Categories**: {supplier.get('mapped_categories') or 'N/A'}")
+
+                # Show matched categories explicitly
+                matched = [
+                    cat for cat in low_score_cats
+                    if cat.lower() in (supplier.get("mapped_categories") or "").lower()
+                ]
+                if matched:
+                    st.markdown(f"- **Matched Needs**: `{', '.join(matched)}`")
+
                 if supplier.get("website"):
                     st.markdown(f"- [🌐 Visit Website]({supplier.get('website')})")
+
             with st.expander("📨 Request Quote"):
                 st.markdown("""
                 <iframe src="https://share.hsforms.com/1aBcD-ExampleEmbedCode" width="100%" height="600" style="border:0;" frameborder="0" scrolling="no"></iframe>
