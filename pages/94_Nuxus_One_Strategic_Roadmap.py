@@ -8,10 +8,10 @@ from controller.supabase_controller import save_session_to_supabase
 from utils.supabase_client import get_supabase
 
 initialize_session()
-page_bootstrap(current_page="Nuxus One Strategic Roadmap")
+page_bootstrap(current_page="Strategic Roadmap")
 enforce_login()
 
-st.set_page_config(page_title="Nuxus One Strategic Roadmap", layout="wide")
+st.set_page_config(page_title="Strategic Roadmap", layout="wide")
 st.title("📊 Strategic_Roadmap")
 
 st.markdown("""
