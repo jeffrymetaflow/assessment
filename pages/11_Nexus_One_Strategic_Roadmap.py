@@ -44,36 +44,6 @@ if not recommendations:
     st.warning("⚠️ No recommendations found. Please complete the IT Maturity Assessment first.")
     st.stop()
 
-# --- Build Roadmap Table ---
-def assign_phase(score):
-    if score < 50:
-        return "Q1"
-    elif score < 80:
-        return "Q2"
-    else:
-        return "Q3"
-
-roadmap_data = []
-for rec in recommendations:
-    roadmap_data.append({
-        "Quarter": assign_phase(rec.get("score", 0)),
-        "Category": rec.get("category", ""),
-        "Action Item": rec.get("recommendation", "Maintain and enhance automation"),
-        "Products": ", ".join([p.get("name") for p in rec.get("products", []) if isinstance(p, dict)]) if rec.get("products") else "N/A",
-        "Source": rec.get("source", "Unknown"),
-        "Score": rec.get("score", 0)
-    })
-
-roadmap_df = pd.DataFrame(roadmap_data)
-st.subheader("📅 Strategic Timeline by Quarter")
-st.dataframe(roadmap_df.drop(columns=["Score"]), use_container_width=True)
-
-st.subheader("✅ Progress Tracker")
-for quarter in sorted(roadmap_df["Quarter"].unique()):
-    st.markdown(f"#### {quarter}")
-    for _, row in roadmap_df[roadmap_df["Quarter"] == quarter].iterrows():
-        st.checkbox(f"{row['Category']} – {row['Action Item']}", key=f"{row['Category']}_{quarter}")
-
 # --- Nexus One Supplier Recommendations ---
 st.subheader("🔗 Nexus One Supplier Recommendations")
 supabase = get_supabase()
