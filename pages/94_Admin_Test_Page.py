@@ -4,7 +4,8 @@ import numpy as np
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
 from utils.auth import enforce_login
-from controller.supabase_controller import save_session_to_supabase, get_supabase_client
+from controller.supabase_controller import save_session_to_supabase
+from utils.supabase_client import get_supabase
 
 initialize_session()
 page_bootstrap(current_page="Strategic Roadmap")
@@ -74,7 +75,7 @@ for quarter in sorted(roadmap_df["Quarter"].unique()):
 
 # --- Nexus One Supplier Recommendations ---
 st.subheader("🔗 Nexus One Supplier Recommendations")
-supabase = get_supabase_client()
+supabase = get_supabase()
 
 # Dynamically infer needs
 target_category = roadmap_df.loc[roadmap_df["Score"] < 80, "Category"].mode().values[0] if not roadmap_df[roadmap_df["Score"] < 80].empty else "UCaaS"
