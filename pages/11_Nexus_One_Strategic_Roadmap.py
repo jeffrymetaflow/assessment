@@ -16,7 +16,7 @@ enforce_login()
 st.title("🤖 Nexus One Supplier Intelligence")
 
 st.markdown("""
-### Strategic Supplier Matching
+### Strategic Supplier Matching  
 Based on your assessment results, we match your IT gaps with curated suppliers from the Nexus One ecosystem.
 """)
 
@@ -42,6 +42,9 @@ if not recommendations:
 roadmap_df = pd.DataFrame(recommendations)
 roadmap_df["category"] = roadmap_df["category"].fillna("General")
 
+# --- Ensure Score is numeric
+roadmap_df["Score"] = pd.to_numeric(roadmap_df["Score"], errors="coerce")
+
 # --- Safely extract compliance need
 available_columns = roadmap_df.columns.tolist()
 target_column = "recommendation" if "recommendation" in available_columns else (
@@ -60,17 +63,22 @@ low_score_cats = low_score_df["category"].unique().tolist()
 
 # --- Category Score Heatmap
 st.subheader("📉 Heatmap of Assessment Gaps by Category")
-category_scores = roadmap_df.groupby("category")["Score"].mean().sort_values()
-st.bar_chart(category_scores)
+valid_scores = roadmap_df.dropna(subset=["Score"])
 
-# Placeholder for seat/Teams logic (can be extended)
-seat_range_need = ""
-teams_support_need = ""
+if not valid_scores.empty:
+    category_scores = valid_scores.groupby("category")["Score"].mean().sort_values()
+    st.bar_chart(category_scores)
+else:
+    st.info("No valid category scores available for heatmap display.")
 
 # --- Load suppliers from Supabase
 supabase = get_supabase()
 response = supabase.table("suppliers").select("*").execute()
 suppliers = response.data
+
+# Placeholder for future filters
+seat_range_need = ""
+teams_support_need = ""
 
 def score_supplier(s):
     score = 0
