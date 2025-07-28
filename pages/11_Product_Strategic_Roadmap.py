@@ -1,5 +1,5 @@
 import streamlit as st
-st.set_page_config(page_title="Nexus One", layout="wide")
+st.set_page_config(page_title="Product", layout="wide")
 
 import pandas as pd
 from utils.bootstrap import page_bootstrap
@@ -10,10 +10,10 @@ from utils.supabase_client import get_supabase
 
 # --- Init
 initialize_session()
-page_bootstrap(current_page="Nexus One")
+page_bootstrap(current_page="Product")
 enforce_login()
 
-st.title("🤖 Nexus One Supplier Intelligence")
+st.title("🤖 Product Supplier Intelligence")
 
 st.markdown("""
 ### Strategic Supplier Matching  
