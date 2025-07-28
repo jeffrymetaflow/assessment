@@ -10,7 +10,7 @@ from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from langchain_core.callbacks.manager import CallbackManagerForToolRun
-from utils.ai_assist import generate_maturity_recommendation_with_products
+
 from utils.session_state import initialize_session
 initialize_session()
 from utils.auth import enforce_login
