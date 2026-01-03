@@ -67,14 +67,6 @@ module_summary_tool = Tool(
     description="Provides insight into the internal application module architecture and logic."
 )
 
-agent = initialize_agent(
-    tools=[search_tool, module_summary_tool],
-    llm=llm,
-    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-    verbose=False,
-    handle_parsing_errors=True
-)
-
 def answer_with_code_context(query: str):
     if not openai_key:
         return "❌ OpenAI API key not configured."
