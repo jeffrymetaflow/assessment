@@ -49,15 +49,6 @@ tools = [search_tool, module_summary_tool]
 underlying_agent = create_openai_functions_agent(llm, tools)
 agent = AgentExecutor(agent=underlying_agent, tools=tools, verbose=False)
 
-# --- Load API Keys ---
-openai_key = st.secrets["openai_api_key"]
-tavily_key = st.secrets["tavily_api_key"]
-os.environ["TAVILY_API_KEY"] = tavily_key or ""
-
-# --- LangChain Agent ---
-llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=openai_key)
-search_tool = TavilySearchResults()
-
 def fetch_module_summary(prompt: str, run_manager: CallbackManagerForToolRun = None):
     components = st.session_state.get("components", [])
     if not components:
