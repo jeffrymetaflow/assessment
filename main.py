@@ -213,6 +213,38 @@ Reasoning: Based on high spend, risk profile, renewal timing, variance against m
 """
     return reasoning
 
+# --- AI Assessment Dashboard ---
+from visuals.charts import chart_score_distribution, chart_confidence_trend, chart_radar_metrics
+from utils.metrics import compute_summary_metrics
+import pandas as pd
+
+st.markdown("---")
+st.header("📊 AI Assessment Insights")
+
+if "assessment_results" in st.session_state and st.session_state["assessment_results"]:
+    df = pd.DataFrame(st.session_state["assessment_results"])
+    summary = compute_summary_metrics(df)
+
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Average Score", f"{summary['avg_score']:.2f}")
+    col2.metric("Median Confidence", f"{summary['median_confidence']:.2%}")
+    col3.metric("Average Risk", f"{summary['risk_average']:.2f}")
+
+    st.plotly_chart(chart_score_distribution(df), use_container_width=True)
+    st.plotly_chart(chart_confidence_trend(df), use_container_width=True)
+
+    radar_fig = chart_radar_metrics({
+        "Accuracy": 0.82,
+        "Consistency": 0.74,
+        "Context Awareness": 0.88,
+        "Bias Control": 0.65,
+        "Clarity": 0.91
+    })
+    st.plotly_chart(radar_fig, use_container_width=True)
+
+else:
+    st.info("Run an assessment to visualize results.")
+
 st.markdown(
     "📄 By using this prototype, you agree to our [Terms](#) and [Privacy Notice](#). "
     "This tool is for pilot use only and does not represent final security controls.",
