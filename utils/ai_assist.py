@@ -1,31 +1,30 @@
-import openai
 import os
 import json
+import openai
 import pandas as pd
 import streamlit as st
 from datetime import datetime
 
-# --- LangChain (≥0.2) imports ---
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from langchain_core.callbacks.manager import CallbackManagerForToolRun
 from langchain_community.tools import Tool
-from langchain.agents import create_tool_calling_agent, AgentExecutor
-from langchain_openai import ChatOpenAI
+from langchain.agents.tool_calling_agent import create_tool_calling_agent
+from langchain.agents import AgentExecutor
+
 from utils.intent_classifier import classify_intent
-from postgrest.exceptions import APIError
 from utils.supabase_client import supabase
+from postgrest.exceptions import APIError
 from tavily import TavilyClient
 
-# --- Load API Keys ---
+# Load keys
 openai_key = st.secrets["openai_api_key"]
 tavily_key = st.secrets["tavily_api_key"]
 os.environ["TAVILY_API_KEY"] = tavily_key or ""
 
-# --- LangChain Agent Setup ---
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, openai_api_key=openai_key)
-search_tool = TavilySearchResults()
-
+# ────────────────────────────────────────────────────────────────
+# TOOL: Module summary tool using session state
+# ────────────────────────────────────────────────────────────────
 def fetch_module_summary(prompt: str, run_manager: CallbackManagerForToolRun = None):
     components = st.session_state.get("components", [])
     if not components:
@@ -44,47 +43,19 @@ module_summary_tool = Tool(
     description="Provides insight into the internal application module architecture and logic."
 )
 
-# ✅ Build modern LangChain agent (0.2+ pattern)
-tools = [search_tool, module_summary_tool]
-underlying_agent = create_openai_functions_agent(llm, tools)
-agent = AgentExecutor(agent=underlying_agent, tools=tools, verbose=False)
+# ────────────────────────────────────────────────────────────────
+# Build and cache the agent using modern LangChain patterns
+# ────────────────────────────────────────────────────────────────
+@st.cache_resource
+def get_agent_executor():
+    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, openai_api_key=openai_key)
+    tools = [TavilySearchResults(), module_summary_tool]
+    agent = create_tool_calling_agent(llm=llm, tools=tools)
+    return AgentExecutor(agent=agent, tools=tools, verbose=False)
 
-def fetch_module_summary(prompt: str, run_manager: CallbackManagerForToolRun = None):
-    components = st.session_state.get("components", [])
-    if not components:
-        return "No component data found to analyze."
-    df = pd.DataFrame(components)
-    summary = [f"You have {len(df)} components across {df['Category'].nunique()} categories."]
-    top = df.groupby("Category")["Spend"].sum().sort_values(ascending=False).head(5)
-    summary.append("Top categories by spend:")
-    for cat, val in top.items():
-        summary.append(f"- {cat}: ${val:,.0f}")
-    return "\n".join(summary)
-
-module_summary_tool = Tool(
-    name="AppModuleSummary",
-    func=fetch_module_summary,
-    description="Provides insight into the internal application module architecture and logic."
-)
-
-def answer_with_code_context(query: str):
-    if not openai_key:
-        return "❌ OpenAI API key not configured."
-    try:
-        from utils.vector_index import load_vector_index
-        vectorstore = load_vector_index()
-        retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
-        from langchain.chains import RetrievalQA
-        qa = RetrievalQA.from_chain_type(
-            llm=ChatOpenAI(temperature=0, openai_api_key=openai_key),
-            chain_type="stuff",
-            retriever=retriever
-        )
-        return qa.run(query)
-    except Exception as e:
-        return f"❌ AI error: {e}"
-
-# --- AI Logic Functions ---
+# ────────────────────────────────────────────────────────────────
+# AI Logic Functions (non-agent deterministic)
+# ────────────────────────────────────────────────────────────────
 def adjust_category_forecast(prompt, session_state):
     for cat in session_state:
         if cat.lower() in prompt.lower():
@@ -116,22 +87,22 @@ def architecture_gap_analysis(prompt):
 def tool_roi_justification(prompt):
     return "Switching to Rubrik from Commvault could reduce backup windows by 40% and lower TCO by 15% over 3 years."
 
+# ────────────────────────────────────────────────────────────────
+# LangChain Agent Call for Open-ended Prompts
+# ────────────────────────────────────────────────────────────────
 def query_langchain_product_agent(prompt: str):
-    """Query the LangChain agent for product or technology insights."""
     try:
-        # The modern call interface expects a dict input with the key "input"
-        response = agent.invoke({"input": prompt})
-
-        # Sometimes AgentExecutor returns a dict with 'output'
+        agent_executor = get_agent_executor()
+        response = agent_executor.invoke({"input": prompt})
         if isinstance(response, dict) and "output" in response:
             return response["output"]
-
-        # Fallback if response is already a string or message object
         return str(response)
-
     except Exception as e:
         return f"❌ Error fetching product info: {e}"
 
+# ────────────────────────────────────────────────────────────────
+# Fallback Classifier
+# ────────────────────────────────────────────────────────────────
 def fallback_classifier(prompt):
     prompt_lower = prompt.lower()
     if any(k in prompt_lower for k in ["compare", "alternative", "better than", "replace", "options", "suggest"]):
@@ -150,6 +121,9 @@ def fallback_classifier(prompt):
         return "optimize_margin"
     return "unknown"
 
+# ────────────────────────────────────────────────────────────────
+# Main Handler
+# ────────────────────────────────────────────────────────────────
 def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimize Costs"):
     intent = classify_intent(user_prompt)
     if intent == "unknown":
@@ -174,132 +148,3 @@ def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimiz
         return architecture_gap_analysis(full_prompt)
     else:
         return "I'm not sure how to help with that yet. Try asking about your budget, risk, or tools."
-
-def generate_it_maturity_recommendation_with_products(category: str) -> dict:
-    return generate_ai_maturity_recommendation_with_products(category)
-
-def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
-    try:
-        response = supabase.table("ai_product_recommendations").select("*").eq("category", category).execute()
-        if response.data:
-            st.info(f"✅ Using cached recommendation for '{category}' from Supabase.")
-            return {
-                "recommendation": response.data[0]["recommendation"],
-                "products": response.data[0]["products"]
-            }
-
-        dynamic_products = get_dynamic_product_recommendations(category)
-        if not dynamic_products:
-            return {
-                "recommendation": f"No dynamic products found for {category}.",
-                "products": []
-            }
-
-        recommendation = (
-            f"These tools are well-suited for improving **{category}** maturity. "
-            "Focus on high-suitability tools first."
-        )
-
-        supabase.table("ai_product_recommendations").insert({
-            "category": category,
-            "recommendation": recommendation,
-            "products": dynamic_products,
-            "created_at": datetime.utcnow().isoformat()
-        }).execute()
-
-        st.info(f"💡 New recommendation generated and cached for '{category}'.")
-        return {"recommendation": recommendation, "products": dynamic_products}
-
-    except APIError as e:
-        st.warning(f"⚠️ Supabase error: {e}")
-    except Exception as e:
-        st.error(f"❌ Error generating recommendations: {e}")
-    return {"recommendation": f"Failed to generate recommendations for {category}.", "products": []}
-
-def get_dynamic_product_recommendations(category: str) -> list:
-    try:
-        tavily = TavilyClient(api_key=tavily_key)
-        query = f"Top enterprise tools or platforms for improving {category} AI maturity"
-        results = tavily.search(query, max_results=5)
-
-        combined = " ".join([
-            f"{r.get('title', '')} — {r.get('snippet', '')}" for r in results if isinstance(r, dict) and r.get("snippet")
-        ])
-
-        prompt = (
-            f"Based on this content:\n{combined}\n\n"
-            f"List 3-5 tools for '{category}' in AI maturity. Format as JSON:\n"
-            "[{\"name\": \"\", \"features\": [\"\"], \"price_estimate\": \"\", \"suitability\": \"\"}]"
-        )
-
-        client = openai.OpenAI(api_key=openai_key)
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3
-        )
-
-        content = response.choices[0].message.content
-        st.write(f"📦 Raw GPT Response for '{category}':\n", content)
-
-        parsed = json.loads(content)
-        return parsed if isinstance(parsed, list) else []
-
-    except Exception as e:
-        st.error(f"❌ Error in dynamic product fetch for '{category}': {e}")
-        return []
-
-def generate_cybersecurity_recommendation_with_products(category: str) -> dict:
-    try:
-        response = supabase.table("cyber_product_recommendations").select("*").eq("category", category).execute()
-        if response.data:
-            st.info(f"✅ Using cached cybersecurity recommendation for '{category}' from Supabase.")
-            return {
-                "recommendation": response.data[0]["recommendation"],
-                "products": response.data[0]["products"]
-            }
-
-        query = f"Best enterprise cybersecurity tools for {category}"
-        tavily = TavilyClient(api_key=tavily_key)
-        results = tavily.search(query, max_results=5)
-
-        combined = " ".join([
-            f"{r.get('title', '')} — {r.get('snippet', '')}" for r in results if isinstance(r, dict) and r.get("snippet")
-        ])
-
-        prompt = (
-            f"Based on this content:\n{combined}\n\n"
-            f"List 3-5 cybersecurity tools for '{category}'. Format as JSON:\n"
-            "[{\"name\": \"\", \"features\": [\"\"], \"price_estimate\": \"\", \"suitability\": \"\"}]"
-        )
-
-        client = openai.OpenAI(api_key=openai_key)
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3
-        )
-
-        content = response.choices[0].message.content
-        st.write(f"📦 Raw Cybersecurity GPT Response for '{category}':\n", content)
-
-        parsed = json.loads(content)
-        if not parsed:
-            return {"recommendation": f"No cybersecurity tools found for {category}.", "products": []}
-
-        recommendation = (
-            f"These cybersecurity tools align well with improving **{category}** maturity and risk posture."
-        )
-
-        supabase.table("cyber_product_recommendations").insert({
-            "category": category,
-            "recommendation": recommendation,
-            "products": parsed,
-            "created_at": datetime.utcnow().isoformat()
-        }).execute()
-
-        return {"recommendation": recommendation, "products": parsed}
-
-    except Exception as e:
-        st.error(f"❌ Cyber recommendation error for '{category}': {e}")
-        return {"recommendation": f"Error retrieving cybersecurity products for {category}.", "products": []}
