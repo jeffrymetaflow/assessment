@@ -24,3 +24,5 @@ sentence-transformers
 faiss-cpu
 sec-edgar-downloader
 supabase
+chromadb
+tiktoken
