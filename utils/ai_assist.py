@@ -9,7 +9,7 @@ from datetime import datetime
 try:
     from langchain.agents import initialize_agent, AgentType
 except ImportError:
-    # LangChain ≥ 0.2 renamed modules
+    # LangChain ≥ 0.2 moved these under different names
     from langchain.agents import create_react_agent as initialize_agent
     from langchain.agents.react.base import ReActAgent as AgentType
 
