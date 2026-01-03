@@ -4,11 +4,20 @@ import json
 import pandas as pd
 import streamlit as st
 from datetime import datetime
-from langchain.agents import initialize_agent, AgentType
+
+# --- LangChain compatibility shim ---
+try:
+    from langchain.agents import initialize_agent, AgentType
+except ImportError:
+    # LangChain ≥ 0.2 renamed modules
+    from langchain.agents import create_react_agent as initialize_agent
+    from langchain.agents.react.base import ReActAgent as AgentType
+
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from langchain_core.callbacks.manager import CallbackManagerForToolRun
 from langchain.tools import Tool
+
 from utils.intent_classifier import classify_intent
 from postgrest.exceptions import APIError
 from utils.supabase_client import supabase
