@@ -5,23 +5,49 @@ import pandas as pd
 import streamlit as st
 from datetime import datetime
 
-# --- LangChain compatibility shim ---
-try:
-    from langchain.agents import initialize_agent, AgentType
-except ImportError:
-    # LangChain ≥ 0.2 moved these under different names
-    from langchain.agents import create_react_agent as initialize_agent
-    from langchain.agents.react.base import ReActAgent as AgentType
-
+# --- LangChain (≥0.2) imports ---
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from langchain_core.callbacks.manager import CallbackManagerForToolRun
 from langchain.tools import Tool
+from langchain.agents import create_openai_functions_agent, AgentExecutor
 
 from utils.intent_classifier import classify_intent
 from postgrest.exceptions import APIError
 from utils.supabase_client import supabase
 from tavily import TavilyClient
+
+# --- Load API Keys ---
+openai_key = st.secrets["openai_api_key"]
+tavily_key = st.secrets["tavily_api_key"]
+os.environ["TAVILY_API_KEY"] = tavily_key or ""
+
+# --- LangChain Agent Setup ---
+llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, openai_api_key=openai_key)
+search_tool = TavilySearchResults()
+
+def fetch_module_summary(prompt: str, run_manager: CallbackManagerForToolRun = None):
+    components = st.session_state.get("components", [])
+    if not components:
+        return "No component data found to analyze."
+    df = pd.DataFrame(components)
+    summary = [f"You have {len(df)} components across {df['Category'].nunique()} categories."]
+    top = df.groupby("Category")["Spend"].sum().sort_values(ascending=False).head(5)
+    summary.append("Top categories by spend:")
+    for cat, val in top.items():
+        summary.append(f"- {cat}: ${val:,.0f}")
+    return "\n".join(summary)
+
+module_summary_tool = Tool(
+    name="AppModuleSummary",
+    func=fetch_module_summary,
+    description="Provides insight into the internal application module architecture and logic."
+)
+
+# ✅ Build modern LangChain agent (0.2+ pattern)
+tools = [search_tool, module_summary_tool]
+underlying_agent = create_openai_functions_agent(llm, tools)
+agent = AgentExecutor(agent=underlying_agent, tools=tools, verbose=False)
 
 # --- Load API Keys ---
 openai_key = st.secrets["openai_api_key"]
