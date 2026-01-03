@@ -220,3 +220,27 @@ def generate_it_maturity_recommendation_with_products(category: str) -> dict:
         st.error(f"❌ Error generating IT maturity recommendation: {e}")
         return {"recommendation": "Unable to generate recommendation.", "products": []}
 
+def generate_cybersecurity_recommendation_with_products(category):
+    # Define sample recommendations and products for each category
+    recommendations = {
+        "CIS Controls": "Prioritize implementation of foundational CIS controls such as inventory management and secure configuration baselines.",
+        "Detect": "Implement a SIEM or EDR solution to centralize monitoring and improve threat detection.",
+        "Identity": "Adopt identity governance tools and enforce least privilege through RBAC and MFA.",
+        "Protect": "Deploy comprehensive endpoint protection and encryption tools.",
+        "Recover": "Enhance backup testing frequency and establish automated recovery validation processes.",
+        "Respond": "Document incident response workflows and use orchestration platforms to automate playbooks."
+    }
+
+    products = {
+        "CIS Controls": ["Tenable Nessus", "Qualys VMDR", "Rapid7 InsightVM"],
+        "Detect": ["Splunk", "CrowdStrike Falcon", "Microsoft Defender XDR"],
+        "Identity": ["Okta", "Microsoft Entra ID", "Ping Identity"],
+        "Protect": ["Symantec Endpoint Protection", "Trend Micro Apex One", "Bitdefender GravityZone"],
+        "Recover": ["Veeam Backup & Replication", "Rubrik", "Zerto"],
+        "Respond": ["Cortex XSOAR", "IBM Resilient", "Tines"]
+    }
+
+    return {
+        "recommendation": recommendations.get(category, "No recommendation available."),
+        "products": [{"Product": p} for p in products.get(category, [])]
+    }
