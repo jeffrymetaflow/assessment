@@ -41,9 +41,7 @@ def render_charts(section_scores):
 if section == "🧠 Overview Summary":
     st.title("🧠 Cybersecurity Assessment Summary")
 
-    summary = f"""
-    **Client Name:** {client_name or '<Client>'}   
-   
+  
     ## Strategy Overview
     - Optimize Cybersecurity environments
     - Improve cybersecurity maturity
