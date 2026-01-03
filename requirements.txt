@@ -15,9 +15,9 @@ fpdf2==2.7.8
 
 # AI & NLP
 openai>=1.0.0
-langchain==0.0.340
-langchain_openai==0.0.5
-langchain_community
+langchain==0.1.13
+langchain-openai==0.0.8
+langchain-community==0.0.29
 transformers
 sentence-transformers
 tiktoken
