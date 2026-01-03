@@ -108,3 +108,57 @@ def handle_ai_consultation(user_prompt, session_state, role="CIO", goal="Optimiz
 
     full_prompt = f"You are advising a {role} focused on {goal}. {user_prompt}"
     return query_llm_with_tools(full_prompt)
+
+def generate_ai_maturity_recommendation_with_products(category: str) -> dict:
+    try:
+        response = supabase.table("ai_product_recommendations").select("*").eq("category", category).execute()
+        if response.data:
+            st.info(f"✅ Using cached recommendation for '{category}' from Supabase.")
+            return {
+                "recommendation": response.data[0]["recommendation"],
+                "products": response.data[0]["products"]
+            }
+
+        tavily = TavilyClient(api_key=tavily_key)
+        query = f"Top enterprise tools or platforms for improving {category} AI maturity"
+        results = tavily.search(query, max_results=5)
+
+        combined = " ".join([
+            f"{r.get('title', '')} — {r.get('snippet', '')}" for r in results if isinstance(r, dict) and r.get("snippet")
+        ])
+
+        prompt = (
+            f"Based on this content:\n{combined}\n\n"
+            f"List 3–5 tools for '{category}' in AI maturity. Format as JSON:\n"
+            "[{\"name\": \"\", \"features\": [\"\"], \"price_estimate\": \"\", \"suitability\": \"\"}]"
+        )
+
+        client = openai.OpenAI(api_key=openai_key)
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3
+        )
+
+        content = response.choices[0].message.content
+        st.write(f"📦 Raw GPT Response for '{category}':\n", content)
+
+        parsed = json.loads(content)
+        recommendation = (
+            f"These tools are well-suited for improving **{category}** maturity. "
+            "Focus on high-suitability tools first."
+        )
+
+        # Save to Supabase
+        supabase.table("ai_product_recommendations").insert({
+            "category": category,
+            "recommendation": recommendation,
+            "products": parsed,
+            "created_at": datetime.utcnow().isoformat()
+        }).execute()
+
+        return {"recommendation": recommendation, "products": parsed}
+
+    except Exception as e:
+        st.error(f"❌ Error generating AI maturity recommendation: {e}")
+        return {"recommendation": "Unable to generate recommendation.", "products": []}
