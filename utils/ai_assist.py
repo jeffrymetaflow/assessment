@@ -133,11 +133,21 @@ def architecture_gap_analysis(prompt):
 def tool_roi_justification(prompt):
     return "Switching to Rubrik from Commvault could reduce backup windows by 40% and lower TCO by 15% over 3 years."
 
-def query_langchain_product_agent(prompt):
+def query_langchain_product_agent(prompt: str):
+    """Query the LangChain agent for product or technology insights."""
     try:
-        return agent.run(prompt)
+        # The modern call interface expects a dict input with the key "input"
+        response = agent.invoke({"input": prompt})
+
+        # Sometimes AgentExecutor returns a dict with 'output'
+        if isinstance(response, dict) and "output" in response:
+            return response["output"]
+
+        # Fallback if response is already a string or message object
+        return str(response)
+
     except Exception as e:
-        return f"Error fetching product info: {str(e)}"
+        return f"❌ Error fetching product info: {e}"
 
 def fallback_classifier(prompt):
     prompt_lower = prompt.lower()
