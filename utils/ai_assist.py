@@ -9,7 +9,7 @@ from datetime import datetime
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from langchain_core.callbacks.manager import CallbackManagerForToolRun
-from langchain.tools import Tool
+from langchain_community.tools import Tool
 from langchain.agents import create_openai_functions_agent, AgentExecutor
 
 from utils.intent_classifier import classify_intent
