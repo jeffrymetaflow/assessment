@@ -19,11 +19,6 @@ enforce_login()
 st.set_page_config(page_title="Cybersecurity Assessment", layout="wide")
 page_bootstrap(current_page="Cybersecurity_Assessment")
 
-client_name = st.session_state.get("project_data", {}).get("client_name")
-if not client_name:
-    st.warning("⚠️ Please load or create a project first.")
-    st.stop()
-
 # ---------------------------
 # Navigation
 # ---------------------------
