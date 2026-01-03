@@ -1,34 +1,42 @@
 import streamlit as st
-import matplotlib.pyplot as plt
 import pandas as pd
-from itertools import groupby
+import matplotlib.pyplot as plt
 import hashlib
-from utils.ai_assist import generate_cybersecurity_recommendation_with_products
+from itertools import groupby
+
 from utils.bootstrap import page_bootstrap
 from utils.session_state import initialize_session
-initialize_session()
 from utils.auth import enforce_login
-enforce_login()
 from controller.supabase_controller import save_session_to_supabase
+from utils.ai_assist import generate_cybersecurity_recommendation_with_products
 
-# ---------- Sidebar Navigation ----------
+# ---------------------------
+# App Init
+# ---------------------------
+initialize_session()
+enforce_login()
+
 st.set_page_config(page_title="Cybersecurity Assessment", layout="wide")
+page_bootstrap(current_page="Cybersecurity_Assessment")
+
+client_name = st.session_state.get("project_data", {}).get("client_name")
+if not client_name:
+    st.warning("⚠️ Please load or create a project first.")
+    st.stop()
+
+# ---------------------------
+# Navigation
+# ---------------------------
 st.sidebar.title("Navigation")
 section = st.sidebar.radio("Go to", [
     "🧠 Overview Summary",
-    "⚙️ Inputs",
-    "✅ AI Recommendations",
-    ])
+    "⚙️ Assessment",
+    "✅ AI Recommendations"
+])
 
-client_name = st.session_state.get("project_data", {}).get("client_name", "")
-
-if not client_name:
-    st.warning("⚠️ No Client Name found. Please load or create a project first.")
-    st.stop()
-
-
-
-page_bootstrap(current_page="Cybersecurity_Assessment")  
+# ---------------------------
+# Questionnaire Definition
+# ---------------------------
 
 def render_charts(section_scores):    
     # --- Maturity Scoring + Visualization ---
