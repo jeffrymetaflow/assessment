@@ -10,7 +10,8 @@ from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from langchain_core.callbacks.manager import CallbackManagerForToolRun
 from langchain_community.tools import Tool
-from langchain.agents import create_openai_functions_agent, AgentExecutor
+from langchain_community.agent_toolkits import create_openai_functions_agent
+from langchain.agents import AgentExecutor
 
 from utils.intent_classifier import classify_intent
 from postgrest.exceptions import APIError
