@@ -1,28 +1,35 @@
+# Core Streamlit App
 streamlit
+streamlit-chat
+
+# Data & Visualization
 pandas
 matplotlib
-fpdf
-fpdf==1.7.2
-fpdf2==2.7.8
-streamlit-chat
-openai>=1.0.0
 plotly
+seaborn
 networkx
-openai
-langchain
-tavily-python
-langchain_openai
-tavily-python
+kaleido
+
+# Document Generation
+fpdf2==2.7.8
+
+# AI & NLP
+openai>=1.0.0
+langchain==0.0.340
+langchain_openai==0.0.5
 langchain_community
+transformers
+sentence-transformers
+tiktoken
+
+# OCR & Parsing
 pytesseract
 pillow
 beautifulsoup4
-kaleido
-seaborn
-transformers
-sentence-transformers
+
+# Search & Retrieval
 faiss-cpu
-sec-edgar-downloader
-supabase
 chromadb
-tiktoken
+supabase
+sec-edgar-downloader
+tavily-python
